@@ -1,6 +1,6 @@
 {
   "name": "cookie-connoisseur",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Package for testing Cookie Clicker mods",
   "main": "index.js",
   "bin": {
@@ -11,8 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
-      "lib/*.js",
-      "lib/*.d.ts"
+    "lib/*.js",
+    "lib/*.d.ts"
   ],
   "author": "Static Variable James",
   "license": "GPL-3.0-or-later",
