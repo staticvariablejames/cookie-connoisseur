@@ -3,10 +3,17 @@
   "version": "0.0.0",
   "description": "Package for testing Cookie Clicker mods",
   "main": "index.js",
+  "bin": {
+    "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js"
+  },
   "scripts": {
     "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+      "lib/*.js",
+      "lib/*.d.ts"
+  ],
   "author": "Static Variable James",
   "license": "GPL-3.0-or-later",
   "dependencies": {
