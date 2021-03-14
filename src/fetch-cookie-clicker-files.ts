@@ -1,11 +1,8 @@
 import { mkdirSync, promises as fsPromises } from 'fs';
 import { firefox } from 'playwright';
+import { urls } from './url-list.js';
 
 let baseURL = 'https://orteil.dashnet.org/cookieclicker/';
-
-let urls = [
-    {url: 'index.html'},
-];
 
 mkdirSync('cache/cookieclicker/', {recursive: true});
 
