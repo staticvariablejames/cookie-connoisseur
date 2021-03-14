@@ -4,7 +4,8 @@
   "description": "Package for testing Cookie Clicker mods",
   "main": "index.js",
   "bin": {
-    "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js"
+    "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js",
+    "launch-cookie-clicker-instance": "bin/launch-cookie-clicker-instance.js"
   },
   "scripts": {
     "build": "npx tsc",
