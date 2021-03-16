@@ -4,7 +4,8 @@ import { urls } from './url-list.js';
 
 let baseURL = 'https://orteil.dashnet.org/cookieclicker/';
 
-mkdirSync('cache/cookieclicker/', {recursive: true});
+mkdirSync('cache/cookieclicker/img/', {recursive: true});
+mkdirSync('cache/cookieclicker/snd/', {recursive: true});
 
 setTimeout(async () => {
     let browser = await firefox.launch();
