@@ -1,11 +1,8 @@
-import { mkdirSync, promises as fsPromises } from 'fs';
+import { promises as fsPromises } from 'fs';
+import { dirname } from 'path';
+import { localPathOfURL } from './cookie-clicker-cache.js';
 import { firefox } from 'playwright';
 import { urls } from './url-list.js';
-
-let baseURL = 'https://orteil.dashnet.org/cookieclicker/';
-
-mkdirSync('cache/cookieclicker/img/', {recursive: true});
-mkdirSync('cache/cookieclicker/snd/', {recursive: true});
 
 setTimeout(async () => {
     let browser = await firefox.launch();
@@ -20,9 +17,10 @@ setTimeout(async () => {
         }
     })
     for(let {url} of urls) {
-        currentURL = baseURL + url;
-        path = 'cache/cookieclicker/' + url;
-        await page.goto(currentURL);
+        currentURL = url;
+        path = localPathOfURL(url);
+        await fsPromises.mkdir(dirname(path), {recursive:true});
+        await page.goto(url);
     }
     await page.close();
     await browser.close();

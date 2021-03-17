@@ -1,6 +1,7 @@
 import { Browser } from 'playwright';
 import { existsSync } from 'fs';
 import { urlSet } from './url-list.js';
+import { localPathOfURL } from './cookie-clicker-cache.js';
 
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
@@ -9,21 +10,21 @@ import { urlSet } from './url-list.js';
 export async function openCookieClickerPage(browser: Browser) {
     let page = await browser.newPage();
 
-    await page.route('https://orteil.dashnet.org/**/*', route => {
-        let path = route.request().url();
-        path = path.replace('https://orteil.dashnet.org/', '');
+    await page.route('**/*', route => {
+        let url = route.request().url();
         /* For some reason, some URLs have a version attached at the end
          * (like 'main.js?v=2.089' instead of just 'main.js'),
          * even though accessing 'https://orteil.dashnet.org/cookieclicker/main.js'
          * yields the same page as 'main.js?v=2.089' and 'main.js?v=2.058'.
          * So we just strip that part out of the equation.
          */
-        path = path.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
+        url = url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
+        let path = localPathOfURL(url);
         console.log(`Request for ${route.request().url()} (path is ${path})...`);
 
-        if(urlSet.has(path.replace('cookieclicker/',''))) {
-            if(existsSync('cache/' + path)) {
-                route.fulfill({path: 'cache/' + path});
+        if(urlSet.has(url)) {
+            if(existsSync(path)) {
+                route.fulfill({path});
             } else {
                 console.log(`File ${path} not cached`);
             }
