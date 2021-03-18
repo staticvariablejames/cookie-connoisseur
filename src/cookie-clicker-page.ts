@@ -43,5 +43,6 @@ export async function openCookieClickerPage(browser: Browser) {
     });
 
     await page.goto('https://orteil.dashnet.org/cookieclicker/index.html');
+    await page.waitForFunction( "Game != undefined && 'ready' in Game && Game.ready" );
     return page;
 }
