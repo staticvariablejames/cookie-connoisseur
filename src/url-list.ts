@@ -1,7 +1,9 @@
 // See cookie-clicker-cache.ts
 export const cacheURLs: {
     // Each URL maps to a list of properties
-    [url: string]: {}
+    [url: string]: {
+        contentType?: string, // MIME type; deduced from extension if absent
+    }
 } = {
     'https://orteil.dashnet.org/cookieclicker/base64.js': {},
     'https://orteil.dashnet.org/cookieclicker/index.html': {},

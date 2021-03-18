@@ -28,7 +28,11 @@ export async function openCookieClickerPage(browser: Browser) {
             route.abort('blockedbyclient');
         } else if(url in cacheURLs) {
             if(existsSync(path)) {
-                route.fulfill({path});
+                let options: any = {path};
+                if('contentType' in cacheURLs[url]) {
+                    options.contentType = cacheURLs[url].contentType;
+                }
+                route.fulfill(options);
             } else {
                 console.log(`File ${path} not cached`);
             }
