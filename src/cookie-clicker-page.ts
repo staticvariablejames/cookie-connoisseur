@@ -20,11 +20,9 @@ export async function openCookieClickerPage(browser: Browser) {
          */
         url = url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
         let path = localPathOfURL(url);
-        console.log(`Request for ${route.request().url()} (path is ${path})...`);
 
         // Ignore ads/
         if(isForbiddenURL(url)) {
-            console.log(`Blocking url ${url}`);
             route.abort('blockedbyclient');
         } else if(url in cacheURLs) {
             if(existsSync(path)) {
@@ -35,9 +33,9 @@ export async function openCookieClickerPage(browser: Browser) {
                 route.fulfill(options);
             } else {
                 console.log(`File ${path} not cached`);
+                route.continue();
             }
         } else {
-            console.log(`Unknown file ${path}, won't use cache...`);
             route.continue();
         }
     });
