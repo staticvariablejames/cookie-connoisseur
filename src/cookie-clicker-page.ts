@@ -1,7 +1,7 @@
 import { Browser } from 'playwright';
 import { existsSync } from 'fs';
 import { urlSet } from './url-list.js';
-import { localPathOfURL } from './cookie-clicker-cache.js';
+import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
 
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
@@ -22,7 +22,11 @@ export async function openCookieClickerPage(browser: Browser) {
         let path = localPathOfURL(url);
         console.log(`Request for ${route.request().url()} (path is ${path})...`);
 
-        if(urlSet.has(url)) {
+        // Ignore ads/
+        if(isForbiddenURL(url)) {
+            console.log(`Blocking url ${url}`);
+            route.abort('blockedbyclient');
+        } else if(urlSet.has(url)) {
             if(existsSync(path)) {
                 route.fulfill({path});
             } else {
@@ -30,6 +34,7 @@ export async function openCookieClickerPage(browser: Browser) {
             }
         } else {
             console.log(`Unknown file ${path}, won't use cache...`);
+            route.continue();
         }
     });
 

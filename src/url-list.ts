@@ -262,4 +262,10 @@ export let urls = [
     {url: 'https://orteil.dashnet.org/cookieclicker/snd/upgrade.mp3'},
 ];
 
+export const urlsToDrop = [
+    'https://pagead2.googlesyndication.com',
+    'https://www.facebook.com',
+    'https://connect.facebook.net',
+];
+
 export const urlSet = new Set( urls.map( v => v.url ) );

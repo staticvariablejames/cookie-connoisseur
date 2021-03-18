@@ -6,7 +6,17 @@
  *
  * This file contains utilities for managing this cache.
  */
+import { urlsToDrop } from './url-list.js';
 
 export function localPathOfURL(url: string) {
     return '.cookie-connoisseur/' + url.replace(/https?:\/\//, '');
+}
+
+// Returns true if the given url has any string in urlsToDrop as substring.
+export function isForbiddenURL(url: string) {
+    for(let forbiddenURL of urlsToDrop) {
+        if(url.includes(forbiddenURL))
+            return true;
+    }
+    return false;
 }
