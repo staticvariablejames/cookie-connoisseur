@@ -2,7 +2,7 @@ import { promises as fsPromises } from 'fs';
 import { dirname } from 'path';
 import { localPathOfURL } from './cookie-clicker-cache.js';
 import { firefox } from 'playwright';
-import { urls } from './url-list.js';
+import { cacheURLs } from './url-list.js';
 
 setTimeout(async () => {
     let browser = await firefox.launch();
@@ -16,7 +16,7 @@ setTimeout(async () => {
             await fsPromises.writeFile(path, await response.body());
         }
     })
-    for(let {url} of urls) {
+    for(let url in cacheURLs) {
         currentURL = url;
         path = localPathOfURL(url);
         await fsPromises.mkdir(dirname(path), {recursive:true});

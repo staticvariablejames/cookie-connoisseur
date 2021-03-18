@@ -1,6 +1,6 @@
 import { Browser } from 'playwright';
 import { existsSync } from 'fs';
-import { urlSet } from './url-list.js';
+import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
 
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
@@ -26,7 +26,7 @@ export async function openCookieClickerPage(browser: Browser) {
         if(isForbiddenURL(url)) {
             console.log(`Blocking url ${url}`);
             route.abort('blockedbyclient');
-        } else if(urlSet.has(url)) {
+        } else if(url in cacheURLs) {
             if(existsSync(path)) {
                 route.fulfill({path});
             } else {
