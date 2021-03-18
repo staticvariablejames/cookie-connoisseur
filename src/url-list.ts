@@ -265,6 +265,10 @@ export const cacheURLs: {
     'https://orteil.dashnet.org/cookieclicker/snd/tillb3.mp3': {},
     'https://orteil.dashnet.org/cookieclicker/snd/toneTick.mp3': {},
     'https://orteil.dashnet.org/cookieclicker/snd/upgrade.mp3': {},
+
+    'https://orteil.dashnet.org/cookieconsent.css': {},
+    'https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js': {},
+    'https://fonts.googleapis.com/css?family=Merriweather:900&subset=latin,latin-ext': { contentType: 'text/css' },
 };
 
 export const urlsToDrop = [
