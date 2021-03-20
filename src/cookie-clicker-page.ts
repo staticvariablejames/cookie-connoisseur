@@ -1,13 +1,43 @@
-import { Browser } from 'playwright';
+import { Browser, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
+
+type CCPageOptions = {
+    heralds?: number,
+    grandmaNames?: string[],
+};
+
+function handlePatreonGrabs(route: Route, options: CCPageOptions) {
+    if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
+        return false;
+
+    let heralds = options.heralds ?? 42;
+    let grandmaNamesList = options.grandmaNames ?? [
+        "Custom grandma names",
+        "See cookie-clicker-page.ts for details"
+    ];
+    let grandmaNames = grandmaNamesList.join('|');
+
+    let response = JSON.stringify({
+        herald: heralds,
+        grandma: grandmaNames,
+    });
+
+    route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: response,
+    });
+
+    return true;
+}
 
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
  */
-export async function openCookieClickerPage(browser: Browser) {
+export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
     let page = await browser.newPage();
 
     await page.route('**/*', route => {
@@ -20,6 +50,9 @@ export async function openCookieClickerPage(browser: Browser) {
          */
         url = url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
         let path = localPathOfURL(url);
+
+        if(handlePatreonGrabs(route, options))
+            return;
 
         // Ignore ads/
         if(isForbiddenURL(url)) {
