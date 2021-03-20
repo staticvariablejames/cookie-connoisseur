@@ -8,6 +8,13 @@ type CCPageOptions = {
     grandmaNames?: string[],
 };
 
+/* Helper function.
+ * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
+ * this function fulfills the request with the format that the game expects
+ * to configure the number of heralds and Patreon grandma names.
+ *
+ * CCPageOptions is passed around for convenience.
+ */
 function handlePatreonGrabs(route: Route, options: CCPageOptions) {
     if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
         return false;
@@ -36,6 +43,13 @@ function handlePatreonGrabs(route: Route, options: CCPageOptions) {
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
+ *
+ * Possible attributes of options:
+ *  heralds <number>: Heralds and Patreon-submitted grandma names are obtained by querying
+ *      https://orteil.dashnet.org/patreon/grab.php. Cookie Connoisseur intercepts this query;
+ *      options.heralds is the number used in the response.
+ *  grandmaNames <string[]>: list of names that some grandmas get if "Custom grandmas" is "ON".
+ *      Names must not contain the pipe (|) character.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
     let page = await browser.newPage();
