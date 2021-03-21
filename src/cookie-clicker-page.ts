@@ -7,7 +7,7 @@ import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
  * For convenience,
  * functions in this file pass around the entire `options` object to each other.
  */
-type CCPageOptions = {
+export type CCPageOptions = {
     heralds?: number,
     grandmaNames?: string[],
     updatesResponse?: string,
@@ -68,15 +68,23 @@ function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  * in a new page.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
  *
+ * The second argument is an object with the optional arguments.
+ * Some options can be changed dynamically; to do so,
+ * create a local object of type CCPageOptions and pass it to openCookieClickerPage.
+ * That object will be queried whenever that option is relevant.
+ *
  * Possible attributes of options:
  *  heralds <number>: Heralds and Patreon-submitted grandma names are obtained by querying
  *      https://orteil.dashnet.org/patreon/grab.php. Cookie Connoisseur intercepts this query;
  *      options.heralds is the number used in the response.
+ *      This option can be changed dynamically.
  *  grandmaNames <string[]>: list of names that some grandmas get if "Custom grandmas" is "ON".
  *      Names must not contain the pipe (|) character.
+ *      This option can be changed dynamically.
  *  updatesResponse <string>: Every 30 minutes Cookie Clicker checks for updates;
  *      this is the string fed to Game.CheckUpdatesResponse.
  *      The default value is '2.029|new stock market minigame!'.
+ *      This option can be changed dynamically.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
     let page = await browser.newPage();

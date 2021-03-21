@@ -4,7 +4,7 @@
  */
 
 import { firefox, Browser } from 'playwright';
-import { openCookieClickerPage } from '../lib/cookie-clicker-page.js';
+import { CCPageOptions, openCookieClickerPage } from '../lib/cookie-clicker-page.js';
 
 let browser: Browser;
 
@@ -52,6 +52,21 @@ test('Updates check is properly intercepted', async () => {
     page = await openCookieClickerPage(browser, {updatesResponse: '2.71828|Logarithms!'});
     await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
     await page.waitForFunction('Game.T > Game.fps * 30 * 60');
+    expect(await page.evaluate('document.getElementById("alert").innerText')).toEqual(
+        expect.stringContaining('New version available')
+    );
+    expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("block");
+    await page.close();
+
+    // Chceck changing the options object works
+    let options: CCPageOptions = {};
+    page = await openCookieClickerPage(browser, options);
+    await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
+    await page.waitForFunction('Game.T > Game.fps * 30 * 60');
+    expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("");
+    options.updatesResponse = '2.71828|Logarithms!';
+    await page.evaluate('Game.T = 2 * Game.fps * 30 * 60 - 1');
+    await page.waitForFunction('Game.T > 2 * Game.fps * 30 * 60');
     expect(await page.evaluate('document.getElementById("alert").innerText')).toEqual(
         expect.stringContaining('New version available')
     );
