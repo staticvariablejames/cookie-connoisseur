@@ -83,3 +83,10 @@ test('Save games can be set', async () => {
     page = await openCookieClickerPage(browser, {saveGame: save});
     expect(await page.evaluate('Game.cookies')).toEqual(1);
 });
+
+test('The game always starts on 2020', async() => {
+    let page = await openCookieClickerPage(browser);
+    let now = await page.evaluate('Date.now()');
+    expect(now).toBeGreaterThan(1.6e12);
+    expect(now).toBeLessThan(1.6e12 + 1e4);
+});
