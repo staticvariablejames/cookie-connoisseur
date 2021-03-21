@@ -12,6 +12,7 @@ export type CCPageOptions = {
     grandmaNames?: string[],
     updatesResponse?: string,
     cookieConsent?: boolean,
+    saveGame?: string,
 };
 
 /* Helper function.
@@ -89,18 +90,29 @@ function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  *  cookieConsent <boolean>: Unless set to 'false',
  *      the page includes the browser cookie `cookieconsent_dismissed=yes`,
  *      which dismisses the cookie consent dialog.
+ *  saveGame <string>: String to be used as the stored save game.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
-    let context = await browser.newContext();
+    let storageState: any = {};
 
     if(options.cookieConsent !== false) {
-        context.addCookies([{
+        storageState.cookies = [{
             name: 'cookieconsent_dismissed',
             value: 'yes',
             url: 'https://orteil.dashnet.org/cookieclicker/',
-        }]);
+        }];
     }
-    let page = await context.newPage();
+
+    if(options.saveGame) {
+        storageState.origins = [{
+            origin: 'https://orteil.dashnet.org/cookieclicker/',
+            localStorage: [
+                {name: 'CookieClickerGame', value: options.saveGame}
+            ]
+        }];
+    }
+
+    let page = await browser.newPage({storageState});
 
     await page.route('**/*', route => {
         let url = route.request().url();

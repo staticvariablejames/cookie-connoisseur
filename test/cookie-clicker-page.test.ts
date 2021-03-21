@@ -73,3 +73,13 @@ test('Updates check is properly intercepted', async () => {
     expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("block");
     await page.close();
 });
+
+test('Save games can be set', async () => {
+    let page = await openCookieClickerPage(browser);
+    await page.click('#bigCookie');
+    let save :string = await page.evaluate('Game.WriteSave(1)');
+    await page.close();
+
+    page = await openCookieClickerPage(browser, {saveGame: save});
+    expect(await page.evaluate('Game.cookies')).toEqual(1);
+});
