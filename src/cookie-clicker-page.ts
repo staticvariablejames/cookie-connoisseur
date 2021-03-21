@@ -11,6 +11,7 @@ export type CCPageOptions = {
     heralds?: number,
     grandmaNames?: string[],
     updatesResponse?: string,
+    cookieConsent?: boolean,
 };
 
 /* Helper function.
@@ -85,9 +86,21 @@ function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  *      this is the string fed to Game.CheckUpdatesResponse.
  *      The default value is '2.029|new stock market minigame!'.
  *      This option can be changed dynamically.
+ *  cookieConsent <boolean>: Unless set to 'false',
+ *      the page includes the browser cookie `cookieconsent_dismissed=yes`,
+ *      which dismisses the cookie consent dialog.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
-    let page = await browser.newPage();
+    let context = await browser.newContext();
+
+    if(options.cookieConsent !== false) {
+        context.addCookies([{
+            name: 'cookieconsent_dismissed',
+            value: 'yes',
+            url: 'https://orteil.dashnet.org/cookieclicker/',
+        }]);
+    }
+    let page = await context.newPage();
 
     await page.route('**/*', route => {
         let url = route.request().url();
