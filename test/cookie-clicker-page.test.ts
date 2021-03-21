@@ -34,3 +34,27 @@ test('Heralds and grandma names work', async () => {
     expect(await page.evaluate('Game.customGrandmaNames[1]')).toEqual("Test3");
     await page.close();
 });
+
+test('Updates check is properly intercepted', async () => {
+    let page = await openCookieClickerPage(browser);
+    await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
+    await page.waitForFunction('Game.T > Game.fps * 30 * 60');
+    expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("");
+    await page.close();
+
+    page = await openCookieClickerPage(browser, {updatesResponse: 'alert|Hello!'});
+    await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
+    await page.waitForFunction('Game.T > Game.fps * 30 * 60');
+    expect(await page.evaluate('document.getElementById("alert").innerHTML')).toEqual("Hello!");
+    expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("block");
+    await page.close();
+
+    page = await openCookieClickerPage(browser, {updatesResponse: '2.71828|Logarithms!'});
+    await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
+    await page.waitForFunction('Game.T > Game.fps * 30 * 60');
+    expect(await page.evaluate('document.getElementById("alert").innerText')).toEqual(
+        expect.stringContaining('New version available')
+    );
+    expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("block");
+    await page.close();
+});

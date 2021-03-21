@@ -3,17 +3,22 @@ import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
 
+/* See the documentation of openCookieClickerPage below for a description of these options.
+ * For convenience,
+ * functions in this file pass around the entire `options` object to each other.
+ */
 type CCPageOptions = {
     heralds?: number,
     grandmaNames?: string[],
+    updatesResponse?: string,
 };
 
 /* Helper function.
  * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
  * this function fulfills the request with the format that the game expects
- * to configure the number of heralds and Patreon grandma names.
- *
- * CCPageOptions is passed around for convenience.
+ * to configure the number of heralds and Patreon grandma names,
+ * and returns true.
+ * It returns false otherwise.
  */
 function handlePatreonGrabs(route: Route, options: CCPageOptions) {
     if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
@@ -40,6 +45,25 @@ function handlePatreonGrabs(route: Route, options: CCPageOptions) {
     return true;
 }
 
+/* Helper function.
+ * If the route queries for https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate,
+ * this function fulfills the request with options.updatesResponse and returns true.
+ * It returns false otherwise.
+ */
+function handleUpdatesQuery(route: Route, options: CCPageOptions) {
+    let url = route.request().url();
+    if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
+        return false;
+
+    let serverResponse = options.updatesResponse ?? '2.029|new stock market minigame!';
+    route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: serverResponse,
+    });
+    return true;
+}
+
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
@@ -50,6 +74,9 @@ function handlePatreonGrabs(route: Route, options: CCPageOptions) {
  *      options.heralds is the number used in the response.
  *  grandmaNames <string[]>: list of names that some grandmas get if "Custom grandmas" is "ON".
  *      Names must not contain the pipe (|) character.
+ *  updatesResponse <string>: Every 30 minutes Cookie Clicker checks for updates;
+ *      this is the string fed to Game.CheckUpdatesResponse.
+ *      The default value is '2.029|new stock market minigame!'.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
     let page = await browser.newPage();
@@ -66,6 +93,8 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
         let path = localPathOfURL(url);
 
         if(handlePatreonGrabs(route, options))
+            return;
+        if(handleUpdatesQuery(route, options))
             return;
 
         // Ignore ads/
