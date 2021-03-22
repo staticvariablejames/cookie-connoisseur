@@ -2,7 +2,7 @@ import { Browser, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
-import { initBrowserUtilities } from './browser-utilities.js';
+import { initBrowserUtilities } from './init-browser-utilities.js';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,
