@@ -122,6 +122,7 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
     context.addInitScript(initBrowserUtilities, utilOptions);
 
     let page = await context.newPage();
+    await page.on('close', async () => await context.close() );
 
     await page.route('**/*', route => {
         let url = route.request().url();

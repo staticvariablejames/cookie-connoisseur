@@ -20,6 +20,7 @@ test('Page loads and game works', async () => {
     expect(await page.evaluate('Game.cookies')).toEqual(0);
     await page.click('#bigCookie');
     expect(await page.evaluate('Game.cookies')).toEqual(1);
+    await page.close();
 });
 
 test('Heralds and grandma names work', async () => {
@@ -82,4 +83,5 @@ test('Save games can be set', async () => {
 
     page = await openCookieClickerPage(browser, {saveGame: save});
     expect(await page.evaluate('Game.cookies')).toEqual(1);
+    await page.close();
 });
