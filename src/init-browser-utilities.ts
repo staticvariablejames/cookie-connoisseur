@@ -7,9 +7,29 @@
 export function initBrowserUtilities() {
     let mockedDate = 1600000000000; // 2020-09-13 12:26:40 UTC
     let currentDate = Date.now();
-    let dateNow = Date.now;
+    let realDate = Date;
 
-    Date.now = () => dateNow() - currentDate + window.CConnoisseur.mockedDate;
+    let newDate = Object.assign(
+        function(this: Date, ...args : any[]) {
+            if(args.length == 0) {
+                if(this) {
+                    return new realDate(newDate.now());
+                }
+                else
+                    return (new realDate(newDate.now())).toString();
+            } else {
+                // @ts-ignore
+                return new realDate(...args);
+            }
+        },
+        {
+            now: () => realDate.now() - currentDate + window.CConnoisseur.mockedDate,
+            parse: realDate.parse,
+            UTC: realDate.UTC,
+        }
+    );
+    // @ts-ignore (I couldn't figure out how to convince Typescript that this works)
+    Date = newDate;
 
     window.CConnoisseur = {mockedDate};
 }
