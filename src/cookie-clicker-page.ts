@@ -2,7 +2,7 @@ import { Browser, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
-import { initBrowserUtilities } from './init-browser-utilities.js';
+import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities.js';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,
@@ -14,6 +14,7 @@ export type CCPageOptions = {
     updatesResponse?: string,
     cookieConsent?: boolean,
     saveGame?: string,
+    mockedDate?: number,
 };
 
 /* Helper function.
@@ -92,6 +93,7 @@ function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  *      the page includes the browser cookie `cookieconsent_dismissed=yes`,
  *      which dismisses the cookie consent dialog.
  *  saveGame <string>: String to be used as the stored save game.
+ *  mockedDate <number>: Initial value of CConnoisseur.mockedDate; see browser-utilities.d.ts.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
     let storageState: any = {};
@@ -114,7 +116,10 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
     }
 
     let context = await browser.newContext({storageState});
-    context.addInitScript(initBrowserUtilities);
+
+    let utilOptions: BrowserUtilitiesOptions = {};
+    if(options.mockedDate) utilOptions.mockedDate = options.mockedDate;
+    context.addInitScript(initBrowserUtilities, utilOptions);
 
     let page = await context.newPage();
 
