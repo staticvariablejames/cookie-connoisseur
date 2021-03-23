@@ -2,8 +2,6 @@ declare global {
     interface Window {
         CConnoisseur: {
             mockedDate: number,
-            currentDate: number,
-            dateNow: () => number,
         };
     }
 }
