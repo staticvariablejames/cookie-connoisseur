@@ -24,7 +24,7 @@ export type CCPageOptions = {
  * and returns true.
  * It returns false otherwise.
  */
-function handlePatreonGrabs(route: Route, options: CCPageOptions) {
+async function handlePatreonGrabs(route: Route, options: CCPageOptions) {
     if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
         return false;
 
@@ -40,7 +40,7 @@ function handlePatreonGrabs(route: Route, options: CCPageOptions) {
         grandma: grandmaNames,
     });
 
-    route.fulfill({
+    await route.fulfill({
         status: 200,
         contentType: 'text/html',
         body: response,
@@ -54,13 +54,13 @@ function handlePatreonGrabs(route: Route, options: CCPageOptions) {
  * this function fulfills the request with options.updatesResponse and returns true.
  * It returns false otherwise.
  */
-function handleUpdatesQuery(route: Route, options: CCPageOptions) {
+async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
     let url = route.request().url();
     if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
         return false;
 
     let serverResponse = options.updatesResponse ?? '2.029|new stock market minigame!';
-    route.fulfill({
+    await route.fulfill({
         status: 200,
         contentType: 'text/html',
         body: serverResponse,
@@ -119,12 +119,12 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
 
     let utilOptions: BrowserUtilitiesOptions = {};
     if(options.mockedDate) utilOptions.mockedDate = options.mockedDate;
-    context.addInitScript(initBrowserUtilities, utilOptions);
+    await context.addInitScript(initBrowserUtilities, utilOptions);
 
     let page = await context.newPage();
     await page.on('close', async () => await context.close() );
 
-    await page.route('**/*', route => {
+    await page.route('**/*', async route => {
         let url = route.request().url();
         /* For some reason, some URLs have a version attached at the end
          * (like 'main.js?v=2.089' instead of just 'main.js'),
@@ -135,27 +135,27 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
         url = url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
         let path = localPathOfURL(url);
 
-        if(handlePatreonGrabs(route, options))
+        if(await handlePatreonGrabs(route, options))
             return;
-        if(handleUpdatesQuery(route, options))
+        if(await handleUpdatesQuery(route, options))
             return;
 
         // Ignore ads/
         if(isForbiddenURL(url)) {
-            route.abort('blockedbyclient');
+            await route.abort('blockedbyclient');
         } else if(url in cacheURLs) {
             if(existsSync(path)) {
                 let options: any = {path};
                 if('contentType' in cacheURLs[url]) {
                     options.contentType = cacheURLs[url].contentType;
                 }
-                route.fulfill(options);
+                await route.fulfill(options);
             } else {
                 console.log(`File ${path} not cached`);
-                route.continue();
+                await route.continue();
             }
         } else {
-            route.continue();
+            await route.continue();
         }
     });
 
