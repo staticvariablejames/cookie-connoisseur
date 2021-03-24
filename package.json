@@ -19,7 +19,7 @@
   "author": "Static Variable James",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "playwright": "^1.8.0"
+    "playwright": "^1.9.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.21",
