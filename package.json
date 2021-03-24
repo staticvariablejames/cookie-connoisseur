@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "npx tsc",
-    "test": "jest"
+    "test": "jest test/all.test.ts"
   },
   "files": [
     "lib/*.js",

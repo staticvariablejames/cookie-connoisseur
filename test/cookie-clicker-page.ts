@@ -3,20 +3,15 @@
  * Note: bin/fetch-cookie-clicker-files.js must be run before running this test.
  */
 
-import { firefox, Browser } from 'playwright';
 import { CCPageOptions, openCookieClickerPage } from '../lib/cookie-clicker-page.js';
+import { Browser } from 'playwright';
 
-let browser: Browser;
+export const cookieClickerPageTest = (getBrowser: () => Browser) => {
 
-beforeAll(async () => {
-  browser = await firefox.launch();
-});
-afterAll(async () => {
-  await browser.close();
-});
+let newPage = (options: CCPageOptions = {}) => openCookieClickerPage(getBrowser(), options);
 
 test('Page loads and game works', async () => {
-    let page = await openCookieClickerPage(browser);
+    let page = await newPage();
     expect(await page.evaluate('Game.cookies')).toEqual(0);
     await page.click('#bigCookie');
     expect(await page.evaluate('Game.cookies')).toEqual(1);
@@ -24,12 +19,12 @@ test('Page loads and game works', async () => {
 });
 
 test('Heralds and grandma names work', async () => {
-    let page = await openCookieClickerPage(browser);
+    let page = await newPage();
     expect(await page.evaluate('Game.heralds')).toEqual(42);
     expect(await page.evaluate('Game.customGrandmaNames[0]')).toEqual("Custom grandma names");
     await page.close();
 
-    page = await openCookieClickerPage(browser, {heralds: 72, grandmaNames: ["Test1", "Test3"]});
+    page = await newPage({heralds: 72, grandmaNames: ["Test1", "Test3"]});
     expect(await page.evaluate('Game.heralds')).toEqual(72);
     expect(await page.evaluate('Game.customGrandmaNames[0]')).toEqual("Test1");
     expect(await page.evaluate('Game.customGrandmaNames[1]')).toEqual("Test3");
@@ -37,20 +32,20 @@ test('Heralds and grandma names work', async () => {
 });
 
 test('Updates check is properly intercepted', async () => {
-    let page = await openCookieClickerPage(browser);
+    let page = await newPage();
     await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
     await page.waitForFunction('Game.T > Game.fps * 30 * 60');
     expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("");
     await page.close();
 
-    page = await openCookieClickerPage(browser, {updatesResponse: 'alert|Hello!'});
+    page = await newPage({updatesResponse: 'alert|Hello!'});
     await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
     await page.waitForFunction('Game.T > Game.fps * 30 * 60');
     expect(await page.evaluate('document.getElementById("alert").innerHTML')).toEqual("Hello!");
     expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("block");
     await page.close();
 
-    page = await openCookieClickerPage(browser, {updatesResponse: '2.71828|Logarithms!'});
+    page = await newPage({updatesResponse: '2.71828|Logarithms!'});
     await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
     await page.waitForFunction('Game.T > Game.fps * 30 * 60');
     expect(await page.evaluate('document.getElementById("alert").innerText')).toEqual(
@@ -61,7 +56,7 @@ test('Updates check is properly intercepted', async () => {
 
     // Chceck changing the options object works
     let options: CCPageOptions = {};
-    page = await openCookieClickerPage(browser, options);
+    page = await newPage(options);
     await page.evaluate('Game.T = Game.fps * 30 * 60 - 1');
     await page.waitForFunction('Game.T > Game.fps * 30 * 60');
     expect(await page.evaluate('document.getElementById("alert").style.display')).toEqual("");
@@ -76,12 +71,14 @@ test('Updates check is properly intercepted', async () => {
 });
 
 test('Save games can be set', async () => {
-    let page = await openCookieClickerPage(browser);
+    let page = await openCookieClickerPage(getBrowser());
     await page.click('#bigCookie');
     let save :string = await page.evaluate('Game.WriteSave(1)');
     await page.close();
 
-    page = await openCookieClickerPage(browser, {saveGame: save});
+    page = await newPage({saveGame: save});
     expect(await page.evaluate('Game.cookies')).toEqual(1);
     await page.close();
 });
+
+}
