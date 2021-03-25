@@ -1,4 +1,4 @@
-import { Browser, Route } from 'playwright';
+import { Browser, BrowserContextOptions, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
@@ -96,7 +96,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  *  mockedDate <number>: Initial value of CConnoisseur.mockedDate; see browser-utilities.d.ts.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
-    let storageState: any = {};
+    let storageState: Exclude<BrowserContextOptions['storageState'], string> = {};
 
     if(options.cookieConsent !== false) {
         storageState.cookies = [{
@@ -145,7 +145,8 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
             await route.abort('blockedbyclient');
         } else if(url in cacheURLs) {
             if(existsSync(path)) {
-                let options: any = {path};
+                let options: Parameters<Route["fulfill"]>[0] = {};
+                options = {path};
                 if('contentType' in cacheURLs[url]) {
                     options.contentType = cacheURLs[url].contentType;
                 }
