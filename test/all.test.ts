@@ -1,6 +1,7 @@
 import { Browser, chromium } from 'playwright';
 import { browserUtilitiesTest } from './browser-utilities';
 import { cookieClickerPageTest } from './cookie-clicker-page';
+import { configFileTest } from './config-file';
 
 let browser: Browser;
 
@@ -13,3 +14,4 @@ afterAll(async () => {
 
 describe('Browser Utilities Test', () => browserUtilitiesTest(() => browser));
 describe('Cookie Clicker Page Test', () => cookieClickerPageTest(() => browser));
+describe('Configuration File Test', () => configFileTest(() => browser));

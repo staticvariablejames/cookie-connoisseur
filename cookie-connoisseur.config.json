@@ -1,0 +1,7 @@
+{
+    "comment": "This file exists only for testing.",
+    "customUrls": [
+        {"url": "https://example.com/test.js",
+         "path": "test/test-file.js"}
+    ]
+}
