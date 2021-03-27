@@ -3,6 +3,7 @@ import { dirname } from 'path';
 import { localPathOfURL } from './cookie-clicker-cache.js';
 import { chromium, Page, Response } from 'playwright';
 import { cacheURLs } from './url-list.js';
+import { parseConfigFile } from './parse-config.js';
 
 async function fetchUrl(page: Page, url: string) {
     if(url.endsWith('/favicon.ico')) {
@@ -33,12 +34,18 @@ async function fetchUrl(page: Page, url: string) {
 };
 
 setTimeout(async () => {
+    let config = await parseConfigFile();
     let browser = await chromium.launch();
     let page = await browser.newPage();
 
     for(let url in cacheURLs) {
         await fetchUrl(page, url);
     }
+    for(let url in config.customUrls) {
+        if(!config.customUrls[url].path)
+            await fetchUrl(page, url);
+    }
+
     await page.close();
     await browser.close();
 });

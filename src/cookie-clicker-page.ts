@@ -3,6 +3,7 @@ import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities.js';
+import { parseConfigFile } from './parse-config.js';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,
@@ -68,6 +69,26 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
     return true;
 }
 
+/* Helper function.
+ * Fulfills the given route using cached files.
+ * `url` is the URL which will be queried for in the file system,
+ * rather than route.request().url().
+ */
+async function handleCacheFile(route: Route, url: string) {
+    let path = localPathOfURL(url);
+    if(existsSync(path)) {
+        let options: Parameters<Route["fulfill"]>[0] = {};
+        options = {path};
+        if('contentType' in cacheURLs[url]) {
+            options.contentType = cacheURLs[url].contentType;
+        }
+        await route.fulfill(options);
+    } else {
+        console.log(`File ${path} not cached`);
+        await route.continue();
+    }
+}
+
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
@@ -96,6 +117,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  *  mockedDate <number>: Initial value of CConnoisseur.mockedDate; see browser-utilities.d.ts.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
+    let config = await parseConfigFile();
     let storageState: Exclude<BrowserContextOptions['storageState'], string> = {};
 
     if(options.cookieConsent !== false) {
@@ -133,27 +155,22 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
          * So we just strip that part out of the equation.
          */
         url = url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
-        let path = localPathOfURL(url);
 
         if(await handlePatreonGrabs(route, options))
             return;
         if(await handleUpdatesQuery(route, options))
             return;
 
-        // Ignore ads/
+        // Ignore ads
         if(isForbiddenURL(url)) {
             await route.abort('blockedbyclient');
         } else if(url in cacheURLs) {
-            if(existsSync(path)) {
-                let options: Parameters<Route["fulfill"]>[0] = {};
-                options = {path};
-                if('contentType' in cacheURLs[url]) {
-                    options.contentType = cacheURLs[url].contentType;
-                }
-                await route.fulfill(options);
+            await handleCacheFile(route, url);
+        } else if(url in config.customUrls) {
+            if(config.customUrls[url].path) {
+                await route.fulfill({path: config.customUrls[url].path});
             } else {
-                console.log(`File ${path} not cached`);
-                await route.continue();
+                await handleCacheFile(route, url);
             }
         } else {
             await route.continue();
