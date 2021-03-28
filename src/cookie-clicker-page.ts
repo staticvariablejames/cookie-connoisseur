@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { cacheURLs } from './url-list.js';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities.js';
-import { parseConfigFile } from './parse-config.js';
+import { parseConfigFile, CookieConnoisseurConfig } from './parse-config.js';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,
@@ -89,6 +89,29 @@ async function handleCacheFile(route: Route, url: string) {
     }
 }
 
+/* Helper function.
+ * Similar to handleCacheFile, but for customUrls instead.
+ */
+async function handleCacheCustomFile(route: Route, url: string, config: CookieConnoisseurConfig) {
+    let options: Parameters<Route["fulfill"]>[0] = {};
+    if(config.customUrls[url].path) {
+        options.path = config.customUrls[url].path;
+    } else {
+        options.path = localPathOfURL(url);
+    }
+
+    if(existsSync(options.path!)) {
+        await route.fulfill(options);
+    } else {
+        if(config.customUrls[url].path) {
+            console.log(`File ${options.path} not found`);
+        } else {
+            console.log(`File ${options.path} not cached`);
+        }
+        await route.continue();
+    }
+}
+
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
  * in a new page.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
@@ -167,11 +190,7 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
         } else if(url in cacheURLs) {
             await handleCacheFile(route, url);
         } else if(url in config.customUrls) {
-            if(config.customUrls[url].path) {
-                await route.fulfill({path: config.customUrls[url].path});
-            } else {
-                await handleCacheFile(route, url);
-            }
+            await handleCacheCustomFile(route, url, config);
         } else {
             await route.continue();
         }
