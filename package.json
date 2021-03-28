@@ -3,7 +3,7 @@
   "version": "0.0.4",
   "description": "Package for testing Cookie Clicker mods",
   "repository": "github:staticvariablejames/cookie-connoisseur",
-  "main": "index.js",
+  "main": "lib/index.js",
   "bin": {
     "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js",
     "launch-cookie-clicker-instance": "bin/launch-cookie-clicker-instance.js"
