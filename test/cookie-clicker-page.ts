@@ -71,9 +71,9 @@ test('Updates check is properly intercepted', async () => {
 });
 
 test('Save games can be set', async () => {
-    let page = await openCookieClickerPage(getBrowser());
+    let page = await newPage();
     await page.click('#bigCookie');
-    let save :string = await page.evaluate('Game.WriteSave(1)');
+    let save:string = await page.evaluate('Game.WriteSave(1)');
     await page.close();
 
     page = await newPage({saveGame: save});
