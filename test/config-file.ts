@@ -19,9 +19,9 @@ test('Configuration file is properly read', async () => {
 
 test('Configuration file affects the page', async () => {
     let page = await newPage();
-    await page.evaluate('Game.LoadMod("https://example.com/test.js");');
-    await page.waitForFunction("'testWorks' in window.CConnoisseur");
-    let test = await page.evaluate('window.CConnoisseur.testWorks');
+    await page.evaluate(() => Game.LoadMod("https://example.com/test.js"));
+    await page.waitForFunction(() => 'testWorks' in window.CConnoisseur);
+    let test = await page.evaluate(() => (window.CConnoisseur as any).testWorks);
     expect(test).toBe(true);
     await page.close();
 });

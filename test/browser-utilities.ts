@@ -38,32 +38,32 @@ test('Overwritten Date class works properly', async() => {
 
 test('Seasons can be chosen via date mocking', async() => {
     let page = await newPage(); // No seasonal event on 2020-09-13 12:26:40
-    let season = await page.evaluate('Game.baseSeason');
+    let season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('');
     await page.close();
 
     page = await newPage({mockedDate: Date.UTC(2020, 9, 30, 12)});
-    season = await page.evaluate('Game.baseSeason');
+    season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('halloween');
     await page.close();
 
     page = await newPage({mockedDate: Date.UTC(2020, 11, 25, 12)});
-    season = await page.evaluate('Game.baseSeason');
+    season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('christmas');
     await page.close();
 
     page = await newPage({mockedDate: Date.UTC(2020, 1, 13, 12)});
-    season = await page.evaluate('Game.baseSeason');
+    season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('valentines');
     await page.close();
 
     page = await newPage({mockedDate: Date.UTC(2020, 3, 1, 12)});
-    season = await page.evaluate('Game.baseSeason');
+    season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('fools');
     await page.close();
 
     page = await newPage({mockedDate: Date.UTC(2020, 3, 11, 12)});
-    season = await page.evaluate('Game.baseSeason');
+    season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('easter');
     await page.close();
 });
