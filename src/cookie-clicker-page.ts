@@ -90,12 +90,12 @@ async function handleCacheFile(route: Route, url: string) {
 }
 
 /* Helper function.
- * Similar to handleCacheFile, but for customUrls instead.
+ * Similar to handleCacheFile, but for customURLs instead.
  */
 async function handleCacheCustomFile(route: Route, url: string, config: CookieConnoisseurConfig) {
     let options: Parameters<Route["fulfill"]>[0] = {};
-    if(config.customUrls[url].path) {
-        options.path = config.customUrls[url].path;
+    if(config.customURLs[url].path) {
+        options.path = config.customURLs[url].path;
     } else {
         options.path = localPathOfURL(url);
     }
@@ -103,7 +103,7 @@ async function handleCacheCustomFile(route: Route, url: string, config: CookieCo
     if(existsSync(options.path!)) {
         await route.fulfill(options);
     } else {
-        if(config.customUrls[url].path) {
+        if(config.customURLs[url].path) {
             console.log(`File ${options.path} not found`);
         } else {
             console.log(`File ${options.path} not cached`);
@@ -189,7 +189,7 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
             await route.abort('blockedbyclient');
         } else if(url in cacheURLs) {
             await handleCacheFile(route, url);
-        } else if(url in config.customUrls) {
+        } else if(url in config.customURLs) {
             await handleCacheCustomFile(route, url, config);
         } else {
             await route.continue();

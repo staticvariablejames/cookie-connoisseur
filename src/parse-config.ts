@@ -4,7 +4,7 @@
 import { promises as fsPromises, existsSync } from 'fs';
 
 export type CookieConnoisseurConfig = {
-    customUrls: {
+    customURLs: {
         [url: string]: {
             path?: string,
         }
@@ -15,18 +15,18 @@ export const configPath = 'cookie-connoisseur.config.json';
 
 export async function parseConfigFile(): Promise<CookieConnoisseurConfig> {
     if(!existsSync(configPath)) {
-        return {customUrls: {}};
+        return {customURLs: {}};
     }
 
-    let config: CookieConnoisseurConfig = {customUrls: {}};
+    let config: CookieConnoisseurConfig = {customURLs: {}};
     let content = JSON.parse(await fsPromises.readFile(configPath, {encoding: 'utf8'}));
-    if(!('customUrls' in content)) return config;
+    if(!('customURLs' in content)) return config;
 
-    for(let obj of content.customUrls) {
+    for(let obj of content.customURLs) {
         if('url' in obj && typeof obj.url == 'string') {
-            config.customUrls[obj.url] = {};
+            config.customURLs[obj.url] = {};
             if('path' in obj && typeof obj.path == 'string')
-                config.customUrls[obj.url].path = obj.path;
+                config.customURLs[obj.url].path = obj.path;
         }
     }
 

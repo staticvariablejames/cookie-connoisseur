@@ -41,8 +41,8 @@ setTimeout(async () => {
     for(let url in cacheURLs) {
         await fetchUrl(page, url);
     }
-    for(let url in config.customUrls) {
-        if(!config.customUrls[url].path)
+    for(let url in config.customURLs) {
+        if(!config.customURLs[url].path)
             await fetchUrl(page, url);
     }
 

@@ -11,7 +11,7 @@ let newPage = (options: CCPageOptions = {}) => openCookieClickerPage(getBrowser(
 
 test('Configuration file is properly read', async () => {
     expect(await parseConfigFile()).toEqual({
-        customUrls: {
+        customURLs: {
             'https://example.com/test.js': {path: "test/test-file.js"},
         }
     });

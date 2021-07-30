@@ -201,7 +201,7 @@ https://github.com/staticvariablejames/ChooseYourOwnLump/blob/master/cookie-conn
 
 ```json
 {
-    "customUrls": [
+    "customURLs": [
         {"url": "https://klattmose.github.io/CookieClicker/CCSE.js"},
         {"url": "https://staticvariablejames.github.io/SpicedCookies/Spice.js"},
         {"url": "https://staticvariablejames.github.io/ChooseYourOwnLump/ChooseYourOwnLump.js",
@@ -214,7 +214,7 @@ https://github.com/staticvariablejames/ChooseYourOwnLump/blob/master/cookie-conn
 
 Currently,
 the file has a single attribute,
-`customUrls`,
+`customURLs`,
 which is a list of custom redirects to be used by Cookie Connoisseur.
 
 The attribute `url` must be present.
