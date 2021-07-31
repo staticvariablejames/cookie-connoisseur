@@ -35,23 +35,23 @@ test('Updates check is properly intercepted', async () => {
     let page = await newPage();
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
-    expect(await page.evaluate(() => document.getElementById("alert")!.style.display)).toEqual("");
+    expect(await page.evaluate(() => document.getElementById("alert")?.style.display)).toEqual("");
     await page.close();
 
     page = await newPage({updatesResponse: 'alert|Hello!'});
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
-    expect(await page.evaluate(() => document.getElementById("alert")!.innerHTML)).toEqual("Hello!");
-    expect(await page.evaluate(() => document.getElementById("alert")!.style.display)).toEqual("block");
+    expect(await page.evaluate(() => document.getElementById("alert")?.innerHTML)).toEqual("Hello!");
+    expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
     await page.close();
 
     page = await newPage({updatesResponse: '2.71828|Logarithms!'});
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
-    expect(await page.evaluate(() => document.getElementById("alert")!.innerText)).toEqual(
+    expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
         expect.stringContaining('New version available')
     );
-    expect(await page.evaluate(() => document.getElementById("alert")!.style.display)).toEqual("block");
+    expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
     await page.close();
 
     // Chceck changing the options object works
@@ -59,14 +59,14 @@ test('Updates check is properly intercepted', async () => {
     page = await newPage(options);
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
-    expect(await page.evaluate(() => document.getElementById("alert")!.style.display)).toEqual("");
+    expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("");
     options.updatesResponse = '2.71828|Logarithms!';
     await page.evaluate(() => Game.T = 2 * Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > 2 * Game.fps * 30 * 60);
-    expect(await page.evaluate(() => document.getElementById("alert")!.innerText)).toEqual(
+    expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
         expect.stringContaining('New version available')
     );
-    expect(await page.evaluate(() => document.getElementById("alert")!.style.display)).toEqual("block");
+    expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
     await page.close();
 });
 
