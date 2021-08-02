@@ -45,6 +45,9 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions) {
         status: 200,
         contentType: 'text/html',
         body: response,
+    }).catch(reason => {
+        if(process.env.DEBUG)
+            console.log(`Couldn't deliver Herald count and Grandma names: ${reason}`);
     });
 
     return true;
@@ -65,6 +68,9 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
         status: 200,
         contentType: 'text/html',
         body: serverResponse,
+    }).catch(reason => {
+        if(process.env.DEBUG)
+            console.log(`Couldn't deliver answer to updates query: ${reason}`);
     });
     return true;
 }
@@ -82,7 +88,10 @@ async function handleCacheFile(route: Route, url: string) {
         if('contentType' in cacheURLs[url]) {
             options.contentType = cacheURLs[url].contentType;
         }
-        await route.fulfill(options);
+        await route.fulfill(options).catch(reason => {
+            if(process.env.DEBUG)
+                console.log(`Couldn't deliver cached page ${url}: ${reason}`);
+        });
     } else {
         console.log(`File ${path} not cached`);
         await route.continue();
@@ -101,7 +110,10 @@ async function handleCacheCustomFile(route: Route, url: string, config: CookieCo
     }
 
     if(existsSync(options.path!)) {
-        await route.fulfill(options);
+        await route.fulfill(options).catch(reason => {
+            if(process.env.DEBUG)
+                console.log(`Couldn't deliver local page ${url}: ${reason}`);
+        });
     } else {
         if(config.customURLs[url].path) {
             console.log(`File ${options.path} not found`);
