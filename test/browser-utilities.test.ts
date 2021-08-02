@@ -4,15 +4,11 @@
  */
 
 /// <reference path="../src/browser-utilities.d.ts" />
+import { test, expect } from '@playwright/test';
 import { CCPageOptions, openCookieClickerPage } from '../lib/cookie-clicker-page.js';
-import { Browser } from 'playwright';
 
-export const browserUtilitiesTest = (getBrowser: () => Browser) => {
-
-let newPage = (options: CCPageOptions = {}) => openCookieClickerPage(getBrowser(), options);
-
-test('The game always starts on 2020', async() => {
-    let page = await newPage();
+test('The game always starts on 2020', async({ browser }) => {
+    let page = await openCookieClickerPage(browser);
     let now = await page.evaluate( () => Date.now() );
     expect(now).toBeGreaterThan(1.6e12);
     expect(now).toBeLessThan(1.6e12 + 1e4);
@@ -24,8 +20,8 @@ test('The game always starts on 2020', async() => {
     await page.close();
 });
 
-test('Overwritten Date class works properly', async() => {
-    let page = await newPage();
+test('Overwritten Date class works properly', async({ browser }) => {
+    let page = await openCookieClickerPage(browser);
     let now = await page.evaluate( () => (new Date()).getTime() );
     expect(now).toBeGreaterThan(1.6e12);
     expect(now).toBeLessThan(1.6e12 + 1e4);
@@ -36,36 +32,34 @@ test('Overwritten Date class works properly', async() => {
     await page.close();
 });
 
-test('Seasons can be chosen via date mocking', async() => {
-    let page = await newPage(); // No seasonal event on 2020-09-13 12:26:40
+test('Seasons can be chosen via date mocking', async({ browser }) => {
+    let page = await openCookieClickerPage(browser); // No seasonal event on 2020-09-13 12:26:40
     let season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('');
     await page.close();
 
-    page = await newPage({mockedDate: Date.UTC(2020, 9, 30, 12)});
+    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 9, 30, 12)});
     season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('halloween');
     await page.close();
 
-    page = await newPage({mockedDate: Date.UTC(2020, 11, 25, 12)});
+    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 11, 25, 12)});
     season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('christmas');
     await page.close();
 
-    page = await newPage({mockedDate: Date.UTC(2020, 1, 13, 12)});
+    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 1, 13, 12)});
     season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('valentines');
     await page.close();
 
-    page = await newPage({mockedDate: Date.UTC(2020, 3, 1, 12)});
+    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 3, 1, 12)});
     season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('fools');
     await page.close();
 
-    page = await newPage({mockedDate: Date.UTC(2020, 3, 11, 12)});
+    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 3, 11, 12)});
     season = await page.evaluate(() => Game.baseSeason);
     expect(season).toEqual('easter');
     await page.close();
 });
-
-}
