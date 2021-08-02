@@ -19,7 +19,7 @@
   "author": "Static Variable James",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "playwright": "^1.10.0"
+    "playwright": "^1.13.1"
   },
   "devDependencies": {
     "@types/cookieclicker": "^2.31.4",
