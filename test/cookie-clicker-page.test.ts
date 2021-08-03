@@ -30,20 +30,20 @@ test('Heralds and grandma names work', async ({browser}) => {
 test('Updates check is properly intercepted', async ({browser}) => {
     let page = await openCookieClickerPage(browser);
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
+    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
     expect(await page.evaluate(() => document.getElementById("alert")?.style.display)).toEqual("");
     await page.close();
 
     page = await openCookieClickerPage(browser, {updatesResponse: 'alert|Hello!'});
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
+    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
     expect(await page.evaluate(() => document.getElementById("alert")?.innerHTML)).toEqual("Hello!");
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
     await page.close();
 
     page = await openCookieClickerPage(browser, {updatesResponse: '2.71828|Logarithms!'});
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
+    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
     expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
         expect.stringContaining('New version available')
     );
@@ -54,11 +54,11 @@ test('Updates check is properly intercepted', async ({browser}) => {
     let options: CCPageOptions = {};
     page = await openCookieClickerPage(browser, options);
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60);
+    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("");
     options.updatesResponse = '2.71828|Logarithms!';
     await page.evaluate(() => Game.T = 2 * Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > 2 * Game.fps * 30 * 60);
+    await page.waitForFunction(() => Game.T > 2 * Game.fps * 30 * 60 + 1);
     expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
         expect.stringContaining('New version available')
     );
