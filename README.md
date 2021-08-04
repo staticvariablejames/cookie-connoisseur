@@ -245,13 +245,3 @@ Favicons are not downloaded.
 and favicon requests
 are [explicitly filtered out](https://github.com/microsoft/playwright/issues/7493).
 I did not implement a fallback yet.
-
-Tests must be done sequentially,
-in the same test suite.
-I still haven't figured out why
-(race condition, perhaps?),
-but simply creating several Jest test suites and running them in parallel
-result in the browser instance closing too soon in some cases,
-so the test crashes when a command is run in a Playwright page whose browser is closed.
-This results in tests failing even though the mod works perfectly fine.
-The workaround I've been using is to simply putting all test cases in a single test suite.
