@@ -171,6 +171,13 @@ If you create an options object and pass it to `openCookieClickerPage`,
 changing these options in the object will update the response issued by Cookie Connoisseur
 in the next query.
 
+Routing is done via [page.route](https://playwright.dev/docs/api/class-page#page-route).
+Since Playwright 1.13,
+if you register conflicting routes,
+[the later routes take precedence](https://github.com/microsoft/playwright/issues/7394).
+So you may override any route established by Cookie Connoisseur
+by just registering a new route.
+
 Additionally,
 Cookie Connoisseur injects in the page's global scope the object `CCoinnosseur`,
 which currently has only one attribute:
