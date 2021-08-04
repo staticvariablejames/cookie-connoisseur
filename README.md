@@ -1,6 +1,8 @@
 Cookie Connoisseur
 ==================
 
+**[Changelog](CHANGELOG.md) | [API](#api) | [Configuration file](#configuration-file)**
+
 Cookie Connoisseur is a Node.js library to automate the testing of Cookie Clicker mods.
 
 First,
