@@ -3,6 +3,7 @@
 ## Unreleased
 - Change: `customURLs` in the configuration file that redirect to local files
     are now located under the `localFiles` attribute. (**breaking**)
+- Added: Property `localDirectories` in the connfiguration file to reroute to entire directories.
 - Added: This changelog!
 
 ## 0.1.1 - 2021-08-03

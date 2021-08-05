@@ -160,6 +160,30 @@ async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
 }
 
 /* Helper function.
+ * Similar to handleCacheFile, but for local directory reroutes instead.
+ */
+async function handleLocalDirectory(route: Route, config: CookieConnoisseurConfig) {
+    let url = normalizeURL(route.request().url());
+    for(let urlPrefix in config.localDirectories) {
+        if(url.startsWith(urlPrefix)) { // Found matching prefix!
+            let directoryPath = config.localDirectories[urlPrefix].path;
+            let filePath = directoryPath + "/" + url.substr(urlPrefix.length);
+            if(existsSync(filePath)) {
+                await route.fulfill({path: filePath}).catch(reason => {
+                    if(process.env.DEBUG)
+                        console.log(`Couldn't deliver local page ${url}: ${reason}`);
+                });
+            } else {
+                console.log(`File ${filePath} not found in directory ${directoryPath}`);
+                await route.continue();
+            }
+            return true;
+        }
+    }
+    return false; // No matching prefix found
+}
+
+/* Helper function.
  * If the requested URL is a forbidden URL, the route is aborted and the function returs true.
  * It returns false otherwise.
  */
@@ -239,6 +263,8 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
         if(await handleCustomURL(route, config))
             return;
         if(await handleLocalFile(route, config))
+            return;
+        if(await handleLocalDirectory(route, config))
             return;
         if(await handleForbiddenURLs(route))
             return;

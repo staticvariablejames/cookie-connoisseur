@@ -235,6 +235,11 @@ Available options:
         Whenever a URL from this list is requested,
         the local file located in `path` is provided instead.
 
+-   `localDirectories`: `{url: string, path: string}[]`
+        List of URL prefixes that are redirected to local directories.
+        Whenever a URL starting with `url` is requested,
+        that prefix is replaced with `path`, and the resulting path is provided instead.
+
 You must re-run `npx fetch-cookie-clicker-files`
 whenever the `customURLs` list is changed.
 

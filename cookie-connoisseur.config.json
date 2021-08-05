@@ -3,5 +3,9 @@
     "localFiles": [
         {"url": "https://example.com/test.js",
          "path": "test/test-file.js"}
+    ],
+    "localDirectories": [
+        {"url": "https://example.org/subdomain/",
+         "path": "./"}
     ]
 }

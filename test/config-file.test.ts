@@ -14,7 +14,10 @@ test('Configuration file is properly read', async () => {
         customURLs: {},
         localFiles: {
             [testURL]: {path: "test/test-file.js"},
-        }
+        },
+        localDirectories: {
+             "https://example.org/subdomain/": {path: "./"},
+        },
     });
 });
 
@@ -39,5 +42,13 @@ test('Configuration file reroutes can be overriden', async ({browser}) => {
     await page.waitForFunction(() => 'overridingWorks' in window.CConnoisseur);
     expect(await page.evaluate(() => (window.CConnoisseur as any).overridingWorks)).toBe(true);
     expect(await page.evaluate(() => 'testWorks' in window.CConnoisseur)).toBe(false);
+    await page.close();
+});
+
+test('Entire domains can be mapped to paths', async ({browser}) => {
+    let page = await openCookieClickerPage(browser);
+    await page.evaluate(url => Game.LoadMod(url), testSubdomainURL + 'test/test-file.js');
+    await page.waitForFunction(() => 'testWorks' in window.CConnoisseur);
+    expect(await page.evaluate(() => (window.CConnoisseur as any).testWorks)).toBe(true);
     await page.close();
 });
