@@ -1,6 +1,6 @@
 {
     "comment": "This file exists only for testing.",
-    "customURLs": [
+    "localFiles": [
         {"url": "https://example.com/test.js",
          "path": "test/test-file.js"}
     ]

@@ -19,6 +19,17 @@ export type CCPageOptions = {
 };
 
 /* Helper function.
+ * For some reason, some URLs have a version attached at the end
+ * (like 'main.js?v=2.089' instead of just 'main.js'),
+ * even though accessing 'https://orteil.dashnet.org/cookieclicker/main.js'
+ * yields the same page as 'main.js?v=2.089' and 'main.js?v=2.058'.
+ * This function strips that version number if present.
+ */
+function normalizeURL(url: string) {
+    return url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
+}
+
+/* Helper function.
  * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
  * this function fulfills the request with the format that the game expects
  * to configure the number of heralds and Patreon grandma names,
@@ -76,11 +87,15 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
 }
 
 /* Helper function.
- * Fulfills the given route using cached files.
- * `url` is the URL which will be queried for in the file system,
- * rather than route.request().url().
+ * If the route queries a URL that is cached by Cookie Connoisseur by default,
+ * this function fulfills the request with the appropriate file and returns true.
+ * It returns false otherwise.
  */
-async function handleCacheFile(route: Route, url: string) {
+async function handleCacheFile(route: Route) {
+    let url = normalizeURL(route.request().url());
+    if(!(url in cacheURLs))
+        return false;
+
     let path = localPathOfURL(url);
     if(existsSync(path)) {
         let options: Parameters<Route["fulfill"]>[0] = {};
@@ -96,32 +111,65 @@ async function handleCacheFile(route: Route, url: string) {
         console.log(`File ${path} not cached`);
         await route.continue();
     }
+    return true;
 }
 
 /* Helper function.
  * Similar to handleCacheFile, but for customURLs instead.
  */
-async function handleCacheCustomFile(route: Route, url: string, config: CookieConnoisseurConfig) {
-    let options: Parameters<Route["fulfill"]>[0] = {};
-    if(config.customURLs[url].path) {
-        options.path = config.customURLs[url].path;
+async function handleCustomURL(route: Route, config: CookieConnoisseurConfig) {
+    let url = normalizeURL(route.request().url());
+    if(!(url in config.customURLs))
+        return false;
+
+    let options = {path: localPathOfURL(url)};
+    if(existsSync(options.path)) {
+        await route.fulfill(options).catch(reason => {
+            if(process.env.DEBUG)
+                console.log(`Couldn't deliver custom URL ${url}: ${reason}`);
+        });
     } else {
-        options.path = localPathOfURL(url);
+        console.log(`File ${options.path} not cached`);
+        await route.continue();
     }
 
-    if(existsSync(options.path!)) {
+    return true;
+}
+
+/* Helper function.
+ * Similar to handleCacheFile, but for local files instead.
+ */
+async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
+    let url = normalizeURL(route.request().url());
+    if(!(url in config.localFiles))
+        return false;
+
+    let options = {path: config.localFiles[url].path};
+
+    if(existsSync(options.path)) {
         await route.fulfill(options).catch(reason => {
             if(process.env.DEBUG)
                 console.log(`Couldn't deliver local page ${url}: ${reason}`);
         });
     } else {
-        if(config.customURLs[url].path) {
-            console.log(`File ${options.path} not found`);
-        } else {
-            console.log(`File ${options.path} not cached`);
-        }
+        console.log(`File ${options.path} not found`);
         await route.continue();
     }
+
+    return true;
+}
+
+/* Helper function.
+ * If the requested URL is a forbidden URL, the route is aborted and the function returs true.
+ * It returns false otherwise.
+ */
+async function handleForbiddenURLs(route: Route) {
+    let url = route.request().url(); // No need for normalization
+    if(!isForbiddenURL(url))
+        return false;
+
+    await route.abort('blockedbyclient');
+    return true;
 }
 
 /* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
@@ -182,30 +230,20 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
     await page.on('close', async () => await context.close() );
 
     await page.route('**/*', async route => {
-        let url = route.request().url();
-        /* For some reason, some URLs have a version attached at the end
-         * (like 'main.js?v=2.089' instead of just 'main.js'),
-         * even though accessing 'https://orteil.dashnet.org/cookieclicker/main.js'
-         * yields the same page as 'main.js?v=2.089' and 'main.js?v=2.058'.
-         * So we just strip that part out of the equation.
-         */
-        url = url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
-
         if(await handlePatreonGrabs(route, options))
             return;
         if(await handleUpdatesQuery(route, options))
             return;
+        if(await handleCacheFile(route))
+            return;
+        if(await handleCustomURL(route, config))
+            return;
+        if(await handleLocalFile(route, config))
+            return;
+        if(await handleForbiddenURLs(route))
+            return;
 
-        // Ignore ads
-        if(isForbiddenURL(url)) {
-            await route.abort('blockedbyclient');
-        } else if(url in cacheURLs) {
-            await handleCacheFile(route, url);
-        } else if(url in config.customURLs) {
-            await handleCacheCustomFile(route, url, config);
-        } else {
-            await route.continue();
-        }
+        await route.continue();
     });
 
     await page.goto('https://orteil.dashnet.org/cookieclicker/index.html');

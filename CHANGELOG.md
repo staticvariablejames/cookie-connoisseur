@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Change: `customURLs` in the configuration file that redirect to local files
+    are now located under the `localFiles` attribute. (**breaking**)
 - Added: This changelog!
 
 ## 0.1.1 - 2021-08-03

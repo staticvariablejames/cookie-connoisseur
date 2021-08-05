@@ -212,7 +212,9 @@ https://github.com/staticvariablejames/ChooseYourOwnLump/blob/master/cookie-conn
 {
     "customURLs": [
         {"url": "https://klattmose.github.io/CookieClicker/CCSE.js"},
-        {"url": "https://staticvariablejames.github.io/SpicedCookies/Spice.js"},
+        {"url": "https://staticvariablejames.github.io/SpicedCookies/Spice.js"}
+    ],
+    "localFiles": [
         {"url": "https://staticvariablejames.github.io/ChooseYourOwnLump/ChooseYourOwnLump.js",
          "path": "ChooseYourOwnLump.js"},
         {"url": "https://staticvariablejames.github.io/ChooseYourOwnLump/dist/main.js",
@@ -221,29 +223,20 @@ https://github.com/staticvariablejames/ChooseYourOwnLump/blob/master/cookie-conn
 }
 ```
 
-Currently,
-the file has a single attribute,
-`customURLs`,
-which is a list of custom redirects to be used by Cookie Connoisseur.
+Available options:
 
-The attribute `url` must be present.
-If `path` is also present,
-then requests for the given URL will be fulfilled with the local file given in the path.
-For example,
-the files exposed by ChooseYourOwnLump are `ChooseYourOwnLump.js` and `dist/main.js`
-(both paths relative to the project root),
-so whenever the page accesses e.g.
-<https://staticvariablejames.github.io/ChooseYourOwnLump/dist/main.js>,
-the local file `dist/main.js` is used instead.
+-   `customURLs`: `{url: string}[]`
+        List of URLs that are handled in the same way as Cookie Clicker files.
+        These files are downloaded by `npx fetch-cookie-clicker-files`
+        and the local copy is used used by Cookie Connoisseur whenever that URL is requested.
 
-If `path` is **not** present,
-then the file will be downloaded by `npx fetch-cookie-clicker-files`
-and the local copy will be used Cookie Connoisseur to fulfill requests for that file.
-In essense,
-those files are managed in the same way as vanilla Cookie Clicker files.
+-   `localFiles`: `{url: string, path: string}[]`
+        List of URLs that are redirected to local files.
+        Whenever a URL from this list is requested,
+        the local file located in `path` is provided instead.
 
 You must re-run `npx fetch-cookie-clicker-files`
-every time an URL without the `path` attribute changes.
+whenever the `customURLs` list is changed.
 
 
 Known Issues

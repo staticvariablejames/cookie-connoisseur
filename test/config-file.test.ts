@@ -7,10 +7,12 @@ import { CCPageOptions, openCookieClickerPage } from '../lib/cookie-clicker-page
 import { parseConfigFile } from '../lib/parse-config.js';
 
 const testURL = 'https://example.com/test.js'
+const testSubdomainURL = 'https://example.org/subdomain/';
 
 test('Configuration file is properly read', async () => {
     expect(await parseConfigFile()).toEqual({
-        customURLs: {
+        customURLs: {},
+        localFiles: {
             [testURL]: {path: "test/test-file.js"},
         }
     });

@@ -5,28 +5,41 @@ import { promises as fsPromises, existsSync } from 'fs';
 
 export type CookieConnoisseurConfig = {
     customURLs: {
-        [url: string]: {
-            path?: string,
-        }
+        [url: string]: {};
     },
+    localFiles: {
+        [url: string]: {
+            path: string;
+        };
+    }
 }
 
 export const configPath = 'cookie-connoisseur.config.json';
 
 export async function parseConfigFile(): Promise<CookieConnoisseurConfig> {
+    let config: CookieConnoisseurConfig = {customURLs: {}, localFiles: {}};
     if(!existsSync(configPath)) {
-        return {customURLs: {}};
+        return config;
     }
 
-    let config: CookieConnoisseurConfig = {customURLs: {}};
     let content = JSON.parse(await fsPromises.readFile(configPath, {encoding: 'utf8'}));
-    if(!('customURLs' in content)) return config;
+    if(!content || typeof content != "object")
+        return config;
 
-    for(let obj of content.customURLs) {
-        if('url' in obj && typeof obj.url == 'string') {
-            config.customURLs[obj.url] = {};
-            if('path' in obj && typeof obj.path == 'string')
-                config.customURLs[obj.url].path = obj.path;
+    if('customURLs' in content && typeof content['customURLs'] == "object") {
+        for(let obj of content.customURLs) {
+            if('url' in obj && typeof obj.url == 'string') {
+                config.customURLs[obj.url] = {};
+            }
+        }
+    }
+
+    if('localFiles' in content && typeof content['localFiles'] == "object") {
+        for(let obj of content.localFiles) {
+            if('url' in obj && typeof obj.url == 'string') {
+                if('path' in obj && typeof obj.path == 'string')
+                    config.localFiles[obj.url] = {path: obj.path};
+            }
         }
     }
 

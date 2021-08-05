@@ -42,8 +42,7 @@ setTimeout(async () => {
         await fetchUrl(page, url);
     }
     for(let url in config.customURLs) {
-        if(!config.customURLs[url].path)
-            await fetchUrl(page, url);
+        await fetchUrl(page, url);
     }
 
     await page.close();
