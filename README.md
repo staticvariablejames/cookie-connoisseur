@@ -162,7 +162,7 @@ Available options:
         Defaults to empty.
 
 -   `mockedDate` <number>: Initial value of CConnoisseur.mockedDate; see below.
-        Defaults to 16e11.
+        Defaults to 1.6e12.
 
 The first three options
 (`heralds`, `grandmaNames` and `updatesResponse`)
