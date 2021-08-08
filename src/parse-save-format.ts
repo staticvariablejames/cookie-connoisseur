@@ -226,12 +226,18 @@ export class CCSave {
     fortuneCPS: boolean = false; // Whether the hour-of-CpS fortune appeared or not
     cookiesPsRawHighest: number = 0; // Highest raw CpS in this ascension (used in the stock market)
 
+    // The following attributes have no direct counterpart in the `Game` namespace.
     buildings: CCBuildingsData = new CCBuildingsData();
+    ownedUpgrades: number[] = [];
+    unlockedUpgrades: number[] = []; // Upgrades which are currently unlocked but non owned
+    achievements: number[] = []; // Achievements won
 
     // TODO: Add constructor accepting partial data
 
     static currentVersion = 2.031;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
+    static upgradeCount = 729;
+    static achievementCount = 538;
 
     static toStringSave(save: CCSave): string {
         let saveString = '';
@@ -306,6 +312,23 @@ export class CCSave {
 
         saveString += '|';
         saveString += CCBuildingsData.toStringSave(save.buildings);
+
+        saveString += '|';
+        let upgrades = '00'.repeat(CCSave.upgradeCount).split('');
+        for(let i of save.ownedUpgrades) {
+            upgrades[2*i] = upgrades[2*i+1] = '1';
+        }
+        for(let i of save.unlockedUpgrades) {
+            upgrades[2*i] = '1';
+        }
+        saveString += upgrades.join('');
+
+        saveString += '|';
+        let achievements = '0'.repeat(CCSave.achievementCount).split('');
+        for(let i of save.achievements) {
+            achievements[i] = '1';
+        }
+        saveString += achievements.join('');
 
         saveString += '|';
         saveString = Buffer.from(saveString).toString('base64');
@@ -392,6 +415,18 @@ export class CCSave {
         saveObject.cookiesPsRawHighest = Number(generalData[51]);
 
         saveObject.buildings = CCBuildingsData.fromStringSave(data[5]);
+
+        for(let i = 0; i < CCSave.upgradeCount; i++) {
+            if(data[6].charAt(2*i) == '1' && data[6].charAt(2*i+1) == '1')
+                saveObject.ownedUpgrades.push(i);
+            if(data[6].charAt(2*i) == '1' && data[6].charAt(2*i+1) == '0')
+                saveObject.unlockedUpgrades.push(i);
+        }
+
+        for(let i = 0; i < CCSave.achievementCount; i++) {
+            if(data[7].charAt(i) == '1')
+                saveObject.achievements.push(i);
+        }
 
         return saveObject;
     }
