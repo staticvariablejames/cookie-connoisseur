@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { CCSave } from '../lib/parse-save-format.js';
+import { CCSave, CCBuff } from '../lib/parse-save-format.js';
 
 const saveAsString =
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+
@@ -1409,6 +1409,19 @@ const saveAsObject = {
         "Max capacity",
         "Liquid assets",
     ],
+
+    buffs: <CCBuff[]>[
+        {name: 'frenzy',         maxTime: 36483,   time: 23680, multCpS: 7},
+        {name: 'sugar blessing', maxTime: 2592000, time: 2561524},
+        {name: 'dragon harvest', maxTime: 6374,    time: 1118, multCpS: 15},
+        {name: 'loan 1',         maxTime: 216000,  time: 210953, multCpS: 1.5},
+        {name: 'loan 3',         maxTime: 5184000, time: 5178968, multCpS: 1.2},
+        {name: 'sugar frenzy',   maxTime: 108000,  time: 103011, multCpS: 3},
+        {name: 'loan 2',         maxTime: 1206,    time: 700, multCpS: 2},
+        {name: 'dragonflight',   maxTime: 690,     time: 215, multClick: 1111},
+        {name: 'click frenzy',   maxTime: 900,     time: 442, multClick: 777},
+        {name: 'building buff',  maxTime: 2070,    time: 1644, multCpS: 60.3, building: 10},
+    ]
 }
 
 test('The save game is properly parsed', async() => {

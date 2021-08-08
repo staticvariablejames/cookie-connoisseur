@@ -1474,6 +1474,311 @@ export class CCBuildingsData { // Aggregates all buildings
     }
 }
 
+/* Cookie Clicker buffs.
+ * `name` here is the "technical name" used in the code;
+ * for example, in Game.buffTypesByName.
+ *
+ * `time` is Game.fps * the duration of the buff in seconds.
+ * (Note that the first argument to Game.gainBuff is in seconds, not Game.fps * seconds.)
+ * `maxTime` is the maximum duration the buff, used e.g. by the "Stretch Time" grimoire spell
+ */
+export class CCBuffFrenzy {
+    name: 'frenzy' = 'frenzy';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 7; // 7x CpS multiplier
+}
+
+export class CCBuffElderFrenzy {
+    name: 'blood frenzy' = 'blood frenzy';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 666; // 666x CpS multiplier
+}
+
+export class CCBuffClot {
+    name: 'clot' = 'clot';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 0.5; // 0.5x CpS multiplier
+}
+
+export class CCBuffDragonHarvest {
+    name: 'dragon harvest' = 'dragon harvest';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 15; // 15x CpS multiplier
+}
+
+export class CCBuffEverythingMustGo {
+    name: 'everything must go' = 'everything must go';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 5; // 5% price reduction
+}
+
+export class CCBuffCursedFinger {
+    name: 'cursed finger' = 'cursed finger';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 0; // Cookies gained per click (default: 10 * current CpS)
+}
+
+export class CCBuffClickFrenzy {
+    name: 'click frenzy' = 'click frenzy';
+    maxTime: number = 0;
+    time: number = 0;
+    multClick: number = 777; // 777x cookies click multiplier
+}
+
+export class CCBuffDragonflight {
+    name: 'dragonflight' = 'dragonflight';
+    maxTime: number = 0;
+    time: number = 0;
+    multClick: number = 1111; // 1111x cookies per click multiplier
+}
+
+export class CCBuffCookieStorm {
+    name: 'cookie storm' = 'cookie storm';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 7; // Unused
+}
+
+export class CCBuffBuildingSpecial {
+    name: 'building buff' = 'building buff';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 2; // 2x CpS multiplier
+    building: number = 1; // Building ID (grandmas in this case)
+}
+
+export class CCBuffBuildingRust {
+    name: 'building debuff' = 'building debuff';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 0.5; // 0.5x CpS multiplier
+    building: number = 1; // Building ID (grandmas in this case)
+}
+
+export class CCBuffSugarBlessing {
+    name: 'sugar blessing' = 'sugar blessing';
+    maxTime: number = 0;
+    time: number = 0;
+}
+
+export class CCBuffHagglersLuck {
+    name: 'haggler luck' = 'haggler luck';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 2; // Upgrades 2% cheaper
+}
+
+export class CCBuffHagglersMisery {
+    name: 'haggler misery' = 'haggler misery';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 2; // Upgrades 2% pricier
+}
+
+export class CCBuffCraftyPixies {
+    name: 'pixie luck' = 'pixie luck';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 2; // Buildings 2% cheaper
+}
+
+export class CCBuffNastyGoblins {
+    name: 'pixie misery' = 'pixie misery';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 2; // Buildings 2% pricier
+}
+
+export class CCBuffMagicAdept {
+    name: 'magic adept' = 'magic adept';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 10; // Spells backfire 10x less
+}
+
+export class CCBuffMagicInept {
+    name: 'magic inept' = 'magic inept';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 5; // Spells backfire 5x more
+}
+
+export class CCBuffDevastation {
+    name: 'devastation' = 'devastation';
+    maxTime: number = 0;
+    time: number = 0;
+    multClick: number = 2; // 2x cookies per click multiplier
+}
+
+export class CCBuffSugarFrenzy {
+    name: 'sugar frenzy' = 'sugar frenzy';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 3; // 3x CpS multiplier
+}
+
+export class CCBuffModestLoan {
+    name: 'loan 1' = 'loan 1';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 1.5; // 1.5x CpS multiplier
+}
+
+export class CCBuffModestLoanRepayment {
+    name: 'loan 1 (interest)' = 'loan 1 (interest)';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 0.25; // 0.25x CpS multiplier
+}
+
+export class CCBuffPawnshopLoan {
+    name: 'loan 2' = 'loan 2';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 2; // 2x CpS multiplier
+}
+
+export class CCBuffPawnshopLoanRepayment {
+    name: 'loan 2 (interest)' = 'loan 2 (interest)';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 0.1; // 3x CpS multiplier
+}
+
+export class CCBuffRetirementLoan {
+    name: 'loan 3' = 'loan 3';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 1.2; // 1.2x CpS multiplier
+}
+
+export class CCBuffRetirementLoanRepayment {
+    name: 'loan 3 (interest)' = 'loan 3 (interest)';
+    maxTime: number = 0;
+    time: number = 0;
+    multCpS: number = 0.8; // 0.8x CpS multiplier
+}
+
+export class CCUnknownBuff {
+    // This buff does not exist in the game code; it is here only to keep TypeScript happy
+    name: 'unknown' = 'unknown';
+    id: number = 26;
+    maxTime: number = 0;
+    time: number = 0;
+    arg1: number = 0;
+    arg2: number = 0;
+    arg3: number = 0;
+}
+
+export const BuffNamesById = [
+    'frenzy',
+    'blood frenzy',
+    'clot',
+    'dragon harvest',
+    'everything must go',
+    'cursed finger',
+    'click frenzy',
+    'dragonflight',
+    'cookie storm',
+    'building buff',
+    'building debuff',
+    'sugar blessing',
+    'haggler luck',
+    'haggler misery',
+    'pixie luck',
+    'pixie misery',
+    'magic adept',
+    'magic inept',
+    'devastation',
+    'sugar frenzy',
+    'loan 1',
+    'loan 1 (interest)',
+    'loan 2',
+    'loan 2 (interest)',
+    'loan 3',
+    'loan 3 (interest)',
+    'unknown',
+];
+
+export const BuffIdsByName = (() => {
+    let map: { [name: string] : number } = {};
+    for(let i in BuffNamesById) {
+        map[BuffNamesById[i]] = Number(i);
+    }
+    return map;
+})();
+
+export type CCBuff = CCBuffFrenzy | CCBuffElderFrenzy | CCBuffClot |
+    CCBuffDragonHarvest | CCBuffEverythingMustGo | CCBuffCursedFinger |
+    CCBuffClickFrenzy | CCBuffDragonflight | CCBuffCookieStorm |
+    CCBuffBuildingSpecial | CCBuffBuildingRust | CCBuffSugarBlessing |
+    CCBuffHagglersLuck | CCBuffHagglersMisery | CCBuffCraftyPixies |
+    CCBuffNastyGoblins | CCBuffMagicAdept | CCBuffMagicInept |
+    CCBuffDevastation | CCBuffSugarFrenzy | CCBuffModestLoan |
+    CCBuffModestLoanRepayment | CCBuffPawnshopLoan | CCBuffPawnshopLoanRepayment |
+    CCBuffRetirementLoan | CCBuffRetirementLoanRepayment | CCUnknownBuff;
+
+export function parseBuffFromString(str: string) : CCBuff {
+    let data = str.split(',');
+    let typeId = data[0];
+    let maxTime = Number(data[1]);
+    let time = Number(data[2]);
+    let arg1 = Number(data[3] ?? 0);
+    let arg2 = Number(data[4] ?? 0);
+    let arg3 = Number(data[5] ?? 0);
+
+    if(typeId == '0') return {name: 'frenzy', maxTime, time, multCpS: arg1};
+    if(typeId == '1') return {name: 'blood frenzy', maxTime, time, multCpS: arg1};
+    if(typeId == '2') return {name: 'clot', maxTime, time, multCpS: arg1};
+    if(typeId == '3') return {name: 'dragon harvest', maxTime, time, multCpS: arg1};
+    if(typeId == '4') return {name: 'everything must go', maxTime, time, power: arg1};
+    if(typeId == '5') return {name: 'cursed finger', maxTime, time, power: arg1};
+    if(typeId == '6') return {name: 'click frenzy', maxTime, time, multClick: arg1};
+    if(typeId == '7') return {name: 'dragonflight', maxTime, time, multClick: arg1};
+    if(typeId == '8') return {name: 'cookie storm', maxTime, time, power: arg1};
+    if(typeId == '9') return {name: 'building buff', maxTime, time, multCpS: arg1, building: arg2};
+    if(typeId == '10') return {name: 'building debuff', maxTime, time, multCpS: arg1, building: arg2};
+    if(typeId == '11') return {name: 'sugar blessing', maxTime, time};
+    if(typeId == '12') return {name: 'haggler luck', maxTime, time, power: arg1};
+    if(typeId == '13') return {name: 'haggler misery', maxTime, time, power: arg1};
+    if(typeId == '14') return {name: 'pixie luck', maxTime, time, power: arg1};
+    if(typeId == '15') return {name: 'pixie misery', maxTime, time, power: arg1};
+    if(typeId == '16') return {name: 'magic adept', maxTime, time, power: arg1};
+    if(typeId == '17') return {name: 'magic inept', maxTime, time, power: arg1};
+    if(typeId == '18') return {name: 'devastation', maxTime, time, multClick: arg1};
+    if(typeId == '19') return {name: 'sugar frenzy', maxTime, time, multCpS: arg1};
+    if(typeId == '20') return {name: 'loan 1', maxTime, time, multCpS: arg1};
+    if(typeId == '21') return {name: 'loan 1 (interest)', maxTime, time, multCpS: arg1};
+    if(typeId == '22') return {name: 'loan 2', maxTime, time, multCpS: arg1};
+    if(typeId == '23') return {name: 'loan 2 (interest)', maxTime, time, multCpS: arg1};
+    if(typeId == '24') return {name: 'loan 3', maxTime, time, multCpS: arg1};
+    if(typeId == '25') return {name: 'loan 3 (interest)', maxTime, time, multCpS: arg1};
+
+    return {name: 'unknown', id: Number(data[0]), maxTime, time, arg1, arg2, arg3};
+}
+
+export function writeBuffToString(buff: CCBuff) {
+    let str = BuffIdsByName[buff.name] + ',' + buff.maxTime + ',' + buff.time;
+    if('multCpS' in buff)
+        str += ',' + buff.multCpS;
+    if('multClick' in buff)
+        str += ',' + buff.multClick;
+    if('power' in buff)
+        str += ',' + buff.power;
+    if('building' in buff)
+        str += ',' + buff.building;
+    if(buff.name === 'unknown')
+        str += ',' + buff.arg1 + ',' + buff.arg2 + ',' + buff.arg3;
+
+    return str;
+}
+
 export class CCSave {
     // Attribute names have the same name in game
     version: number = 2.031;
@@ -1535,6 +1840,7 @@ export class CCSave {
     ownedUpgrades: string[] = [];
     unlockedUpgrades: string[] = []; // Upgrades which are currently unlocked but non owned
     achievements: string[] = []; // Achievements won
+    buffs: CCBuff[] = [];
 
     // TODO: Add constructor accepting partial data
 
@@ -1638,6 +1944,9 @@ export class CCSave {
         saveString += achievements.join('');
 
         saveString += '|';
+        saveString += save.buffs.map(writeBuffToString).join(';');
+
+        saveString += '|';
         saveString = Buffer.from(saveString).toString('base64');
         return encodeURIComponent(saveString) + '%21END%21';
     }
@@ -1733,6 +2042,11 @@ export class CCSave {
         for(let i = 0; i < CCSave.achievementCount; i++) {
             if(data[7].charAt(i) == '1')
                 saveObject.achievements.push(AchievementsById[i]);
+        }
+
+        let buffStr = data[8].split(';');
+        for(let str of buffStr) {
+            if(str != '') saveObject.buffs.push(parseBuffFromString(str));
         }
 
         return saveObject;
