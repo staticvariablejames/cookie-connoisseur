@@ -155,6 +155,27 @@ const saveAsObject = {
     fortuneGC: true,
     fortuneCPS: true,
     cookiesPsRawHighest: 8.704799674705293e+50,
+
+    buildings: {
+        'Cursor':               {amount: 731, bought: 2932, totalCookies:  4.543140626515491e+54, level: 20, muted: false, highest: 782},
+        'Grandma':              {amount: 821, bought: 1415, totalCookies:  3.868116975149197e+54, level: 10, muted:  true, highest: 821},
+        'Farm':                 {amount:   0, bought: 1092, totalCookies: 7.3413533783125586e+50, level: 10, muted:  true, highest: 742},
+        'Mine':                 {amount:   0, bought: 1071, totalCookies:  6.755067422094288e+52, level: 10, muted:  true, highest: 721},
+        'Factory':              {amount:   0, bought: 1058, totalCookies: 1.1820949627460863e+52, level: 10, muted:  true, highest: 708},
+        'Bank':                 {amount:   0, bought: 1049, totalCookies: 2.4836125026038515e+51, level: 10, muted: false, highest: 699},
+        'Temple':               {amount:   0, bought: 1023, totalCookies: 1.0096880226829498e+52, level: 10, muted:  true, highest: 673},
+        'Wizard tower':         {amount:   1, bought: 1715, totalCookies:  2.187965131587015e+51, level: 10, muted: false, highest: 711},
+        'Shipment':             {amount:   0, bought:  980, totalCookies:  8.991850192359247e+50, level: 10, muted:  true, highest: 630},
+        'Alchemy lab':          {amount: 600, bought:  950, totalCookies: 4.8800521828335506e+51, level: 10, muted:  true, highest: 600},
+        'Portal':               {amount: 593, bought:  943, totalCookies:  8.841652191148956e+53, level: 10, muted:  true, highest: 593},
+        'Time machine':         {amount: 572, bought:  922, totalCookies: 1.7701184983146313e+53, level: 10, muted:  true, highest: 572},
+        'Antimatter condenser': {amount: 555, bought:  905, totalCookies: 1.8017232175077135e+54, level: 10, muted:  true, highest: 555},
+        'Prism':                {amount: 602, bought:  952, totalCookies: 1.0461069726618845e+55, level: 10, muted:  true, highest: 602},
+        'Chancemaker':          {amount: 600, bought: 2038, totalCookies: 3.6345861814059334e+55, level: 10, muted:  true, highest: 600},
+        'Fractal engine':       {amount: 600, bought: 2052, totalCookies:  2.793821458824039e+56, level: 10, muted:  true, highest: 600},
+        'Javascript console':   {amount: 583, bought: 1962, totalCookies:  7.376629221584014e+55, level: 10, muted:  true, highest: 583},
+        'Idleverse':            {amount: 545, bought: 2428, totalCookies: 4.6363535311180915e+56, level: 10, muted:  true, highest: 550},
+    },
 }
 
 test('The save game is properly parsed', async() => {
