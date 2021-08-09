@@ -77,28 +77,102 @@ export class CCPlainBuilding { // Building without minigame data
     muted: boolean = false; // Whether the building is hidden or not
     highest: number = 0; // Higest amount of this building owned in this ascension
 
-    static fromStringSave(str: string) {
+    static fromStringSave(str: string, callback?: (minigameData: string) => void) {
+        // Callback is called with the minigame string
         let obj = new CCPlainBuilding();
         let data = str.split(',');
         obj.amount = Number(data[0]);
         obj.bought = Number(data[1]);
         obj.totalCookies = Number(data[2]);
         obj.level = Number(data[3]);
-        // data[4] is the minigame data
+        if(callback) callback(data[4]);
         obj.muted = Boolean(Number(data[5]));
         obj.highest = Number(data[6] ?? obj.amount); // highest was introduced in 2.026
         return obj;
     }
 
-    static toStringSave(obj: CCPlainBuilding) {
+    static toStringSave(obj: CCPlainBuilding, minigameData: string = '') {
         return obj.amount + ',' +
             obj.bought + ',' +
             obj.totalCookies + ',' +
             obj.level + ',' +
-            ',' + // No minigame data
+            minigameData + ',' +
             Number(obj.muted) + ',' +
             obj.highest;
     }
+};
+
+export class CCPantheonMinigame {
+    diamondSlot: string = '';
+    rubySlot: string = '';
+    jadeSlot: string = '';
+    swaps: number = 3;
+    swapT: TimePoint = 1.6e12; // Essentially, last time that the `swaps` attribute changed.
+    // `swaps` may decrease by slotting in spirits or clicking a shimmer with Holobore slotted,
+    // and it increases after 1h, 4h or 16h if swaps == 2, 1, 0, respectively.
+    onMinigame: boolean = true; // Whether the minigame is open or not
+
+    static GodsById = [
+        'asceticism', // Holobore, Spirit of Asceticism
+        'decadence', // Vomitrax, Spirit of Decadence
+        'ruin', // Godzamok, Spirit of Ruin
+        'ages', // Cyclius, Spirit of Ages
+        'seasons', // Selebrak, Spirit of Festivities
+        'creation', // Dotjeiess, Spirit of Creation
+        'labor', // Muridal, Spirit of Labor
+        'industry', // Jeremy, Spirit of Industry
+        'mother', // Mokalsium, Mother Spirit
+        'scorn', // Skruuia, Spirit of Scorn
+        'order' // Rigidel, Spirit of Order
+    ];
+
+    static GodsByName = (() => {
+        let map: { [name: string] : number } = {};
+        for(let i in CCPantheonMinigame.GodsById) {
+            map[CCPantheonMinigame.GodsById[i]] = Number(i);
+        }
+        return map;
+    })();
+
+    static fromStringSave(str: string) {
+        let M = new CCPantheonMinigame();
+        let data = str.split(' ');
+        let gods = data[0].split('/');
+        M.diamondSlot = CCPantheonMinigame.GodsById[Number(gods[0])];
+        M.rubySlot = CCPantheonMinigame.GodsById[Number(gods[1])];
+        M.jadeSlot = CCPantheonMinigame.GodsById[Number(gods[2])];
+        M.swaps = Number(data[1]);
+        M.swapT = Number(data[2]);
+        M.onMinigame = Boolean(Number(data[3]));
+        return M;
+    }
+
+    static toStringSave(m: CCPantheonMinigame) {
+        return CCPantheonMinigame.GodsByName[m.diamondSlot] + '/' +
+            CCPantheonMinigame.GodsByName[m.rubySlot] + '/' +
+            CCPantheonMinigame.GodsByName[m.jadeSlot] + ' ' +
+            m.swaps + ' ' + m.swapT +
+            ' ' + Number(m.onMinigame);
+    }
+};
+
+export class CCMinigameBuilding<MinigameData> extends CCPlainBuilding {
+    constructor(public minigame: MinigameData) {
+        super();
+    }
+};
+
+export function parseCCBuildingWithMinigame<MinigameData>(
+    str: string,
+    minigameParser: (str: string) => MinigameData
+): CCMinigameBuilding<MinigameData>
+{
+    let minigame!: MinigameData;
+    let building = CCPlainBuilding.fromStringSave(str, (dataStr) => {
+        minigame = minigameParser(dataStr);
+    });
+    return {...building, minigame};
+}
 
 export class CCBuildingsData { // Aggregates all buildings
     'Cursor': CCPlainBuilding = new CCPlainBuilding();
@@ -153,7 +227,9 @@ export class CCBuildingsData { // Aggregates all buildings
         str += CCPlainBuilding.toStringSave(buildings['Mine']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Factory']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Bank']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Temple']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Temple'],
+                    CCPantheonMinigame.toStringSave(buildings['Temple'].minigame)
+                ) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Wizard tower']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Shipment']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Alchemy lab']) + ';';
