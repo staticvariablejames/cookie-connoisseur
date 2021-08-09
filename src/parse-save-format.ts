@@ -99,6 +99,74 @@ export class CCPlainBuilding { // Building without minigame data
             Number(obj.muted) + ',' +
             obj.highest;
     }
+
+export class CCBuildingsData { // Aggregates all buildings
+    'Cursor': CCPlainBuilding = new CCPlainBuilding();
+    'Grandma': CCPlainBuilding = new CCPlainBuilding();
+    'Farm': CCPlainBuilding = new CCPlainBuilding(); // TODO: implement minigame
+    'Mine': CCPlainBuilding = new CCPlainBuilding();
+    'Factory': CCPlainBuilding = new CCPlainBuilding();
+    'Bank': CCPlainBuilding = new CCPlainBuilding(); // TODO
+    'Temple' = new CCMinigameBuilding(new CCPantheonMinigame());
+    'Wizard tower': CCPlainBuilding = new CCPlainBuilding(); // TODO
+    'Shipment': CCPlainBuilding = new CCPlainBuilding();
+    'Alchemy lab': CCPlainBuilding = new CCPlainBuilding();
+    'Portal': CCPlainBuilding = new CCPlainBuilding();
+    'Time machine': CCPlainBuilding = new CCPlainBuilding();
+    'Antimatter condenser': CCPlainBuilding = new CCPlainBuilding();
+    'Prism': CCPlainBuilding = new CCPlainBuilding();
+    'Chancemaker': CCPlainBuilding = new CCPlainBuilding();
+    'Fractal engine': CCPlainBuilding = new CCPlainBuilding();
+    'Javascript console': CCPlainBuilding = new CCPlainBuilding();
+    'Idleverse': CCPlainBuilding = new CCPlainBuilding();
+
+    static fromStringSave(str: string) {
+        let buildings = new CCBuildingsData();
+        let data = str.split(';');
+        buildings['Cursor'] = CCPlainBuilding.fromStringSave(data[0]);
+        buildings['Grandma'] = CCPlainBuilding.fromStringSave(data[1]);
+        buildings['Farm'] = CCPlainBuilding.fromStringSave(data[2]);
+        buildings['Mine'] = CCPlainBuilding.fromStringSave(data[3]);
+        buildings['Factory'] = CCPlainBuilding.fromStringSave(data[4]);
+        buildings['Bank'] = CCPlainBuilding.fromStringSave(data[5]);
+        buildings['Temple'] = parseCCBuildingWithMinigame(data[6], CCPantheonMinigame.fromStringSave);
+        buildings['Wizard tower'] = CCPlainBuilding.fromStringSave(data[7]);
+        buildings['Shipment'] = CCPlainBuilding.fromStringSave(data[8]);
+        buildings['Alchemy lab'] = CCPlainBuilding.fromStringSave(data[9]);
+        buildings['Portal'] = CCPlainBuilding.fromStringSave(data[10]);
+        buildings['Time machine'] = CCPlainBuilding.fromStringSave(data[11]);
+        buildings['Antimatter condenser'] = CCPlainBuilding.fromStringSave(data[12]);
+        buildings['Prism'] = CCPlainBuilding.fromStringSave(data[13]);
+        buildings['Chancemaker'] = CCPlainBuilding.fromStringSave(data[14]);
+        buildings['Fractal engine'] = CCPlainBuilding.fromStringSave(data[15]);
+        buildings['Javascript console'] = CCPlainBuilding.fromStringSave(data[16]);
+        if(data[17] != '') // Idleverses were introduced in 2.03
+            buildings['Idleverse'] = CCPlainBuilding.fromStringSave(data[17]);
+        return buildings;
+    }
+
+    static toStringSave(buildings: CCBuildingsData) {
+        let str = '';
+        str += CCPlainBuilding.toStringSave(buildings['Cursor']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Grandma']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Farm']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Mine']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Factory']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Bank']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Temple']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Wizard tower']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Shipment']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Alchemy lab']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Portal']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Time machine']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Antimatter condenser']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Prism']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Chancemaker']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Fractal engine']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Javascript console']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Idleverse']) + ';';
+        return str;
+    }
 }
 
 /* List of all upgrades in the game, sorted by id.
@@ -1404,75 +1472,6 @@ export const AchievementsByName = (() => {
     }
     return map;
 })();
-
-export class CCBuildingsData { // Aggregates all buildings
-    'Cursor': CCPlainBuilding = new CCPlainBuilding();
-    'Grandma': CCPlainBuilding = new CCPlainBuilding();
-    'Farm': CCPlainBuilding = new CCPlainBuilding(); // TODO: implement minigame
-    'Mine': CCPlainBuilding = new CCPlainBuilding();
-    'Factory': CCPlainBuilding = new CCPlainBuilding();
-    'Bank': CCPlainBuilding = new CCPlainBuilding(); // TODO
-    'Temple': CCPlainBuilding = new CCPlainBuilding(); // TODO
-    'Wizard tower': CCPlainBuilding = new CCPlainBuilding(); // TODO
-    'Shipment': CCPlainBuilding = new CCPlainBuilding();
-    'Alchemy lab': CCPlainBuilding = new CCPlainBuilding();
-    'Portal': CCPlainBuilding = new CCPlainBuilding();
-    'Time machine': CCPlainBuilding = new CCPlainBuilding();
-    'Antimatter condenser': CCPlainBuilding = new CCPlainBuilding();
-    'Prism': CCPlainBuilding = new CCPlainBuilding();
-    'Chancemaker': CCPlainBuilding = new CCPlainBuilding();
-    'Fractal engine': CCPlainBuilding = new CCPlainBuilding();
-    'Javascript console': CCPlainBuilding = new CCPlainBuilding();
-    'Idleverse': CCPlainBuilding = new CCPlainBuilding();
-
-    static fromStringSave(str: string) {
-        let buildings = new CCBuildingsData();
-        let data = str.split(';');
-        buildings['Cursor'] = CCPlainBuilding.fromStringSave(data[0]);
-        buildings['Grandma'] = CCPlainBuilding.fromStringSave(data[1]);
-        buildings['Farm'] = CCPlainBuilding.fromStringSave(data[2]);
-        buildings['Mine'] = CCPlainBuilding.fromStringSave(data[3]);
-        buildings['Factory'] = CCPlainBuilding.fromStringSave(data[4]);
-        buildings['Bank'] = CCPlainBuilding.fromStringSave(data[5]);
-        buildings['Temple'] = CCPlainBuilding.fromStringSave(data[6]);
-        buildings['Wizard tower'] = CCPlainBuilding.fromStringSave(data[7]);
-        buildings['Shipment'] = CCPlainBuilding.fromStringSave(data[8]);
-        buildings['Alchemy lab'] = CCPlainBuilding.fromStringSave(data[9]);
-        buildings['Portal'] = CCPlainBuilding.fromStringSave(data[10]);
-        buildings['Time machine'] = CCPlainBuilding.fromStringSave(data[11]);
-        buildings['Antimatter condenser'] = CCPlainBuilding.fromStringSave(data[12]);
-        buildings['Prism'] = CCPlainBuilding.fromStringSave(data[13]);
-        buildings['Chancemaker'] = CCPlainBuilding.fromStringSave(data[14]);
-        buildings['Fractal engine'] = CCPlainBuilding.fromStringSave(data[15]);
-        buildings['Javascript console'] = CCPlainBuilding.fromStringSave(data[16]);
-        if(data[17] != '') // Idleverses were introduced in 2.03
-            buildings['Idleverse'] = CCPlainBuilding.fromStringSave(data[17]);
-        return buildings;
-    }
-
-    static toStringSave(buildings: CCBuildingsData) {
-        let str = '';
-        str += CCPlainBuilding.toStringSave(buildings['Cursor']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Grandma']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Farm']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Mine']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Factory']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Bank']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Temple']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Wizard tower']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Shipment']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Alchemy lab']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Portal']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Time machine']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Antimatter condenser']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Prism']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Chancemaker']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Fractal engine']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Javascript console']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Idleverse']) + ';';
-        return str;
-    }
-}
 
 /* Cookie Clicker buffs.
  * `name` here is the "technical name" used in the code;
