@@ -1425,10 +1425,10 @@ const saveAsObject = {
 }
 
 test('The save game is properly parsed', async() => {
-    expect(CCSave.fromStringSave(saveAsString)).toMatchObject(saveAsObject);
+    expect(CCSave.fromStringSave(saveAsString)).toEqual(saveAsObject);
 });
 
 test('Written saves can be recovered', async() => {
     let str = CCSave.toStringSave(saveAsObject);
-    expect(CCSave.fromStringSave(str)).toMatchObject(saveAsObject);
+    expect(CCSave.fromStringSave(str)).toEqual(saveAsObject);
 });

@@ -1836,6 +1836,7 @@ export class CCSave {
     cookiesPsRawHighest: number = 0; // Highest raw CpS in this ascension (used in the stock market)
 
     // The following attributes have no direct counterpart in the `Game` namespace.
+
     buildings: CCBuildingsData = new CCBuildingsData();
     ownedUpgrades: string[] = [];
     unlockedUpgrades: string[] = []; // Upgrades which are currently unlocked but non owned
@@ -2024,7 +2025,7 @@ export class CCSave {
         saveObject.lumpT = Number(generalData[44]);
         saveObject.lumpRefill = Number(generalData[45]);
         saveObject.lumpCurrentType = Number(generalData[46]);
-        saveObject.vault = generalData[47].split(',').map(s => Number(s));
+        saveObject.vault = generalData[47].split(',').filter(s => s != '').map(s => Number(s));
         saveObject.heralds = Number(generalData[48]);
         saveObject.fortuneGC = generalData[49] == '1';
         saveObject.fortuneCPS = generalData[50] == '1';
