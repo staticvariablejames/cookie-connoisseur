@@ -102,6 +102,161 @@ export class CCPlainBuilding { // Building without minigame data
     }
 };
 
+export class CCGardenMinigame {
+    nextStep: TimePoint = 1.6e12; // Point in time where the next garden tick will be processed
+    soil: string = 'dirt';
+    nextSoil: TimePoint = 1.6e12; // Point in time where a new soil may be selected
+    freeze: boolean = false; // Whether the garden is frozen or not
+    harvests: number = 0; // Number of mature plants harvested in this ascension
+    harvestsTotal: number = 0; // Total number of mature plants harvested across ascensions
+    onMinigame: boolean = true; // Whether the minigame is open or not
+    convertTimes: number = 0; // Total number of times the garden was sacrificed for 10 sugar lumps
+    nextFreeze: TimePoint = 0; // Unused; used to be the next time the garden could be frozen again
+
+    unlockedPlants: string[] = ['bakersWheat']; // This info is spread in M.plants in-game
+
+    /* In-game, M.plot is always a 6x6 array of pairs [idPlusOne, age]
+     * where idPlusOne is the plant id + 1 (e.g. Baker's Wheat's id is 0,
+     * it is represented by 1 in M.plot), and age is a number between 0 and 100
+     * representing the age of the plant.
+     * Here,
+     * we use the plant name (as defined by the PlantsById array below) or 'empty'.
+     *
+     * Note that the game always keeps a 6x6 grid, even when the garden level is < 9,
+     * and expands it outwards; so e.g. a level 1 garden with all plots full
+     * will occupy the entries plot[2][2], plot[2][3], plot[3][2], plot[3][3].
+     */
+    plot: [string, number][][] = [[['empty', 0]]];
+
+    static SoilsById = [
+        'dirt',
+        'fertilizer',
+        'clay',
+        'pebbles',
+        'woodchips',
+    ];
+
+    static SoilsByName = (() => {
+        let map: { [name: string] : number } = {};
+        for(let i in CCGardenMinigame.SoilsById) {
+            map[CCGardenMinigame.SoilsById[i]] = Number(i);
+        }
+        return map;
+    })();
+
+    static PlantsById = [
+        "bakerWheat",
+        "thumbcorn",
+        "cronerice",
+        "gildmillet",
+        "clover",
+        "goldenClover",
+        "shimmerlily",
+        "elderwort",
+        "bakeberry",
+        "chocoroot",
+        "whiteChocoroot",
+        "whiteMildew",
+        "brownMold",
+        "meddleweed",
+        "whiskerbloom",
+        "chimerose",
+        "nursetulip",
+        "drowsyfern",
+        "wardlichen",
+        "keenmoss",
+        "queenbeet",
+        "queenbeetLump",
+        "duketater",
+        "crumbspore",
+        "doughshroom",
+        "glovemorel",
+        "cheapcap",
+        "foolBolete",
+        "wrinklegill",
+        "greenRot",
+        "shriekbulb",
+        "tidygrass",
+        "everdaisy",
+        "ichorpuff",
+    ];
+
+    static PlantsByKey = (() => {
+        let map: { [name: string] : number } = {};
+        for(let i in CCGardenMinigame.PlantsById) {
+            map[CCGardenMinigame.PlantsById[i]] = Number(i);
+        }
+        return map;
+    })();
+
+    static fromStringSave(str: string) {
+        let m = new CCGardenMinigame();
+        let data = str.split(' ');
+
+        let basicStats = data[0].split(':');
+        m.nextStep = Number(basicStats[0]);
+        m.soil = CCGardenMinigame.SoilsById[Number(basicStats[1])];
+        m.nextSoil = Number(basicStats[2]);
+        m.freeze = Boolean(Number(basicStats[3]));
+        m.harvests = Number(basicStats[4]);
+        m.harvestsTotal = Number(basicStats[5]);
+        m.onMinigame = Boolean(Number(basicStats[6]));
+        m.convertTimes = Number(basicStats[7]);
+        m.nextFreeze = Number(basicStats[8]);
+
+        let plants = data[1];
+        m.unlockedPlants = [];
+        for(let i = 0; i < plants.length; i++) {
+            if(plants.charAt(i) == '1')
+                m.unlockedPlants.push(CCGardenMinigame.PlantsById[i]);
+        }
+
+        let plots = data[2].split(':');
+        let i = 0;
+        for(let x = 0; x < 6; x++) {
+            m.plot[x] = [];
+            for(let y = 0; y < 6; y++) {
+                let id = Number(plots[i++]);
+                let plant = id == 0 ? 'empty' : CCGardenMinigame.PlantsById[id-1];
+                let age = Number(plots[i++]);
+                m.plot[x][y] = [plant, age];
+            }
+        }
+        return m;
+    }
+
+    static toStringSave(m: CCGardenMinigame) {
+        let str = '';
+        str += m.nextStep + ':' +
+            CCGardenMinigame.SoilsByName[m.soil] + ':' +
+            m.nextSoil + ':' +
+            Number(m.freeze) + ':' +
+            m.harvests + ':' +
+            m.harvestsTotal + ':' +
+            Number(m.onMinigame) + ':' +
+            m.convertTimes + ':' +
+            m.nextFreeze + ':' +
+            ' ';
+
+        let unlocked = '0'.repeat(CCGardenMinigame.PlantsById.length).split('');
+        for(let plant of m.unlockedPlants) {
+            unlocked[CCGardenMinigame.PlantsByKey[plant]] = '1';
+        }
+        str += unlocked.join('');
+
+        str += ' ';
+        for(let x = 0; x < 6; x++) {
+            for(let y = 0; y < 6; y++) {
+                let [plant, age] = m.plot[x][y];
+                str += plant == 'empty' ? 0 : CCGardenMinigame.PlantsByKey[plant] + 1;
+                str += ':' + age + ':';
+            }
+        }
+
+        return str;
+    }
+};
+
 export class CCPantheonMinigame {
     diamondSlot: string = '';
     rubySlot: string = '';
@@ -201,7 +356,7 @@ export function parseCCBuildingWithMinigame<MinigameData>(
 export class CCBuildingsData { // Aggregates all buildings
     'Cursor': CCPlainBuilding = new CCPlainBuilding();
     'Grandma': CCPlainBuilding = new CCPlainBuilding();
-    'Farm': CCPlainBuilding = new CCPlainBuilding(); // TODO: implement minigame
+    'Farm' = new CCMinigameBuilding(new CCGardenMinigame());
     'Mine': CCPlainBuilding = new CCPlainBuilding();
     'Factory': CCPlainBuilding = new CCPlainBuilding();
     'Bank': CCPlainBuilding = new CCPlainBuilding(); // TODO
@@ -223,7 +378,7 @@ export class CCBuildingsData { // Aggregates all buildings
         let data = str.split(';');
         buildings['Cursor'] = CCPlainBuilding.fromStringSave(data[0]);
         buildings['Grandma'] = CCPlainBuilding.fromStringSave(data[1]);
-        buildings['Farm'] = CCPlainBuilding.fromStringSave(data[2]);
+        buildings['Farm'] = parseCCBuildingWithMinigame(data[2], CCGardenMinigame.fromStringSave);
         buildings['Mine'] = CCPlainBuilding.fromStringSave(data[3]);
         buildings['Factory'] = CCPlainBuilding.fromStringSave(data[4]);
         buildings['Bank'] = CCPlainBuilding.fromStringSave(data[5]);
@@ -247,7 +402,9 @@ export class CCBuildingsData { // Aggregates all buildings
         let str = '';
         str += CCPlainBuilding.toStringSave(buildings['Cursor']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Grandma']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Farm']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Farm'],
+                    CCGardenMinigame.toStringSave(buildings['Farm'].minigame)
+                )+ ';';
         str += CCPlainBuilding.toStringSave(buildings['Mine']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Factory']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Bank']) + ';';
