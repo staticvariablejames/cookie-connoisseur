@@ -156,6 +156,30 @@ export class CCPantheonMinigame {
     }
 };
 
+export class CCGrimoireMinigame {
+    magic: number = 0; // Current amount of magic; max magic is computed in-game
+    spellsCast: number = 0; // Number of spells cast in the current ascension
+    spellsCastTotal: number = 0; // Total number of spells cast, across ascensions
+    onMinigame: boolean = true; // Whether the minigame is open or not
+
+    static fromStringSave(str: string) {
+        let m = new CCGrimoireMinigame();
+        let data = str.split(' ');
+        m.magic = Number(data[0]);
+        m.spellsCast = Number(data[1]);
+        m.spellsCastTotal = Number(data[2]);
+        m.onMinigame = Boolean(Number(data[3]));
+        return m;
+    }
+
+    static toStringSave(m: CCGrimoireMinigame) {
+        return m.magic + ' ' +
+            m.spellsCast + ' ' +
+            m.spellsCastTotal + ' ' +
+            Number(m.onMinigame);
+    }
+}
+
 export class CCMinigameBuilding<MinigameData> extends CCPlainBuilding {
     constructor(public minigame: MinigameData) {
         super();
@@ -182,7 +206,7 @@ export class CCBuildingsData { // Aggregates all buildings
     'Factory': CCPlainBuilding = new CCPlainBuilding();
     'Bank': CCPlainBuilding = new CCPlainBuilding(); // TODO
     'Temple' = new CCMinigameBuilding(new CCPantheonMinigame());
-    'Wizard tower': CCPlainBuilding = new CCPlainBuilding(); // TODO
+    'Wizard tower' = new CCMinigameBuilding(new CCGrimoireMinigame());
     'Shipment': CCPlainBuilding = new CCPlainBuilding();
     'Alchemy lab': CCPlainBuilding = new CCPlainBuilding();
     'Portal': CCPlainBuilding = new CCPlainBuilding();
@@ -204,7 +228,7 @@ export class CCBuildingsData { // Aggregates all buildings
         buildings['Factory'] = CCPlainBuilding.fromStringSave(data[4]);
         buildings['Bank'] = CCPlainBuilding.fromStringSave(data[5]);
         buildings['Temple'] = parseCCBuildingWithMinigame(data[6], CCPantheonMinigame.fromStringSave);
-        buildings['Wizard tower'] = CCPlainBuilding.fromStringSave(data[7]);
+        buildings['Wizard tower'] = parseCCBuildingWithMinigame(data[7], CCGrimoireMinigame.fromStringSave);
         buildings['Shipment'] = CCPlainBuilding.fromStringSave(data[8]);
         buildings['Alchemy lab'] = CCPlainBuilding.fromStringSave(data[9]);
         buildings['Portal'] = CCPlainBuilding.fromStringSave(data[10]);
@@ -230,7 +254,9 @@ export class CCBuildingsData { // Aggregates all buildings
         str += CCPlainBuilding.toStringSave(buildings['Temple'],
                     CCPantheonMinigame.toStringSave(buildings['Temple'].minigame)
                 ) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Wizard tower']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Wizard tower'],
+                    CCGrimoireMinigame.toStringSave(buildings['Wizard tower'].minigame)
+                ) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Shipment']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Alchemy lab']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Portal']) + ';';
