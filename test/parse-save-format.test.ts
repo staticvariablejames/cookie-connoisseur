@@ -149,7 +149,7 @@ const saveAsObject = {
     lumpsTotal: 1283,
     lumpT: 1606556034153,
     lumpRefill: 0,
-    lumpCurrentType: 2,
+    lumpCurrentType: 'golden',
     vault: [227],
     heralds: 41,
     fortuneGC: true,

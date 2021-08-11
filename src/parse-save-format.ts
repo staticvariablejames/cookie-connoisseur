@@ -82,6 +82,16 @@ export class CCWrinklerData {
     amountShinies: number = 0; // Sum of cookies inside all shiny wrinklers
 }
 
+export const SugarLumpTypesById = [
+    'normal',
+    'bifurcated',
+    'golden',
+    'meaty',
+    'caramelized',
+];
+
+export const SugarLumpTypesByName = invertMap(SugarLumpTypesById);
+
 export class CCPlainBuilding { // Building without minigame data
     amount: number = 0; // Amount of that building that is currently owned
     bought: number = 0; // Number of times this building was bought this ascension
@@ -2064,7 +2074,7 @@ export class CCSave {
     lumpsTotal: number = -1; // Total number of lumps collected across ascensions
     lumpT: TimePoint = 1.6e12; // Time when the current coalescing lump started growing
     lumpRefill: number = 0; // Game.fps * seconds since a minigame lump refill was used
-    lumpCurrentType: number = 0;
+    lumpCurrentType: string = 'normal';
     vault: number[] = []; // ids of vaulted upgrades (from the Insipired checklist heavenly upgrade)
     heralds: number = 42; // Heralds when the game was saved (for calculating offline production)
     fortuneGC: boolean = false; // Whether the golden-cookie-spawning fortune appeared or not
@@ -2150,7 +2160,7 @@ export class CCSave {
             save.lumpsTotal + ';' +
             save.lumpT + ';' +
             save.lumpRefill + ';' +
-            save.lumpCurrentType + ';' +
+            SugarLumpTypesByName[save.lumpCurrentType] + ';' +
             save.vault.join(',') + ';' +
             save.heralds + ';' +
             Number(save.fortuneGC) + ';' +
@@ -2260,7 +2270,7 @@ export class CCSave {
         saveObject.lumpsTotal = Number(generalData[43]);
         saveObject.lumpT = Number(generalData[44]);
         saveObject.lumpRefill = Number(generalData[45]);
-        saveObject.lumpCurrentType = Number(generalData[46]);
+        saveObject.lumpCurrentType = SugarLumpTypesById[Number(generalData[46])];
         saveObject.vault = generalData[47].split(',').filter(s => s != '').map(s => Number(s));
         saveObject.heralds = Number(generalData[48]);
         saveObject.fortuneGC = generalData[49] == '1';
