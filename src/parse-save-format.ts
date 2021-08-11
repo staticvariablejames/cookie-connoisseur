@@ -11,6 +11,20 @@
  */
 type TimePoint = number;
 
+/* Internal function.
+ * Given a list of strings,
+ * return a string->number object inverseMap such that
+ *  inverseMap[map[i]] == i
+ * for all i.
+ */
+function invertMap( map: string[] ) : { [key: string] : number } {
+    let inverseMap: { [name: string] : number } = {};
+    for(let i in map) {
+        inverseMap[map[i]] = Number(i);
+    }
+    return inverseMap;
+}
+
 export class CCPreferences {
     particles: boolean = true; // e.g. cookies falling down
     numbers: boolean = true; // Numbers that pop up when clicking the big cookie
@@ -136,13 +150,7 @@ export class CCGardenMinigame {
         'woodchips',
     ];
 
-    static SoilsByName = (() => {
-        let map: { [name: string] : number } = {};
-        for(let i in CCGardenMinigame.SoilsById) {
-            map[CCGardenMinigame.SoilsById[i]] = Number(i);
-        }
-        return map;
-    })();
+    static SoilsByName = invertMap(CCGardenMinigame.SoilsById);
 
     static PlantsById = [
         "bakerWheat",
@@ -181,13 +189,7 @@ export class CCGardenMinigame {
         "ichorpuff",
     ];
 
-    static PlantsByKey = (() => {
-        let map: { [name: string] : number } = {};
-        for(let i in CCGardenMinigame.PlantsById) {
-            map[CCGardenMinigame.PlantsById[i]] = Number(i);
-        }
-        return map;
-    })();
+    static PlantsByKey = invertMap(CCGardenMinigame.PlantsById);
 
     static fromStringSave(str: string) {
         let m = new CCGardenMinigame();
@@ -281,13 +283,7 @@ export class CCPantheonMinigame {
         'order' // Rigidel, Spirit of Order
     ];
 
-    static GodsByName = (() => {
-        let map: { [name: string] : number } = {};
-        for(let i in CCPantheonMinigame.GodsById) {
-            map[CCPantheonMinigame.GodsById[i]] = Number(i);
-        }
-        return map;
-    })();
+    static GodsByName = invertMap(CCPantheonMinigame.GodsById);
 
     static fromStringSave(str: string) {
         let M = new CCPantheonMinigame();
@@ -1167,13 +1163,7 @@ export const UpgradesById = [
     "Milk chocolate cookies",
 ];
 
-export const UpgradesByName = (() => {
-    let map: { [name: string] : number } = {};
-    for(let i in UpgradesById) {
-        map[UpgradesById[i]] = Number(i);
-    }
-    return map;
-})();
+export const UpgradesByName = invertMap(UpgradesById);
 
 /* List of all achievements in the game, sorted by id.
  * This lis follow their in-game names,
@@ -1724,13 +1714,7 @@ export const AchievementsById = [
     "Liquid assets",
 ]
 
-export const AchievementsByName = (() => {
-    let map: { [name: string] : number } = {};
-    for(let i in AchievementsById) {
-        map[AchievementsById[i]] = Number(i);
-    }
-    return map;
-})();
+export const AchievementsByName = invertMap(AchievementsById);
 
 /* Cookie Clicker buffs.
  * `name` here is the "technical name" used in the code;
@@ -1964,13 +1948,7 @@ export const BuffNamesById = [
     'unknown',
 ];
 
-export const BuffIdsByName = (() => {
-    let map: { [name: string] : number } = {};
-    for(let i in BuffNamesById) {
-        map[BuffNamesById[i]] = Number(i);
-    }
-    return map;
-})();
+export const BuffIdsByName = invertMap(BuffNamesById);
 
 export type CCBuff = CCBuffFrenzy | CCBuffElderFrenzy | CCBuffClot |
     CCBuffDragonHarvest | CCBuffEverythingMustGo | CCBuffCursedFinger |
