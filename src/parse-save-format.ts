@@ -2064,7 +2064,7 @@ export class CCSave {
     heavenlyChips: number = 0; // Number of unspent heavenly chips
     heavenlyChipsSpent: number = 0; // prestige - heavenlyChips
     ascensionMode: number = 0; // 0 if regular, 1 if Born again
-    permanentUpgrades: number[] = [-1, -1, -1, -1, -1]; // Upgrade ids in the permanent upgrade slots
+    permanentUpgrades: string[] = ['', '', '', '', '']; // Upgrade ids in the permanent upgrade slots
     dragonLevel: number = 0; // Current level of Krumblor
     dragonAura: number = 0; // Id of the first aura
     dragonAura2: number = 0; // Id of the second aura
@@ -2075,7 +2075,7 @@ export class CCSave {
     lumpT: TimePoint = 1.6e12; // Time when the current coalescing lump started growing
     lumpRefill: number = 0; // Game.fps * seconds since a minigame lump refill was used
     lumpCurrentType: string = 'normal';
-    vault: number[] = []; // ids of vaulted upgrades (from the Insipired checklist heavenly upgrade)
+    vault: string[] = []; // vaulted upgrades (from the Insipired checklist heavenly upgrade)
     heralds: number = 42; // Heralds when the game was saved (for calculating offline production)
     fortuneGC: boolean = false; // Whether the golden-cookie-spawning fortune appeared or not
     fortuneCPS: boolean = false; // Whether the hour-of-CpS fortune appeared or not
@@ -2144,11 +2144,7 @@ export class CCSave {
             save.heavenlyChipsSpent + ';' +
             '0;' + // Game.heavenlyCookies; unused, always zero
             save.ascensionMode + ';' +
-            save.permanentUpgrades[0] + ';' +
-            save.permanentUpgrades[1] + ';' +
-            save.permanentUpgrades[2] + ';' +
-            save.permanentUpgrades[3] + ';' +
-            save.permanentUpgrades[4] + ';' +
+            save.permanentUpgrades.map(u => u == '' ? '-1' : UpgradesByName[u]).join(';') + ';' +
             save.dragonLevel + ';' +
             save.dragonAura + ';' +
             save.dragonAura2 + ';' +
@@ -2161,7 +2157,7 @@ export class CCSave {
             save.lumpT + ';' +
             save.lumpRefill + ';' +
             SugarLumpTypesByName[save.lumpCurrentType] + ';' +
-            save.vault.join(',') + ';' +
+            save.vault.map(u => UpgradesByName[u]).join(',') + ';' +
             save.heralds + ';' +
             Number(save.fortuneGC) + ';' +
             Number(save.fortuneCPS) + ';' +
@@ -2254,11 +2250,11 @@ export class CCSave {
         saveObject.heavenlyChipsSpent = Number(generalData[27]);
         // generalData[28] is Game.heavenlyCookies, which is always zero
         saveObject.ascensionMode = Number(generalData[29]);
-        saveObject.permanentUpgrades[0] = Number(generalData[30]);
-        saveObject.permanentUpgrades[1] = Number(generalData[31]);
-        saveObject.permanentUpgrades[2] = Number(generalData[32]);
-        saveObject.permanentUpgrades[3] = Number(generalData[33]);
-        saveObject.permanentUpgrades[4] = Number(generalData[34]);
+        saveObject.permanentUpgrades[0] = generalData[30] == '-1' ? '' : UpgradesById[Number(generalData[30])];
+        saveObject.permanentUpgrades[1] = generalData[31] == '-1' ? '' : UpgradesById[Number(generalData[31])];
+        saveObject.permanentUpgrades[2] = generalData[32] == '-1' ? '' : UpgradesById[Number(generalData[32])];
+        saveObject.permanentUpgrades[3] = generalData[33] == '-1' ? '' : UpgradesById[Number(generalData[33])];
+        saveObject.permanentUpgrades[4] = generalData[34] == '-1' ? '' : UpgradesById[Number(generalData[34])];
         saveObject.dragonLevel = Number(generalData[35]);
         saveObject.dragonAura = Number(generalData[36]);
         saveObject.dragonAura2 = Number(generalData[37]);
@@ -2271,7 +2267,7 @@ export class CCSave {
         saveObject.lumpT = Number(generalData[44]);
         saveObject.lumpRefill = Number(generalData[45]);
         saveObject.lumpCurrentType = SugarLumpTypesById[Number(generalData[46])];
-        saveObject.vault = generalData[47].split(',').filter(s => s != '').map(s => Number(s));
+        saveObject.vault = generalData[47].split(',').filter(s => s != '').map(s => UpgradesById[Number(s)]);
         saveObject.heralds = Number(generalData[48]);
         saveObject.fortuneGC = generalData[49] == '1';
         saveObject.fortuneCPS = generalData[50] == '1';
