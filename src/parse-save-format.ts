@@ -269,6 +269,133 @@ export class CCGardenMinigame {
     }
 };
 
+// Represents a single stock from the market minigame
+export class CCMarketStock {
+    val: number = 0; // 100 * current value of the stock
+    mode: string = 'stable'; // One of the eight stock market modes
+    d: number = 0; // 100 * current stock delta
+    dur: number = 0; // Number of stock market ticks that the stock will stay in its current mode
+    stock: number = 0; // Amount of this stock we currently own
+    hidden: boolean = false; // Visual toggle in each stock
+    last: number = 0; // 1: stock was bought last tick; 2: stock was sold last tick; 0: neither
+
+    static ModesById = ['stable','slow rise','slow fall','fast rise','fast fall','chaotic'];
+    static ModesByName = invertMap(CCMarketStock.ModesById);
+
+    static fromStringSave(str: string) {
+        let s = new CCMarketStock();
+        let data = str.split(':');
+        s.val = Number(data[0]) / 100;
+        s.mode = CCMarketStock.ModesById[Number(data[1])];
+        s.d = Number(data[2]) / 100;
+        s.dur = Number(data[3]);
+        s.stock = Number(data[4]);
+        s.hidden = Boolean(Number(data[5]));
+        s.last = Number(data[6]);
+        return s;
+    }
+
+    static toStringSave(s: CCMarketStock) {
+        return Math.round(100 * s.val) + ':' +
+            CCMarketStock.ModesByName[s.mode] + ':' +
+            Math.round(100 * s.d) + ':' +
+            s.dur + ':' +
+            s.stock + ':' +
+            Number(s.hidden) + ':' +
+            s.last;
+    }
+}
+
+export class CCMarketStockList {
+    CRL: CCMarketStock = new CCMarketStock(); // Cereals
+    CHC: CCMarketStock = new CCMarketStock(); // Chocolate
+    BTR: CCMarketStock = new CCMarketStock(); // Butter
+    SUG: CCMarketStock = new CCMarketStock(); // Sugar
+    NUT: CCMarketStock = new CCMarketStock(); // Nuts
+    SLT: CCMarketStock = new CCMarketStock(); // Salt
+    VNL: CCMarketStock = new CCMarketStock(); // Vanilla
+    EGG: CCMarketStock = new CCMarketStock(); // Eggs
+    CNM: CCMarketStock = new CCMarketStock(); // Cinnamon
+    CRM: CCMarketStock = new CCMarketStock(); // Cream
+    JAM: CCMarketStock = new CCMarketStock(); // Jam
+    WCH: CCMarketStock = new CCMarketStock(); // White chocolate
+    HNY: CCMarketStock = new CCMarketStock(); // Honey
+    CKI: CCMarketStock = new CCMarketStock(); // Cookies
+    RCP: CCMarketStock = new CCMarketStock(); // Recipes
+    SBD: CCMarketStock = new CCMarketStock(); // Subsidiaries
+
+    static fromStringSave(str: string) {
+        let l = new CCMarketStockList();
+        let data = str.split('!');
+        l.CRL = CCMarketStock.fromStringSave(data[0]);
+        l.CHC = CCMarketStock.fromStringSave(data[1]);
+        l.BTR = CCMarketStock.fromStringSave(data[2]);
+        l.SUG = CCMarketStock.fromStringSave(data[3]);
+        l.NUT = CCMarketStock.fromStringSave(data[4]);
+        l.SLT = CCMarketStock.fromStringSave(data[5]);
+        l.VNL = CCMarketStock.fromStringSave(data[6]);
+        l.EGG = CCMarketStock.fromStringSave(data[7]);
+        l.CNM = CCMarketStock.fromStringSave(data[8]);
+        l.CRM = CCMarketStock.fromStringSave(data[9]);
+        l.JAM = CCMarketStock.fromStringSave(data[10]);
+        l.WCH = CCMarketStock.fromStringSave(data[11]);
+        l.HNY = CCMarketStock.fromStringSave(data[12]);
+        l.CKI = CCMarketStock.fromStringSave(data[13]);
+        l.RCP = CCMarketStock.fromStringSave(data[14]);
+        if(data[15] != '') // Support for versions < 2.03
+            l.SBD = CCMarketStock.fromStringSave(data[15]);
+        return l;
+    }
+
+    static toStringSave(l: CCMarketStockList) {
+        let str = '';
+        for(let [_key, value] of Object.entries(l)) {
+            str += CCMarketStock.toStringSave(value) + '!';
+        }
+        return str;
+    }
+
+}
+
+export class CCMarketMinigame {
+    officeLevel: number = 0; // Office level; this is one less than the displayed level
+    brokers: number = 0; // Number of brokers
+    graphLines: boolean = true; // Show the graph as a line instead of a box plot
+    profit: number = 0; // Profits during this ascension
+    graphCols: boolean = false; // Graph colors; dark mode if true, light mode if false.
+    onMinigame: boolean = true; // Whether the minigame is open or not
+
+    goods = new CCMarketStockList(); // List of goods; not directly available like this in-game
+
+    static fromStringSave(str: string) {
+        let m = new CCMarketMinigame();
+        let data = str.split(' ');
+
+        let basicData = data[0].split(':');
+        m.officeLevel = Number(basicData[0]);
+        m.brokers = Number(basicData[1]);
+        m.graphLines = Boolean(Number(basicData[2]));
+        m.profit = Number(basicData[3]);
+        m.graphCols = Boolean(Number(basicData[4]));
+
+        m.goods = CCMarketStockList.fromStringSave(data[1]);
+
+        m.onMinigame = Boolean(Number(data[2]));
+        return m;
+    }
+
+    static toStringSave(m: CCMarketMinigame) {
+        return m.officeLevel + ':' +
+            m.brokers + ':' +
+            Number(m.graphLines) + ':' +
+            m.profit + ':' +
+            m.graphCols + ':' +
+            ' ' +
+            CCMarketStockList.toStringSave(m.goods) + ' ' +
+            Number(m.onMinigame);
+    }
+};
+
 export class CCPantheonMinigame {
     diamondSlot: string = '';
     rubySlot: string = '';
@@ -365,7 +492,7 @@ export class CCBuildingsData { // Aggregates all buildings
     'Farm' = new CCMinigameBuilding(new CCGardenMinigame());
     'Mine': CCPlainBuilding = new CCPlainBuilding();
     'Factory': CCPlainBuilding = new CCPlainBuilding();
-    'Bank': CCPlainBuilding = new CCPlainBuilding(); // TODO
+    'Bank' = new CCMinigameBuilding(new CCMarketMinigame());
     'Temple' = new CCMinigameBuilding(new CCPantheonMinigame());
     'Wizard tower' = new CCMinigameBuilding(new CCGrimoireMinigame());
     'Shipment': CCPlainBuilding = new CCPlainBuilding();
@@ -387,7 +514,7 @@ export class CCBuildingsData { // Aggregates all buildings
         buildings['Farm'] = parseCCBuildingWithMinigame(data[2], CCGardenMinigame.fromStringSave);
         buildings['Mine'] = CCPlainBuilding.fromStringSave(data[3]);
         buildings['Factory'] = CCPlainBuilding.fromStringSave(data[4]);
-        buildings['Bank'] = CCPlainBuilding.fromStringSave(data[5]);
+        buildings['Bank'] = parseCCBuildingWithMinigame(data[5], CCMarketMinigame.fromStringSave);
         buildings['Temple'] = parseCCBuildingWithMinigame(data[6], CCPantheonMinigame.fromStringSave);
         buildings['Wizard tower'] = parseCCBuildingWithMinigame(data[7], CCGrimoireMinigame.fromStringSave);
         buildings['Shipment'] = CCPlainBuilding.fromStringSave(data[8]);
@@ -413,7 +540,9 @@ export class CCBuildingsData { // Aggregates all buildings
                 )+ ';';
         str += CCPlainBuilding.toStringSave(buildings['Mine']) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Factory']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Bank']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Bank'],
+                    CCMarketMinigame.toStringSave(buildings['Bank'].minigame)
+                ) + ';';
         str += CCPlainBuilding.toStringSave(buildings['Temple'],
                     CCPantheonMinigame.toStringSave(buildings['Temple'].minigame)
                 ) + ';';
