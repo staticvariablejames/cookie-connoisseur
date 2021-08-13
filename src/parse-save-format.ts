@@ -432,17 +432,17 @@ export class CCPantheonMinigame {
     static GodsByName = invertMap(CCPantheonMinigame.GodsById);
 
     static fromStringSave(str: string) {
-        let M = new CCPantheonMinigame();
-        if(!str) return M;
+        let m = new CCPantheonMinigame();
+        if(!str) return m;
         let data = str.split(' ');
         let gods = data[0].split('/');
-        M.diamondSlot = CCPantheonMinigame.GodsById[Number(gods[0])];
-        M.rubySlot = CCPantheonMinigame.GodsById[Number(gods[1])];
-        M.jadeSlot = CCPantheonMinigame.GodsById[Number(gods[2])];
-        M.swaps = Number(data[1]);
-        M.swapT = Number(data[2]);
-        M.onMinigame = Boolean(Number(data[3]));
-        return M;
+        m.diamondSlot = CCPantheonMinigame.GodsById[Number(gods[0])];
+        m.rubySlot = CCPantheonMinigame.GodsById[Number(gods[1])];
+        m.jadeSlot = CCPantheonMinigame.GodsById[Number(gods[2])];
+        m.swaps = Number(data[1]);
+        m.swapT = Number(data[2]);
+        m.onMinigame = Boolean(Number(data[3]));
+        return m;
     }
 
     static toStringSave(m: CCPantheonMinigame) {
