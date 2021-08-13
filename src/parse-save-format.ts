@@ -101,6 +101,11 @@ export class CCPlainBuilding { // Building without minigame data
     muted: boolean = false; // Whether the building is hidden or not
     highest: number = 0; // Higest amount of this building owned in this ascension
 
+    /* The portion of the save format which contains the building data
+     * also contains the minigame data.
+     * The callback will be called with that data.
+     * Note that minigameData might be the empty string!
+     */
     static fromStringSave(str: string, callback?: (minigameData: string) => void) {
         // Callback is called with the minigame string
         let obj = new CCPlainBuilding();
@@ -203,6 +208,8 @@ export class CCGardenMinigame {
 
     static fromStringSave(str: string) {
         let m = new CCGardenMinigame();
+        if(!str) return m;
+
         let data = str.split(' ');
 
         let basicStats = data[0].split(':');
@@ -284,6 +291,7 @@ export class CCMarketStock {
 
     static fromStringSave(str: string) {
         let s = new CCMarketStock();
+        if(!str) return s;
         let data = str.split(':');
         s.val = Number(data[0]) / 100;
         s.mode = CCMarketStock.ModesById[Number(data[1])];
@@ -326,6 +334,7 @@ export class CCMarketStockList {
 
     static fromStringSave(str: string) {
         let l = new CCMarketStockList();
+        if(!str) return l;
         let data = str.split('!');
         l.CRL = CCMarketStock.fromStringSave(data[0]);
         l.CHC = CCMarketStock.fromStringSave(data[1]);
@@ -342,8 +351,7 @@ export class CCMarketStockList {
         l.HNY = CCMarketStock.fromStringSave(data[12]);
         l.CKI = CCMarketStock.fromStringSave(data[13]);
         l.RCP = CCMarketStock.fromStringSave(data[14]);
-        if(data[15] != '') // Support for versions < 2.03
-            l.SBD = CCMarketStock.fromStringSave(data[15]);
+        l.SBD = CCMarketStock.fromStringSave(data[15]);
         return l;
     }
 
@@ -369,6 +377,7 @@ export class CCMarketMinigame {
 
     static fromStringSave(str: string) {
         let m = new CCMarketMinigame();
+        if(!str) return m;
         let data = str.split(' ');
 
         let basicData = data[0].split(':');
@@ -424,6 +433,7 @@ export class CCPantheonMinigame {
 
     static fromStringSave(str: string) {
         let M = new CCPantheonMinigame();
+        if(!str) return M;
         let data = str.split(' ');
         let gods = data[0].split('/');
         M.diamondSlot = CCPantheonMinigame.GodsById[Number(gods[0])];
@@ -452,6 +462,7 @@ export class CCGrimoireMinigame {
 
     static fromStringSave(str: string) {
         let m = new CCGrimoireMinigame();
+        if(!str) return m;
         let data = str.split(' ');
         m.magic = Number(data[0]);
         m.spellsCast = Number(data[1]);
