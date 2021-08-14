@@ -72,7 +72,9 @@ const saveAsString =
    'MCwwOzExLDI1OTIwMDAsMjU2MTUyNCwxLDAsMDszLDYzNzQsMTExOCwxNSwwLDA7MjAsMjE2MDAw'+
    'LDIxMDk1MywxLjUsMCwwOzI0LDUxODQwMDAsNTE3ODk2OCwxLjIsMCwwOzE5LDEwODAwMCwxMDMw'+
    'MTEsMywwLDA7MjIsMTIwNiw3MDAsMjs3LDY5MCwyMTUsMTExMTs2LDkwMCw0NDIsNzc3OzksMjA3'+
-   'MCwxNjQ0LDYwLjMsMTA7fA%3D%3D%21END%21';
+   'MCwxNjQ0LDYwLjMsMTA7fG1vZDE6c29tZSBub24tSlNPTi5wYXJzZS1hYmxlIGRhdGE7bW9kMjp7'+
+   'InRoaXNJc1BhcnNlYWJsZSI6IHRydWV9O21vZDM6eyJhIHRyaWNreSBlbnRyeSI6IltQXSIsImFu'+
+   'b3RoZXIgb25lIjoiW1NdIn07%21END%21';
 
 const saveAsObject = {
     version: 2.031,
@@ -1516,7 +1518,18 @@ const saveAsObject = {
         {name: 'dragonflight',   maxTime: 690,     time: 215, multClick: 1111},
         {name: 'click frenzy',   maxTime: 900,     time: 442, multClick: 777},
         {name: 'building buff',  maxTime: 2070,    time: 1644, multCpS: 60.3, building: 10},
-    ]
+    ],
+
+    modSaveData: {
+        mod1: "some non-JSON.parse-able data",
+        mod2: {
+            thisIsParseable: true,
+        },
+        mod3: {
+            'a tricky entry': '|',
+            'another one': ';',
+        },
+    },
 }
 
 test('The save game is properly parsed', async() => {

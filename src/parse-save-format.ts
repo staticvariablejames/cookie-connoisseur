@@ -2165,6 +2165,63 @@ export function writeBuffToString(buff: CCBuff) {
     return str;
 }
 
+/* In the Game namespace,
+ * the values of modSaveData are always strings.
+ * However, a common pattern is for the string to be the output of JSON.stringify.
+ * Therefore, if the given string is JSON.parse-able,
+ * this is the value it will be written here.
+ */
+export class CCModSaveData {
+    [modName: string] : string | object;
+
+    /* Cookie Clicker's handcrafted save format relies on '|' and ';' as separators,
+     * so to prevent mod data from messing with this,
+     * all '|' and ';' are replaced with '[P]' and '[S]', respectively,
+     * and back again when restoring.
+     *
+     * This does mean that if the save itself contains '[P]', for example,
+     * then this process will break the mods' save.
+     * If your mod can potentially generate a save with the substring '[P]',
+     * one workaround is to replace all instances of '[P' with '[PP'
+     * before saving, and '[PP' to '[P' when restoring.
+     * Similarly '[S' -> '[SS' before saving and '[SS' -> '[S' when restoring.
+     */
+    static safeSaveString(str: string) {
+        return str.replace(/\|/g, '[P]').replace(/;/g, '[S]');
+    }
+    static safeLoadString(str: string) {
+        return str.replace(/\[P\]/g, '|').replace(/\[S\]/g, ';');
+    }
+
+    static fromStringSave(str: string) {
+        let modSaveData = new CCModSaveData();
+        let allData = str.split(';');
+        for(let data of allData) {
+            if(!data) continue;
+            let i = data.indexOf(':');
+            let modName = data.substring(0, i);
+            let modRawData = CCModSaveData.safeLoadString(data.substring(i+1));
+            try {
+                modSaveData[modName] = JSON.parse(modRawData);
+            } catch (_) {
+                modSaveData[modName] = modRawData;
+            }
+        }
+        return modSaveData;
+    }
+
+    static toStringSave(modSaveData: CCModSaveData) {
+        let str = '';
+        for(let name in modSaveData) {
+            let rawData = modSaveData[name];
+            if(typeof rawData != 'string')
+                rawData = JSON.stringify(rawData);
+            str += name + ':' + CCModSaveData.safeSaveString(rawData) + ';';
+        }
+        return str;
+    }
+}
+
 export class CCSave {
     // Attribute names have the same name in game
     version: number = 2.031;
@@ -2228,6 +2285,7 @@ export class CCSave {
     unlockedUpgrades: string[] = []; // Upgrades which are currently unlocked but non owned
     achievements: string[] = []; // Achievements won
     buffs: CCBuff[] = [];
+    modSaveData = new CCModSaveData();
 
     // TODO: Add constructor accepting partial data
 
@@ -2330,6 +2388,8 @@ export class CCSave {
         saveString += save.buffs.map(writeBuffToString).join(';');
 
         saveString += '|';
+        saveString += CCModSaveData.toStringSave(save.modSaveData);
+
         saveString = Buffer.from(saveString).toString('base64');
         return encodeURIComponent(saveString) + '%21END%21';
     }
@@ -2431,6 +2491,8 @@ export class CCSave {
         for(let str of buffStr) {
             if(str != '') saveObject.buffs.push(parseBuffFromString(str));
         }
+
+        saveObject.modSaveData = CCModSaveData.fromStringSave(data[9]);
 
         return saveObject;
     }
