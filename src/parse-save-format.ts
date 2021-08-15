@@ -2202,12 +2202,27 @@ export class CCModSaveData {
 
     static fromStringSave(str: string) {
         let modSaveData = new CCModSaveData();
+        if(!str) return modSaveData;
+
         let allData = str.split(';');
         for(let data of allData) {
             if(!data) continue;
             let i = data.indexOf(':');
             let modName = data.substring(0, i);
             let modRawData = CCModSaveData.safeLoadString(data.substring(i+1));
+
+            if(modName.trim() == '' && modRawData.trim() == '') {
+                /* This should not happen normally.
+                 * It may happen if the save is un-base64-encoded,
+                 * the plain save is edited manually,
+                 * and when encoding back to base64,
+                 * a "\n" at the end of the file is accidentally encoded together with the rest.
+                 *
+                 * We silently ignore this entry in this case.
+                 */
+                continue;
+            }
+
             try {
                 modSaveData[modName] = JSON.parse(modRawData);
             } catch (_) {
