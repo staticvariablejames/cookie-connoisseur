@@ -155,7 +155,14 @@ export class CCGardenMinigame {
      * and expands it outwards; so e.g. a level 1 garden with all plots full
      * will occupy the entries plot[2][2], plot[2][3], plot[3][2], plot[3][3].
      */
-    plot: [string, number][][] = [[['empty', 0]]];
+    plot: [string, number][][] = [
+        [['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0]],
+        [['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0]],
+        [['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0]],
+        [['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0]],
+        [['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0]],
+        [['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0], ['empty', 0]],
+    ];
 
     static SoilsById = [
         'dirt',
