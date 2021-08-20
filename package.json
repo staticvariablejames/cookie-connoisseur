@@ -5,6 +5,7 @@
   "repository": "github:staticvariablejames/cookie-connoisseur",
   "main": "lib/index.js",
   "bin": {
+    "ccsave-to-json": "bin/ccsave-to-json.js",
     "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js",
     "launch-cookie-clicker-instance": "bin/launch-cookie-clicker-instance.js"
   },
