@@ -1,12 +1,14 @@
 # Changelog
 
 ## Unreleased
+- Added; Class `CCSave`, a JSON-like representation of a Cookie Clicker save.
+- Added: Command line utility for parsing Cookie Clicker saves to a human-readable JSON format.
+- Added: Property `localDirectories` in the configuration file to reroute to entire directories.
 - Change: `customURLs` in the configuration file that redirect to local files
     are now located under the `localFiles` attribute. (**breaking**)
-- Added: Property `localDirectories` in the connfiguration file to reroute to entire directories.
-- Added: This changelog!
 
 ## 0.1.1 - 2021-08-03
+- Added: This changelog!
 - Added: Made explicit that routes registered by Cookie Connoisseur may be overriden.
 - Bugfix: Prevents routing errors from crashing Playwright.
     This should allow for parallel testing.
