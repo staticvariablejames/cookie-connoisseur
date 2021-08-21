@@ -1,4 +1,4 @@
-import { CCSave } from './parse-save-format';
+import { CCSave } from './ccsave';
 
 process.stdin.setEncoding('utf8');
 
