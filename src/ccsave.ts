@@ -5,25 +5,13 @@
  * but several boolean attributes are in fact either 0 or 1 in the game code.
  */
 
+import { invertMap } from './util';
+
 /* This type exists only for documentation.
  * Numbers of this type represent a number of milliseconds since January 1st, 1970,
  * like the output of Date.now() and Date.UTC().
  */
 type TimePoint = number;
-
-/* Internal function.
- * Given a list of strings,
- * return a string->number object inverseMap such that
- *  inverseMap[map[i]] == i
- * for all i.
- */
-function invertMap( map: string[] ) : { [key: string] : number } {
-    let inverseMap: { [name: string] : number } = {};
-    for(let i in map) {
-        inverseMap[map[i]] = Number(i);
-    }
-    return inverseMap;
-}
 
 export class CCPreferences {
     particles: boolean = true; // e.g. cookies falling down
