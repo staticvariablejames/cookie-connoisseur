@@ -62,11 +62,11 @@ test.describe('pseudoObjectAssign', () => {
     test('complains if arguments are not objects', () => {
         let mock = makeOnErrorMock();
         pseudoObjectAssign('a', {}, mock.onError);
-        expect(mock.msg).toContain('target is not a non-null object');
+        expect(mock.msg).toContain('target is not an object');
 
         mock = makeOnErrorMock();
         pseudoObjectAssign({}, 'a', mock.onError);
-        expect(mock.msg).toContain('source is not a non-null object');
+        expect(mock.msg).toContain('source is not an object');
     });
 
     test('leaves alone arrays, functions, and objects', () => {
