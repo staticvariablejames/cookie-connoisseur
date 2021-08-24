@@ -27,8 +27,10 @@ export const throwOnError: ErrorHandler = (msg: string) => {
  * and the attribute must be a string, number or boolean
  * (so functions, arrays and objects are ignored).
  *
- * If either the target or the source are null (or not objects),
+ * If either the target or the source are null or undefined,
  * the target is returned unmodified.
+ * Otherwise, if either the target or the source are not objects,
+ * the function still returns the target unmodified but complains to onError first.
  *
  * The subobjectName attribute is used to generate more helpful error messages.
  * By default, the function complains that e.g. "source.amount is not a number".
@@ -43,11 +45,12 @@ export function pseudoObjectAssign<T>(
     // TODO: improve typings
     let _target = target as any;
     if(_target === null || source === null) return _target;
-    if(typeof _target != 'object' || _target == null) {
+    if(_target === undefined || source === undefined) return _target;
+    if(typeof _target != 'object') {
         onError('target is not an object');
         return _target;
     }
-    if(typeof source != 'object' || source == null) {
+    if(typeof source != 'object') {
         onError('source is not an object');
         return _target;
     }

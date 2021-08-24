@@ -45,6 +45,24 @@ test.describe('pseudoObjectAssign', () => {
         expect(mock.msg).toEqual('');
     });
 
+    test('ignores null and undefined', () => {
+        let mock = makeOnErrorMock();
+        expect(pseudoObjectAssign({a: 5}, null, mock.onError)).toMatchObject({a: 5});
+        expect(mock.msg == '');
+
+        mock = makeOnErrorMock();
+        expect(pseudoObjectAssign(null, {a: 5}, mock.onError)).toBeNull();
+        expect(mock.msg == '');
+
+        mock = makeOnErrorMock();
+        expect(pseudoObjectAssign({a: 5}, undefined, mock.onError)).toMatchObject({a: 5});
+        expect(mock.msg == '');
+
+        mock = makeOnErrorMock();
+        expect(pseudoObjectAssign(undefined, {a: 5}, mock.onError)).toBeUndefined();
+        expect(mock.msg == '');
+    });
+
     test('complains about mismatched types', () => {
         let mock = makeOnErrorMock();
         let out = pseudoObjectAssign({a: 5}, {a: true}, mock.onError);
