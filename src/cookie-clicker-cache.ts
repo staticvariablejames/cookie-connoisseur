@@ -6,7 +6,7 @@
  *
  * This file contains utilities for managing this cache.
  */
-import { urlsToDrop } from './url-list.js';
+import { urlsToDrop } from './url-list';
 
 export function localPathOfURL(url: string) {
     return '.cookie-connoisseur/' + url.replace(/https?:\/\//, '');

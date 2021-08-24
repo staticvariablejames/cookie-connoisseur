@@ -1,9 +1,9 @@
 import { Browser, BrowserContextOptions, Route } from 'playwright';
 import { existsSync } from 'fs';
-import { cacheURLs } from './url-list.js';
-import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache.js';
-import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities.js';
-import { parseConfigFile, CookieConnoisseurConfig } from './parse-config.js';
+import { cacheURLs } from './url-list';
+import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache';
+import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities';
+import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,

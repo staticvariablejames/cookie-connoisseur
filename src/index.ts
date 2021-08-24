@@ -1,2 +1,2 @@
-export { CCPageOptions, openCookieClickerPage } from './cookie-clicker-page.js';
+export { CCPageOptions, openCookieClickerPage } from './cookie-clicker-page';
 export * from './ccsave';

@@ -5,7 +5,7 @@
 
 /// <reference path="../src/browser-utilities.d.ts" />
 import { test, expect } from '@playwright/test';
-import { CCPageOptions, openCookieClickerPage } from '../lib/cookie-clicker-page.js';
+import { CCPageOptions, openCookieClickerPage } from '../src/cookie-clicker-page';
 
 test('The game always starts on 2020', async({ browser }) => {
     let page = await openCookieClickerPage(browser);

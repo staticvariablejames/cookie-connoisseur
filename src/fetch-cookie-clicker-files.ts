@@ -1,9 +1,9 @@
 import { promises as fsPromises } from 'fs';
 import { dirname } from 'path';
-import { localPathOfURL } from './cookie-clicker-cache.js';
+import { localPathOfURL } from './cookie-clicker-cache';
 import { chromium, Page, Response } from 'playwright';
-import { cacheURLs } from './url-list.js';
-import { parseConfigFile } from './parse-config.js';
+import { cacheURLs } from './url-list';
+import { parseConfigFile } from './parse-config';
 
 async function fetchUrl(page: Page, url: string) {
     if(url.endsWith('/favicon.ico')) {

@@ -1,5 +1,5 @@
 import { firefox } from 'playwright';
-import { openCookieClickerPage } from './cookie-clicker-page.js';
+import { openCookieClickerPage } from './cookie-clicker-page';
 
 setTimeout(async () => {
     let browser = await firefox.launch( {headless: false} );

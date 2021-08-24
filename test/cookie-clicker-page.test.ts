@@ -4,7 +4,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-import { CCPageOptions, openCookieClickerPage } from '../lib/cookie-clicker-page.js';
+import { CCPageOptions, openCookieClickerPage } from '../src/cookie-clicker-page';
 
 test('Page loads and game works', async ({browser}) => {
     let page = await openCookieClickerPage(browser);

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { CCSave, CCBuff } from '../lib/ccsave.js';
+import { CCSave, CCBuff } from '../src/ccsave';
 
 const saveAsString =
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+
