@@ -84,7 +84,7 @@ const saveAsObject = {
     bakeryName: 'Static',
     seed: 'ujxnq',
 
-    preferences: {
+    prefs: {
         particles: true,
         numbers: true,
         autosave: true,

@@ -2241,7 +2241,7 @@ export class CCSave {
     bakeryName: string = "Test"; // Matches [A-Za-z0-9_ ]{1,28}
     seed: string = "aaaaa"; // Matches [a-z]{5}
 
-    preferences: CCPreferences = new CCPreferences();
+    prefs: CCPreferences = new CCPreferences();
 
     cookies: number = 0; // Number of cookies in bank
     cookiesEarned: number = 0; // Total number of cookies baked in this ascension
@@ -2319,7 +2319,7 @@ export class CCSave {
             save.seed;
 
         saveString += '|';
-        saveString += CCPreferences.toBitstring(save.preferences)
+        saveString += CCPreferences.toBitstring(save.prefs)
 
         saveString += '|';
         saveString += save.cookies + ';' +
@@ -2427,7 +2427,7 @@ export class CCSave {
         saveObject.bakeryName = saveMetadata[3] ?? 'Test';
         saveObject.seed = saveMetadata[4];
 
-        saveObject.preferences = CCPreferences.fromBitstring(data[3]);
+        saveObject.prefs = CCPreferences.fromBitstring(data[3]);
 
         let generalData = data[4].split(';');
         saveObject.cookies = Number(generalData[0]);
