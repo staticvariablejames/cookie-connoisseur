@@ -122,5 +122,13 @@ test.describe('pseudoObjectAssign', () => {
         mock = makeOnErrorMock();
         pseudoObjectAssign({a: 1}, {a: true}, mock.onError, '["Wizard towers"]');
         expect(mock.msg).toContain('source["Wizard towers"].a is not a number');
+
+        mock = makeOnErrorMock();
+        pseudoObjectAssign({a: 1}, true, mock.onError, '.prefs');
+        expect(mock.msg).toContain('source.prefs is not an object');
+
+        mock = makeOnErrorMock();
+        pseudoObjectAssign(false, {a: 1}, mock.onError, '.prefs');
+        expect(mock.msg).toContain('target.prefs is not an object');
     });
 });

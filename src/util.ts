@@ -47,11 +47,11 @@ export function pseudoObjectAssign<T>(
     if(_target === null || source === null) return _target;
     if(_target === undefined || source === undefined) return _target;
     if(typeof _target != 'object') {
-        onError('target is not an object');
+        onError(`target${subobjectName} is not an object`);
         return _target;
     }
     if(typeof source != 'object') {
-        onError('source is not an object');
+        onError(`source${subobjectName} is not an object`);
         return _target;
     }
 
