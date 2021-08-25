@@ -211,8 +211,9 @@ export class CCGardenMinigame {
     static PlantsByKey = invertMap(CCGardenMinigame.PlantsById);
 
     static fromStringSave(str: string) {
+        if(str == '') return null;
+
         let m = new CCGardenMinigame();
-        if(!str) return m;
 
         let data = str.split(' ');
 
@@ -248,7 +249,8 @@ export class CCGardenMinigame {
         return m;
     }
 
-    static toStringSave(m: CCGardenMinigame) {
+    static toStringSave(m: CCGardenMinigame | null) {
+        if(m === null) return '';
         let str = '';
         str += m.nextStep + ':' +
             CCGardenMinigame.SoilsByName[m.soil] + ':' +
@@ -380,8 +382,9 @@ export class CCMarketMinigame {
     goods = new CCMarketStockList(); // List of goods; not directly available like this in-game
 
     static fromStringSave(str: string) {
+        if(str === '') return null;
+
         let m = new CCMarketMinigame();
-        if(!str) return m;
         let data = str.split(' ');
 
         let basicData = data[0].split(':');
@@ -397,7 +400,9 @@ export class CCMarketMinigame {
         return m;
     }
 
-    static toStringSave(m: CCMarketMinigame) {
+    static toStringSave(m: CCMarketMinigame | null) {
+        if(m === null) return '';
+
         return m.officeLevel + ':' +
             m.brokers + ':' +
             Number(m.graphLines) + ':' +
@@ -436,8 +441,9 @@ export class CCPantheonMinigame {
     static GodsByName = invertMap(CCPantheonMinigame.GodsById);
 
     static fromStringSave(str: string) {
+        if(str === '') return null;
+
         let m = new CCPantheonMinigame();
-        if(!str) return m;
         let data = str.split(' ');
         let gods = data[0].split('/');
         m.diamondSlot = CCPantheonMinigame.GodsById[Number(gods[0])];
@@ -449,7 +455,8 @@ export class CCPantheonMinigame {
         return m;
     }
 
-    static toStringSave(m: CCPantheonMinigame) {
+    static toStringSave(m: CCPantheonMinigame | null) {
+        if(m === null) return '';
         return CCPantheonMinigame.GodsByName[m.diamondSlot] + '/' +
             CCPantheonMinigame.GodsByName[m.rubySlot] + '/' +
             CCPantheonMinigame.GodsByName[m.jadeSlot] + ' ' +
@@ -465,6 +472,8 @@ export class CCGrimoireMinigame {
     onMinigame: boolean = true; // Whether the minigame is open or not
 
     static fromStringSave(str: string) {
+        if(str === '') return null;
+
         let m = new CCGrimoireMinigame();
         if(!str) return m;
         let data = str.split(' ');
@@ -475,7 +484,9 @@ export class CCGrimoireMinigame {
         return m;
     }
 
-    static toStringSave(m: CCGrimoireMinigame) {
+    static toStringSave(m: CCGrimoireMinigame | null) {
+        if(m === null) return '';
+
         return m.magic + ' ' +
             m.spellsCast + ' ' +
             m.spellsCastTotal + ' ' +
@@ -484,17 +495,19 @@ export class CCGrimoireMinigame {
 }
 
 export class CCMinigameBuilding<MinigameData> extends CCPlainBuilding {
-    constructor(public minigame: MinigameData) {
-        super();
-    }
+    /* If the building level is zero or if the minigame hasn't loaded yet,
+     * the game does not include the minigame data in the save file.
+     * We represent this situation by letting minigame === null.
+     */
+    minigame: MinigameData | null = null;
 };
 
 export function parseCCBuildingWithMinigame<MinigameData>(
     str: string,
-    minigameParser: (str: string) => MinigameData
+    minigameParser: (str: string) => MinigameData | null
 ): CCMinigameBuilding<MinigameData>
 {
-    let minigame!: MinigameData;
+    let minigame: MinigameData | null = null;
     let building = CCPlainBuilding.fromStringSave(str, (dataStr) => {
         minigame = minigameParser(dataStr);
     });
@@ -504,12 +517,12 @@ export function parseCCBuildingWithMinigame<MinigameData>(
 export class CCBuildingsData { // Aggregates all buildings
     'Cursor': CCPlainBuilding = new CCPlainBuilding();
     'Grandma': CCPlainBuilding = new CCPlainBuilding();
-    'Farm' = new CCMinigameBuilding(new CCGardenMinigame());
+    'Farm' = new CCMinigameBuilding<CCGardenMinigame>();
     'Mine': CCPlainBuilding = new CCPlainBuilding();
     'Factory': CCPlainBuilding = new CCPlainBuilding();
-    'Bank' = new CCMinigameBuilding(new CCMarketMinigame());
-    'Temple' = new CCMinigameBuilding(new CCPantheonMinigame());
-    'Wizard tower' = new CCMinigameBuilding(new CCGrimoireMinigame());
+    'Bank' = new CCMinigameBuilding<CCMarketMinigame>();
+    'Temple' = new CCMinigameBuilding<CCPantheonMinigame>();
+    'Wizard tower' = new CCMinigameBuilding<CCGrimoireMinigame>();
     'Shipment': CCPlainBuilding = new CCPlainBuilding();
     'Alchemy lab': CCPlainBuilding = new CCPlainBuilding();
     'Portal': CCPlainBuilding = new CCPlainBuilding();
