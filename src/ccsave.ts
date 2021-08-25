@@ -5,7 +5,7 @@
  * but several boolean attributes are in fact either 0 or 1 in the game code.
  */
 
-import { invertMap } from './util';
+import { invertMap, ErrorHandler, throwOnError, pseudoObjectAssign } from './util';
 
 /* This type exists only for documentation.
  * Numbers of this type represent a number of milliseconds since January 1st, 1970,
@@ -43,6 +43,7 @@ export class CCPreferences {
         }
         return str;
     }
+
     static fromBitstring(str: string) {
         let prefs = new CCPreferences();
         let keys = Object.keys(prefs) as Array<keyof CCPreferences>;
@@ -50,6 +51,10 @@ export class CCPreferences {
             prefs[keys[i]] = Boolean(Number(str.charAt(i)));
         }
         return prefs;
+    }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        return pseudoObjectAssign(new CCPreferences(), obj, onError, subobjectName);
     }
 }
 
@@ -68,6 +73,10 @@ export class CCWrinklerData {
     number: number = 0; // Number of non-shiny wrinklers
     shinies: number = 0; // Number of shiny wrinklers
     amountShinies: number = 0; // Sum of cookies inside all shiny wrinklers
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        return pseudoObjectAssign(new CCWrinklerData(), obj, onError, subobjectName);
+    }
 }
 
 export const SugarLumpTypesById = [
@@ -2297,8 +2306,6 @@ export class CCSave {
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
 
-    // TODO: Add constructor accepting partial data
-
     static currentVersion = 2.031;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
     static upgradeCount = 729;
@@ -2505,5 +2512,98 @@ export class CCSave {
         saveObject.modSaveData = CCModSaveData.fromStringSave(data[9]);
 
         return saveObject;
+    }
+
+    static fromObject(obj: unknown, onError: ErrorHandler = throwOnError) {
+        let save = new CCSave();
+
+        /* https://github.com/microsoft/TypeScript/issues/21732
+         * Why, TypeScript, why?
+         * TODO: add better types
+         */
+        let _obj = obj as any;
+
+        if(_obj === null) {
+            return save;
+        }
+
+        if(typeof _obj != 'object') {
+            onError('source is not an object');
+            return save;
+        }
+
+        pseudoObjectAssign(save, _obj, onError);
+
+        if('prefs' in _obj) {
+            save.prefs = CCPreferences.fromObject(_obj.prefs, onError, '.prefs');
+        }
+
+        if('wrinklers' in _obj) {
+            save.wrinklers = CCWrinklerData.fromObject(_obj.wrinklers, onError, '.wrinklers');
+        }
+
+        // The permanent upgrade slots have to be handled manually
+        if('permanentUpgrades' in _obj) {
+            if(!Array.isArray(_obj.permanentUpgrades)) {
+                onError(`source.permanentUpgrades is not an array`);
+            } else {
+                let length = Math.min(_obj.permanentUpgrades.length, save.permanentUpgrades.length);
+                if(_obj.permanentUpgrades.length > length) {
+                    onError(`source.permanentUpgrades has more than ${length} entries`);
+                }
+                for(let i = 0; i < length; i++) {
+                    if(typeof _obj.permanentUpgrades[i] == 'string') {
+                        let upgrade: string = _obj.permanentUpgrades[i];
+                        if(upgrade in UpgradesByName || upgrade == '') {
+                            save.permanentUpgrades[i] = upgrade;
+                        } else {
+                            onError(`source.permanentUpgrades[${i}] is not an upgrade (typo?)`);
+                        }
+                    } else if(typeof _obj.permanentUpgrades[i] == 'number') {
+                        let id: number = _obj.permanentUpgrades[i];
+                        if(Number.isInteger(id) && id >= -1 && id < UpgradesById.length) {
+                            if(id == -1) {
+                                save.permanentUpgrades[i] = '';
+                            } else {
+                                save.permanentUpgrades[i] = UpgradesById[id];
+                            }
+                        } else {
+                            onError(`source.permanentUpgrades[${i}] is not an upgrade id`);
+                        }
+                    } else {
+                        onError(`source.permanentUpgrades[${i}] is not a number or a string`);
+                    }
+                }
+            }
+        }
+
+        if('vault' in _obj) {
+            // TODO: maybe eliminate duplicates?
+            if(!Array.isArray(_obj.vault)) {
+                onError(`source.vault is not an array`);
+            } else {
+                for(let i = 0; i < _obj.vault.length; i++) {
+                    if(typeof _obj.vault[i] == 'string') {
+                        let upgrade: string = _obj.vault[i];
+                        if(upgrade in UpgradesByName || upgrade == '') {
+                            save.vault.push(upgrade);
+                        } else {
+                            onError(`source.vault[${i}] is not an upgrade (typo?)`);
+                        }
+                    } else if(typeof _obj.vault[i] == 'number') {
+                        let id: number = _obj.vault[i];
+                        if(Number.isInteger(id) && id >= -1 && id < UpgradesById.length) {
+                            save.vault.push(UpgradesById[id]);
+                        } else {
+                            onError(`source.vault[${i}] is not an upgrade id (typo?)`);
+                        }
+                    } else {
+                        onError(`source.vault[${i}] is not a number or a string`);
+                    }
+                }
+            }
+        }
+
+        return save;
     }
 };

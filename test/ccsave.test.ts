@@ -1540,3 +1540,126 @@ test('Written saves can be recovered', async() => {
     let str = CCSave.toStringSave(saveAsObject);
     expect(CCSave.fromStringSave(str)).toEqual(saveAsObject);
 });
+
+test.describe('CCSave.fromObject', () => {
+    test('throws if argument is not object', () => {
+        expect( () => {
+            CCSave.fromObject('wrong')
+        }).toThrow('not an object');
+    });
+
+    test('uses callback if provided', () => {
+        let localStr = '';
+        let callback = (str: string) => {localStr = str};
+        expect( () => {
+            CCSave.fromObject('wrong', callback)
+        }).not.toThrow();
+        expect(localStr).toContain('not an object');
+    });
+
+    test.describe('returns default-initialized object', () => {
+        test('on empty input', () => {
+            expect(CCSave.fromObject({})).toEqual(new CCSave());
+        });
+
+        test('on null input', () => {
+            expect(CCSave.fromObject(null)).toEqual(new CCSave());
+        });
+    });
+
+    test('handles simple attributes', () => {
+        let manualSave = new CCSave();
+        manualSave.heralds = 72;
+        manualSave.season = 'christmas';
+        let jsonSave = CCSave.fromObject({heralds: 72, season: 'christmas'});
+        expect(jsonSave).toEqual(manualSave);
+    });
+
+    test.describe('handles .prefs', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.prefs.milk = false;
+            let jsonSave = CCSave.fromObject({prefs: {milk: false}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({prefs: 'green'})
+            }).toThrow('source.prefs is not an object');
+            expect(() => {
+                CCSave.fromObject({prefs: {milk: 'high'}})
+            }).toThrow('source.prefs.milk is not a boolean');
+            expect(() => {
+                CCSave.fromObject({prefs: {nonExistent: true}})
+            }).toThrow('target.prefs.nonExistent does not exist');
+        });
+    });
+
+    test.describe('handles .permanentUpgrades', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.permanentUpgrades[0] = 'Kitten helpers';
+            manualSave.permanentUpgrades[1] = '';
+            manualSave.permanentUpgrades[2] = '';
+            manualSave.permanentUpgrades[3] = 'Cheap hoes';
+            let jsonSave = CCSave.fromObject({permanentUpgrades: ['Kitten helpers', -1, '', 10]});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: 'all of them'});
+            }).toThrow('source.permanentUpgrades is not an array');
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: ['', '', '', '', '', '']});
+            }).toThrow('source.permanentUpgrades has more than 5 entries');
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: ['invalid upgrade']});
+            }).toThrow('source.permanentUpgrades[0] is not an upgrade');
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: ['', -5]});
+            }).toThrow('source.permanentUpgrades[1] is not an upgrade id');
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: ['', '', 3.14]});
+            }).toThrow('source.permanentUpgrades[2] is not an upgrade id');
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: ['', '', '', 31415926535]});
+            }).toThrow('source.permanentUpgrades[3] is not an upgrade id');
+            expect(() => {
+                CCSave.fromObject({permanentUpgrades: ['', '', '', '', true]});
+            }).toThrow('source.permanentUpgrades[4] is not a number or a string');
+        });
+    });
+
+    test.describe('handles .vault', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.vault[0] = 'Kitten helpers';
+            manualSave.vault[1] = 'Cheap hoes';
+            let jsonSave = CCSave.fromObject({vault: ['Kitten helpers', 10]});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({vault: 'all of them'});
+            }).toThrow('source.vault is not an array');
+            expect(() => {
+                CCSave.fromObject({vault: ['invalid upgrade']});
+            }).toThrow('source.vault[0] is not an upgrade');
+            expect(() => {
+                CCSave.fromObject({vault: [10, -5]});
+            }).toThrow('source.vault[1] is not an upgrade id');
+            expect(() => {
+                CCSave.fromObject({vault: [10, 11, 3.14]});
+            }).toThrow('source.vault[2] is not an upgrade id');
+            expect(() => {
+                CCSave.fromObject({vault: [10, 11, 12, 31415926535]});
+            }).toThrow('source.vault[3] is not an upgrade id');
+            expect(() => {
+                CCSave.fromObject({vault: [10, 11, 12, 13, true]});
+            }).toThrow('source.vault[4] is not a number or a string');
+        });
+    });
+});
