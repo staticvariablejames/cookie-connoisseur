@@ -589,6 +589,28 @@ export class CCBuildingsData { // Aggregates all buildings
         str += CCPlainBuilding.toStringSave(buildings['Idleverse']) + ';';
         return str;
     }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        let buildings = new CCBuildingsData();
+        if(typeof obj != 'object' || obj === null) {
+            onError(`source${subobjectName} is not an object`);
+            return buildings;
+        }
+        for(let building of Object.keys(obj)) {
+            if(!(building in buildings)) {
+                onError(`target${subobjectName}.${building} does not exist (typo?)`);
+                continue;
+            }
+            pseudoObjectAssign(
+                buildings[building as keyof CCBuildingsData],
+                (obj as any)[building],
+                onError,
+                `${subobjectName}["${building}"]`
+            );
+        }
+
+        return buildings;
+    }
 }
 
 /* List of all upgrades in the game, sorted by id.
@@ -2615,6 +2637,10 @@ export class CCSave {
                     }
                 }
             }
+        }
+
+        if('buildings' in _obj) {
+            save.buildings = CCBuildingsData.fromObject(_obj.buildings, onError, '.buildings');
         }
 
         return save;

@@ -1662,4 +1662,28 @@ test.describe('CCSave.fromObject', () => {
             }).toThrow('source.vault[4] is not a number or a string');
         });
     });
+
+    test.describe('handles .buildings without minigames', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Cursor"].totalCookies = 1e5;
+            let jsonSave = CCSave.fromObject({buildings: {"Cursor": {totalCookies: 1e5}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({buildings: 'all of them'});
+            }).toThrow('source.buildings is not an object');
+            expect(() => {
+                CCSave.fromObject({buildings: null});
+            }).toThrow('source.buildings is not an object');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Cursor": {a: 5}}});
+            }).toThrow('target.buildings["Cursor"].a does not exist');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Barracks": {level: 5}}});
+            }).toThrow('target.buildings.Barracks does not exist');
+        });
+    });
 });
