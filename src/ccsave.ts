@@ -139,7 +139,7 @@ export class CCGardenMinigame {
     convertTimes: number = 0; // Total number of times the garden was sacrificed for 10 sugar lumps
     nextFreeze: TimePoint = 0; // Unused; used to be the next time the garden could be frozen again
 
-    unlockedPlants: string[] = ['bakersWheat']; // This info is spread in M.plants in-game
+    unlockedPlants: string[] = ['bakerWheat']; // This info is spread in M.plants in-game
 
     /* In-game, M.plot is always a 6x6 array of pairs [idPlusOne, age]
      * where idPlusOne is the plant id + 1 (e.g. Baker's Wheat's id is 0,
