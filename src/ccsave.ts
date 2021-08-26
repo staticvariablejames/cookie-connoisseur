@@ -280,6 +280,84 @@ export class CCGardenMinigame {
 
         return str;
     }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        if(obj === null) return null;
+        let m = new CCGardenMinigame();
+        pseudoObjectAssign(m, obj, onError, subobjectName);
+        if(typeof obj != 'object') {
+            // pseudoObjectAssign already complained about it
+            return m;
+        }
+
+        if('unlockedPlants' in obj!) {
+            let unlockedList = (obj as any).unlockedPlants;
+            if(!Array.isArray(unlockedList)) {
+                onError(`source${subobjectName}.unlockedPlants is not an array`);
+            } else {
+                // Produce a sorted list
+                m.unlockedPlants = unlockedList.filter( (value, i) => {
+                    if(typeof value != 'string') {
+                        onError(`source${subobjectName}.unlockedPlants[${i}] is not a string`);
+                        return false;
+                    } else if(!(value in CCGardenMinigame.PlantsByKey)) {
+                        onError(`source${subobjectName}.unlockedPlants[${i}] is not a plant`);
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }).sort(
+                    (p, q) => CCGardenMinigame.PlantsByKey[p] - CCGardenMinigame.PlantsByKey[q]
+                );
+                if(m.unlockedPlants[0] != 'bakerWheat') {
+                    m.unlockedPlants.unshift('bakerWheat');
+                }
+            }
+        }
+
+        if('plot' in obj!) {
+            let plot = (obj as any).plot;
+            if(!Array.isArray(plot)) {
+                onError(`source${subobjectName}.plot is not an array`);
+            } else {
+                if(plot.length > m.plot.length) {
+                    onError(`source${subobjectName}.plot contains too many elements`);
+                }
+                for(let i = 0; i < plot.length; i++) {
+                    if(!Array.isArray(plot[i])) {
+                        onError(`source${subobjectName}.plot[${i}] is not an array`);
+                        continue;
+                    }
+                    if(plot[i].length > m.plot[i].length) {
+                        onError(`source${subobjectName}.plot[${i}] contains too many elements`);
+                    }
+                    for(let j = 0; j < plot[i].length; j++) {
+                        if(!Array.isArray(plot[i][j])) {
+                            onError(`source${subobjectName}.plot[${i}][${j}] is not an array`);
+                            continue;
+                        }
+                        if(plot[i][j].length > 2) {
+                            onError(`source${subobjectName}.plot[${i}][${j}] contains too many elements`);
+                        }
+                        let [plant, age] = plot[i][j];
+                        if(plant === undefined) plant = 'empty';
+                        if(typeof plant != 'string') {
+                            onError(`source${subobjectName}.plot[${i}][${j}][0] is not a string`);
+                            plant = 'empty';
+                        }
+                        if(age === undefined) age = 0;
+                        if(typeof age != 'number') {
+                            onError(`source${subobjectName}.plot[${i}][${j}][1] is not a number`);
+                            age = 0;
+                        }
+                        m.plot[i][j] = [plant, age];
+                    }
+                }
+            }
+        }
+
+        return m;
+    }
 };
 
 // Represents a single stock from the market minigame
@@ -607,6 +685,27 @@ export class CCBuildingsData { // Aggregates all buildings
                 onError,
                 `${subobjectName}["${building}"]`
             );
+
+            type minigameT<T> = {
+                fromObject: (obj: unknown, onError: ErrorHandler, subobjectName: string) => T | null;
+                new(): T;
+            }
+            function handleMinigame(name: 'Farm', minigameClass: minigameT<CCGardenMinigame>): void;
+            function handleMinigame(name: string, minigameClass: any) {
+                if(building === name) {
+                    if('minigame' in (obj as any)[name]) {
+                        (buildings as any)[name].minigame = minigameClass.fromObject(
+                            (obj as any)[name].minigame,
+                            onError,
+                            `${subobjectName}["${name}"].minigame`
+                        );
+                    } else if((buildings as any)[name].level > 0) {
+                        // source.minigame has to be explicitly null to avoid this conditional
+                        (buildings as any)[name].minigame = new minigameClass();
+                    }
+                }
+            }
+            handleMinigame('Farm', CCGardenMinigame);
         }
 
         return buildings;

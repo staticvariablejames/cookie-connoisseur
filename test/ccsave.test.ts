@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { CCSave, CCBuff } from '../src/ccsave';
+import { CCBuff, CCGardenMinigame, CCSave } from '../src/ccsave';
 
 const saveAsString =
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+
@@ -1684,6 +1684,140 @@ test.describe('CCSave.fromObject', () => {
             expect(() => {
                 CCSave.fromObject({buildings: {"Barracks": {level: 5}}});
             }).toThrow('target.buildings.Barracks does not exist');
+        });
+    });
+
+    test.describe('handles the Garden minigame', () => {
+        test('leaving it alone if level == 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Farm"].level = 0;
+            let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 0}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('autocreating it if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Farm"].level = 1;
+            manualSave.buildings["Farm"].minigame = new CCGardenMinigame();
+            let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 1}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('leaving it alone if null, even if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Farm"].level = 1;
+            manualSave.buildings["Farm"].minigame = null;
+            let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: null}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('sorting unlocked seeds', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Farm"].level = 1;
+            manualSave.buildings["Farm"].minigame = new CCGardenMinigame();
+            manualSave.buildings["Farm"].minigame.unlockedPlants[1] = 'bakeberry';
+            let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                unlockedPlants: ['bakeberry', 'bakerWheat'],
+            }}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('always unlocking Barker\'s Wheat', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Farm"].level = 1;
+            manualSave.buildings["Farm"].minigame = new CCGardenMinigame();
+            manualSave.buildings["Farm"].minigame.unlockedPlants[1] = 'bakeberry';
+            let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                unlockedPlants: ['bakeberry'],
+            }}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('extending plots', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Farm"].level = 1;
+            manualSave.buildings["Farm"].minigame = new CCGardenMinigame();
+            manualSave.buildings["Farm"].minigame.plot[2][2] = ['bakerWheat', 5];
+            let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                plot: [
+                    [], [], [[], [], ['bakerWheat', 5]]
+                ],
+            }}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('complaining nicely about weird unlockedPlants', () => {
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    unlockedPlants: 'bakeberry',
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.unlockedPlants is not an array');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    unlockedPlants: [5],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.unlockedPlants[0] is not a string');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    unlockedPlants: ['bakerWheat', 'unknownPlant'],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.unlockedPlants[1] is not a plant');
+        });
+
+        test('complaining nicely about weird plots', () => {
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: 'all',
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot is not an array');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: [[], [], [], [], [], [], []],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot contains too many elements');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: ['all'],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot[0] is not an array');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: [
+                        [],
+                        [[], [], [], [], [], [], []],
+                    ],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot[1] contains too many elements');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: [
+                        [],
+                        [[], [], 'bakerWheat'],
+                    ],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot[1][2] is not an array');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: [
+                        [], [],
+                        [[], [], ['bakerWheat', 5, 'mature']],
+                    ],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot[2][2] contains too many elements');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: [
+                        [[0, 5]],
+                    ],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot[0][0][0] is not a string');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Farm": {level: 1, minigame: {
+                    plot: [
+                        [['bakersWheat', 'mature']],
+                    ],
+                }}}});
+            }).toThrow('source.buildings["Farm"].minigame.plot[0][0][1] is not a number');
         });
     });
 });
