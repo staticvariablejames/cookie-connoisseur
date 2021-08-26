@@ -396,6 +396,10 @@ export class CCMarketStock {
             Number(s.hidden) + ':' +
             s.last;
     }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        return pseudoObjectAssign(new CCMarketStock(), obj, onError, subobjectName);
+    }
 }
 
 export class CCMarketStockList {
@@ -447,6 +451,23 @@ export class CCMarketStockList {
         return str;
     }
 
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        let l = new CCMarketStockList();
+        if(typeof obj != 'object' || obj === null) {
+            onError(`source${subobjectName} is not an object`);
+            return l;
+        }
+
+        for(let [key, value] of Object.entries(obj)) {
+            if(key in l) {
+                pseudoObjectAssign((l as any)[key], value, onError, `${subobjectName}.${key}`);
+            } else {
+                onError(`target${subobjectName}.${key} does not exist`);
+            }
+        }
+
+        return l;
+    }
 }
 
 export class CCMarketMinigame {
@@ -489,6 +510,22 @@ export class CCMarketMinigame {
             ' ' +
             CCMarketStockList.toStringSave(m.goods) + ' ' +
             Number(m.onMinigame);
+    }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        if(obj === null) return null;
+        let m = new CCMarketMinigame();
+        pseudoObjectAssign(m, obj, onError, subobjectName);
+        if(typeof obj != 'object') {
+            // pseudoObjectAssign already complained about it
+            return m;
+        }
+
+        if('goods' in obj!) {
+            m.goods = CCMarketStockList.fromObject((obj as any).goods, onError, `${subobjectName}.goods`);
+        }
+
+        return m;
     }
 };
 
@@ -691,6 +728,7 @@ export class CCBuildingsData { // Aggregates all buildings
                 new(): T;
             }
             function handleMinigame(name: 'Farm', minigameClass: minigameT<CCGardenMinigame>): void;
+            function handleMinigame(name: 'Bank', minigameClass: minigameT<CCMarketMinigame>): void;
             function handleMinigame(name: string, minigameClass: any) {
                 if(building === name) {
                     if('minigame' in (obj as any)[name]) {
@@ -706,6 +744,7 @@ export class CCBuildingsData { // Aggregates all buildings
                 }
             }
             handleMinigame('Farm', CCGardenMinigame);
+            handleMinigame('Bank', CCMarketMinigame);
         }
 
         return buildings;

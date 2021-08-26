@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { CCBuff, CCGardenMinigame, CCSave } from '../src/ccsave';
+import { CCBuff, CCGardenMinigame, CCMarketMinigame, CCSave } from '../src/ccsave';
 
 const saveAsString =
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+
@@ -1818,6 +1818,74 @@ test.describe('CCSave.fromObject', () => {
                     ],
                 }}}});
             }).toThrow('source.buildings["Farm"].minigame.plot[0][0][1] is not a number');
+        });
+    });
+
+    test.describe('handles the Stock Market minigame', () => {
+        test('leaving it alone if level == 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Bank"].level = 0;
+            let jsonSave = CCSave.fromObject({buildings: {"Bank": {level: 0}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('autocreating it if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Bank"].level = 1;
+            manualSave.buildings["Bank"].minigame = new CCMarketMinigame();
+            let jsonSave = CCSave.fromObject({buildings: {"Bank": {level: 1}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('leaving it alone if null, even if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Bank"].level = 1;
+            manualSave.buildings["Bank"].minigame = null;
+            let jsonSave = CCSave.fromObject({buildings: {"Bank": {level: 1, minigame: null}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Bank"].level = 1;
+            manualSave.buildings["Bank"].minigame = new CCMarketMinigame();
+            manualSave.buildings["Bank"].minigame.brokers = 15;
+            manualSave.buildings["Bank"].minigame.goods.EGG.val = 9;
+            let jsonSave = CCSave.fromObject({buildings: {"Bank": {level: 1, minigame: {
+                brokers: 15,
+                goods: {
+                    EGG: {
+                        val: 9,
+                    },
+                },
+            }}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('complaining nicely about weird goods', () => {
+            expect(() => {
+                CCSave.fromObject({buildings: {"Bank": {level: 1, minigame: {
+                    goods: 'all-of-them',
+                }}}});
+            }).toThrow('source.buildings["Bank"].minigame.goods is not an object');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Bank": {level: 1, minigame: {
+                    goods: {
+                        ALL: {
+                            value: 15,
+                        },
+                    },
+                }}}});
+            }).toThrow('target.buildings["Bank"].minigame.goods.ALL does not exist');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Bank": {level: 1, minigame: {
+                    goods: {
+                        EGG: {
+                            value: 15,
+                        },
+                    },
+                }}}});
+            }).toThrow('target.buildings["Bank"].minigame.goods.EGG.value does not exist');
         });
     });
 });
