@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { CCBuff, CCGardenMinigame, CCMarketMinigame, CCSave } from '../src/ccsave';
+import {
+    CCBuff,
+    CCGardenMinigame,
+    CCGrimoireMinigame,
+    CCMarketMinigame,
+    CCPantheonMinigame,
+    CCSave
+} from '../src/ccsave';
 
 const saveAsString =
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+
@@ -1886,6 +1893,112 @@ test.describe('CCSave.fromObject', () => {
                     },
                 }}}});
             }).toThrow('target.buildings["Bank"].minigame.goods.EGG.value does not exist');
+        });
+    });
+
+    test.describe('handles the Pantheon minigame', () => {
+        test('leaving it alone if level == 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Temple"].level = 0;
+            let jsonSave = CCSave.fromObject({buildings: {"Temple": {level: 0}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('autocreating it if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Temple"].level = 1;
+            manualSave.buildings["Temple"].minigame = new CCPantheonMinigame();
+            let jsonSave = CCSave.fromObject({buildings: {"Temple": {level: 1}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('leaving it alone if null, even if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Temple"].level = 1;
+            manualSave.buildings["Temple"].minigame = null;
+            let jsonSave = CCSave.fromObject({buildings: {"Temple": {level: 1, minigame: null}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Temple"].level = 1;
+            manualSave.buildings["Temple"].minigame = new CCPantheonMinigame();
+            manualSave.buildings["Temple"].minigame.diamondSlot = 'ruin';
+            let jsonSave = CCSave.fromObject({buildings: {"Temple": {level: 1, minigame: {
+                diamondSlot: 'ruin',
+            }}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('complaining nicely about bad inputs', () => {
+            expect(() => {
+                CCSave.fromObject({buildings: {"Temple": {level: 1, minigame: 'yes'}}});
+            }).toThrow('source.buildings["Temple"].minigame is not an object');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Temple": {level: 1, minigame: {
+                    diamondSlot: 3
+                }}}});
+            }).toThrow('source.buildings["Temple"].minigame.diamondSlot is not a string');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Temple": {level: 1, minigame: {
+                    goldenSlot: 'mother',
+                }}}});
+            }).toThrow('target.buildings["Temple"].minigame.goldenSlot does not exist');
+        });
+    });
+
+    test.describe('handles the Grimoire minigame', () => {
+        test('leaving it alone if level == 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Wizard tower"].level = 0;
+            let jsonSave = CCSave.fromObject({buildings: {"Wizard tower": {level: 0}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('autocreating it if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Wizard tower"].level = 1;
+            manualSave.buildings["Wizard tower"].minigame = new CCGrimoireMinigame();
+            let jsonSave = CCSave.fromObject({buildings: {"Wizard tower": {level: 1}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('leaving it alone if null, even if level > 0', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Wizard tower"].level = 1;
+            manualSave.buildings["Wizard tower"].minigame = null;
+            let jsonSave = CCSave.fromObject({buildings: {"Wizard tower": {
+                level: 1, minigame: null,
+            }}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Wizard tower"].level = 1;
+            manualSave.buildings["Wizard tower"].minigame = new CCGrimoireMinigame();
+            manualSave.buildings["Wizard tower"].minigame.spellsCastTotal = 5;
+            let jsonSave = CCSave.fromObject({buildings: {"Wizard tower": {level: 1, minigame: {
+                spellsCastTotal: 5,
+            }}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('complaining nicely about bad inputs', () => {
+            expect(() => {
+                CCSave.fromObject({buildings: {"Wizard tower": {level: 1, minigame: 'yes'}}});
+            }).toThrow('source.buildings["Wizard tower"].minigame is not an object');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Wizard tower": {level: 1, minigame: {
+                    spellsCastTotal: 'a lot',
+                }}}});
+            }).toThrow('source.buildings["Wizard tower"].minigame.spellsCastTotal is not a number');
+            expect(() => {
+                CCSave.fromObject({buildings: {"Wizard tower": {level: 1, minigame: {
+                    forceGC: 'building special',
+                }}}});
+            }).toThrow('target.buildings["Wizard tower"].minigame.forceGC does not exist');
         });
     });
 });

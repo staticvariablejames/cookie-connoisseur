@@ -578,6 +578,11 @@ export class CCPantheonMinigame {
             m.swaps + ' ' + m.swapT +
             ' ' + Number(m.onMinigame);
     }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        if(obj === null) return null;
+        return pseudoObjectAssign(new CCPantheonMinigame(), obj, onError, subobjectName);
+    }
 };
 
 export class CCGrimoireMinigame {
@@ -606,6 +611,11 @@ export class CCGrimoireMinigame {
             m.spellsCast + ' ' +
             m.spellsCastTotal + ' ' +
             Number(m.onMinigame);
+    }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        if(obj === null) return null;
+        return pseudoObjectAssign(new CCGrimoireMinigame(), obj, onError, subobjectName);
     }
 }
 
@@ -729,6 +739,8 @@ export class CCBuildingsData { // Aggregates all buildings
             }
             function handleMinigame(name: 'Farm', minigameClass: minigameT<CCGardenMinigame>): void;
             function handleMinigame(name: 'Bank', minigameClass: minigameT<CCMarketMinigame>): void;
+            function handleMinigame(name: 'Temple', minigameClass: minigameT<CCPantheonMinigame>): void;
+            function handleMinigame(name: 'Wizard tower', minigameClass: minigameT<CCGrimoireMinigame>): void;
             function handleMinigame(name: string, minigameClass: any) {
                 if(building === name) {
                     if('minigame' in (obj as any)[name]) {
@@ -745,6 +757,8 @@ export class CCBuildingsData { // Aggregates all buildings
             }
             handleMinigame('Farm', CCGardenMinigame);
             handleMinigame('Bank', CCMarketMinigame);
+            handleMinigame('Temple', CCPantheonMinigame);
+            handleMinigame('Wizard tower', CCGrimoireMinigame);
         }
 
         return buildings;
