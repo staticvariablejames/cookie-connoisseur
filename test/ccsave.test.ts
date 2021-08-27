@@ -86,7 +86,7 @@ const saveAsString =
    'InRoaXNJc1BhcnNlYWJsZSI6IHRydWV9O21vZDM6eyJhIHRyaWNreSBlbnRyeSI6IltQXSIsImFu'+
    'b3RoZXIgb25lIjoiW1NdIn07%21END%21';
 
-const saveAsObject = {
+const saveAsObject: CCSave = {
     version: 2.031,
     startDate: 1606528436262,
     fullDate: 1591465355520,
@@ -1540,7 +1540,7 @@ const saveAsObject = {
             'another one': ';',
         },
     },
-}
+};
 
 test('The save game is properly parsed', async() => {
     expect(CCSave.fromStringSave(saveAsString)).toEqual(saveAsObject);
@@ -1552,6 +1552,11 @@ test('Written saves can be recovered', async() => {
 });
 
 test.describe('CCSave.fromObject', () => {
+    test('Can parse entire save objects', () => {
+        // This is an "integration test" of sorts
+        expect(CCSave.fromObject(saveAsObject)).toEqual(saveAsObject);
+    });
+
     test('throws if argument is not object', () => {
         expect( () => {
             CCSave.fromObject('wrong')
