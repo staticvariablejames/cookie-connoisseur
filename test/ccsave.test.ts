@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 import {
     CCBuff,
+    CCBuffBuildingSpecial,
+    CCBuffDragonflight,
+    CCBuffSugarBlessing,
     CCGardenMinigame,
     CCGrimoireMinigame,
     CCMarketMinigame,
@@ -2089,6 +2092,93 @@ test.describe('CCSave.fromObject', () => {
             expect(() => {
                 CCSave.fromObject({achievements: [10, 11, 12, 13, true]});
             }).toThrow('source.achievements[4] is not a number or a string');
+        });
+    });
+
+    test.describe('handles .buffs', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            let sugarBlessing = new CCBuffSugarBlessing();
+            sugarBlessing.maxTime = 24*3600*1000;
+            sugarBlessing.time = 20*3600*1000;
+            let buildingSpecial = new CCBuffBuildingSpecial();
+            buildingSpecial.maxTime = 60*1000;
+            buildingSpecial.time = 30*1000;
+            buildingSpecial.building = 6;
+            buildingSpecial.multCpS = 60;
+            let dragonflight = new CCBuffDragonflight();
+            dragonflight.maxTime = 20*1000;
+            dragonflight.time = 5*1000;
+            dragonflight.multClick = 1223;
+            manualSave.buffs[0] = sugarBlessing;
+            manualSave.buffs[1] = buildingSpecial;
+            manualSave.buffs[2] = dragonflight;
+
+            let jsonSave = CCSave.fromObject({buffs: [
+                {
+                    name: 'sugar blessing',
+                    maxTime: 24*3600*1000,
+                    time: 20*3600*1000,
+                },
+                {
+                    name: 'building buff',
+                    maxTime: 60*1000,
+                    time: 30*1000,
+                    building: 6,
+                    multCpS: 60,
+                },
+                {
+                    name: 'dragonflight',
+                    maxTime: 20*1000,
+                    time: 5*1000,
+                    multClick: 1223,
+                },
+            ]});
+
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({buffs: 'all of them'});
+            }).toThrow('source.buffs is not an array');
+            expect(() => {
+                CCSave.fromObject({buffs: [
+                    'dragonflight',
+                ]});
+            }).toThrow('source.buffs[0] is not an object');
+            expect(() => {
+                CCSave.fromObject({buffs: [
+                    {},
+                ]});
+            }).toThrow('source.buffs[0] is missing buff name');
+            expect(() => {
+                CCSave.fromObject({buffs: [
+                    {name: 5},
+                ]});
+            }).toThrow('source.buffs[0].name is not a valid buff name');
+            expect(() => {
+                CCSave.fromObject({buffs: [
+                    {
+                        name: 'building buff',
+                        maxTime: 60*1000,
+                        time: 30*1000,
+                        building: 6,
+                        multCpS: 60,
+                    },
+                    {
+                        name: 'some powerful buff'
+                    },
+                ]});
+            }).toThrow('source.buffs[1].name is not a valid buff name');
+            expect(() => {
+                CCSave.fromObject({buffs: [
+                    {
+                        name: 'dragonflight',
+                        multCpS: 17,
+                    },
+                ]});
+            }).toThrow('target.buffs[0].multCpS does not exist');
         });
     });
 });

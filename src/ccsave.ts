@@ -2301,43 +2301,65 @@ export type CCBuff = CCBuffFrenzy | CCBuffElderFrenzy | CCBuffClot |
     CCBuffModestLoanRepayment | CCBuffPawnshopLoan | CCBuffPawnshopLoanRepayment |
     CCBuffRetirementLoan | CCBuffRetirementLoanRepayment | CCUnknownBuff;
 
+// List of all buff classes
+export const BuffClasses = [
+    CCBuffFrenzy, CCBuffElderFrenzy, CCBuffClot,
+    CCBuffDragonHarvest, CCBuffEverythingMustGo, CCBuffCursedFinger,
+    CCBuffClickFrenzy, CCBuffDragonflight, CCBuffCookieStorm,
+    CCBuffBuildingSpecial, CCBuffBuildingRust, CCBuffSugarBlessing,
+    CCBuffHagglersLuck, CCBuffHagglersMisery, CCBuffCraftyPixies,
+    CCBuffNastyGoblins, CCBuffMagicAdept, CCBuffMagicInept,
+    CCBuffDevastation, CCBuffSugarFrenzy, CCBuffModestLoan,
+    CCBuffModestLoanRepayment, CCBuffPawnshopLoan, CCBuffPawnshopLoanRepayment,
+    CCBuffRetirementLoan, CCBuffRetirementLoanRepayment, CCUnknownBuff,
+];
+
+// The 'T extends T' part forces the generic type to distribute over union
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+
+// This will have to be refactored if any buff with a non-numerical attribute is introduced...
+const buffArgNames: (KeysOfUnion<CCBuff> | null)[][] = [
+    BuffClasses.map(buffClass => {
+        let t = new buffClass();
+        if('multCpS' in t) return 'multCpS';
+        if('power' in t) return 'power';
+        if('multClick' in t) return 'multClick';
+        return null;
+    }),
+    BuffClasses.map(buffClass => {
+        let t = new buffClass();
+        if('building' in t) return 'building';
+        return null;
+    }),
+];
+
 export function parseBuffFromString(str: string) : CCBuff {
     let data = str.split(',');
-    let typeId = data[0];
+    let typeId = Number(data[0]);
     let maxTime = Number(data[1]);
     let time = Number(data[2]);
     let arg1 = Number(data[3] ?? 0);
     let arg2 = Number(data[4] ?? 0);
     let arg3 = Number(data[5] ?? 0);
 
-    if(typeId == '0') return {name: 'frenzy', maxTime, time, multCpS: arg1};
-    if(typeId == '1') return {name: 'blood frenzy', maxTime, time, multCpS: arg1};
-    if(typeId == '2') return {name: 'clot', maxTime, time, multCpS: arg1};
-    if(typeId == '3') return {name: 'dragon harvest', maxTime, time, multCpS: arg1};
-    if(typeId == '4') return {name: 'everything must go', maxTime, time, power: arg1};
-    if(typeId == '5') return {name: 'cursed finger', maxTime, time, power: arg1};
-    if(typeId == '6') return {name: 'click frenzy', maxTime, time, multClick: arg1};
-    if(typeId == '7') return {name: 'dragonflight', maxTime, time, multClick: arg1};
-    if(typeId == '8') return {name: 'cookie storm', maxTime, time, power: arg1};
-    if(typeId == '9') return {name: 'building buff', maxTime, time, multCpS: arg1, building: arg2};
-    if(typeId == '10') return {name: 'building debuff', maxTime, time, multCpS: arg1, building: arg2};
-    if(typeId == '11') return {name: 'sugar blessing', maxTime, time};
-    if(typeId == '12') return {name: 'haggler luck', maxTime, time, power: arg1};
-    if(typeId == '13') return {name: 'haggler misery', maxTime, time, power: arg1};
-    if(typeId == '14') return {name: 'pixie luck', maxTime, time, power: arg1};
-    if(typeId == '15') return {name: 'pixie misery', maxTime, time, power: arg1};
-    if(typeId == '16') return {name: 'magic adept', maxTime, time, power: arg1};
-    if(typeId == '17') return {name: 'magic inept', maxTime, time, power: arg1};
-    if(typeId == '18') return {name: 'devastation', maxTime, time, multClick: arg1};
-    if(typeId == '19') return {name: 'sugar frenzy', maxTime, time, multCpS: arg1};
-    if(typeId == '20') return {name: 'loan 1', maxTime, time, multCpS: arg1};
-    if(typeId == '21') return {name: 'loan 1 (interest)', maxTime, time, multCpS: arg1};
-    if(typeId == '22') return {name: 'loan 2', maxTime, time, multCpS: arg1};
-    if(typeId == '23') return {name: 'loan 2 (interest)', maxTime, time, multCpS: arg1};
-    if(typeId == '24') return {name: 'loan 3', maxTime, time, multCpS: arg1};
-    if(typeId == '25') return {name: 'loan 3 (interest)', maxTime, time, multCpS: arg1};
+    if(!(typeId in BuffClasses) || typeId == BuffClasses.length - 1) {
+        return {name: 'unknown', id: Number(data[0]), maxTime, time, arg1, arg2, arg3};
+    }
 
-    return {name: 'unknown', id: Number(data[0]), maxTime, time, arg1, arg2, arg3};
+    let buff = new BuffClasses[typeId]();
+    buff.maxTime = maxTime;
+    buff.time = time;
+
+    let argName1 = buffArgNames[0][typeId];
+    let argName2 = buffArgNames[1][typeId];
+    if(argName1 && argName1 in buff) {
+        (buff as any)[argName1] = arg1;
+    }
+    if(argName2 != null && argName2 in buff) {
+        (buff as any)[argName2] = arg2;
+    }
+
+    return buff;
 }
 
 export function writeBuffToString(buff: CCBuff) {
@@ -2354,6 +2376,28 @@ export function writeBuffToString(buff: CCBuff) {
         str += ',' + buff.arg1 + ',' + buff.arg2 + ',' + buff.arg3;
 
     return str;
+}
+
+export function parseBuffFromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+    if(typeof obj != 'object' || obj === null) {
+        onError(`source${subobjectName} is not an object`);
+        return null;
+    }
+
+    if(!('name' in obj as any)) {
+        onError(`source${subobjectName} is missing buff name`);
+        return null;
+    }
+
+    let name: string = (obj as any).name;
+
+    if(!(name in BuffIdsByName)) {
+        onError(`source${subobjectName}.name is not a valid buff name (typo?)`);
+        return null;
+    }
+
+    let buff = new BuffClasses[BuffIdsByName[name]]();
+    return pseudoObjectAssign(buff, obj, onError, subobjectName);
 }
 
 /* In the Game namespace,
@@ -2857,6 +2901,19 @@ export class CCSave {
                     }
                 }
                 save.achievements.sort((u, v) => AchievementsByName[u] - AchievementsByName[v]);
+            }
+        }
+
+        if('buffs' in _obj) {
+            if(!Array.isArray(_obj.buffs)) {
+                onError(`source.buffs is not an array`);
+            } else {
+                for(let i = 0; i < _obj.buffs.length; i++) {
+                    let buff = parseBuffFromObject(_obj.buffs[i], onError, `.buffs[${i}]`);
+                    if(buff !== null) {
+                        save.buffs.push(buff);
+                    }
+                }
             }
         }
 
