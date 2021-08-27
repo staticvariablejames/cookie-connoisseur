@@ -1642,9 +1642,17 @@ test.describe('CCSave.fromObject', () => {
     test.describe('handles .vault', () => {
         test('with correct inputs', () => {
             let manualSave = new CCSave();
-            manualSave.vault[0] = 'Kitten helpers';
-            manualSave.vault[1] = 'Cheap hoes';
+            manualSave.vault[0] = 'Cheap hoes';
+            manualSave.vault[1] = 'Kitten helpers';
             let jsonSave = CCSave.fromObject({vault: ['Kitten helpers', 10]});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('sorting the vault if necessary', () => {
+            let manualSave = new CCSave();
+            manualSave.vault[0] = 'Cheap hoes';
+            manualSave.vault[1] = 'Kitten helpers';
+            let jsonSave = CCSave.fromObject({vault: [10, 'Kitten helpers']});
             expect(jsonSave).toEqual(manualSave);
         });
 

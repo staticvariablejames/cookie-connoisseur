@@ -2788,6 +2788,7 @@ export class CCSave {
                         onError(`source.vault[${i}] is not a number or a string`);
                     }
                 }
+                save.vault.sort((u, v) => UpgradesByName[u] - UpgradesByName[v]);
             }
         }
 
