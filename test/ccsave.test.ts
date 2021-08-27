@@ -2009,4 +2009,47 @@ test.describe('CCSave.fromObject', () => {
             }).toThrow('target.buildings["Wizard tower"].minigame.forceGC does not exist');
         });
     });
+
+    test.describe('handles .ownedUpgrades', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.ownedUpgrades[0] = 'Cheap hoes';
+            manualSave.ownedUpgrades[1] = 'Kitten helpers';
+            let jsonSave = CCSave.fromObject({ownedUpgrades: ['Kitten helpers', 10]});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({ownedUpgrades: ['invalid upgrade']});
+            }).toThrow('source.ownedUpgrades[0] is not an upgrade');
+        });
+
+        // More extensive test is not needed because the code is the same as for .vault
+    });
+
+    test.describe('handles .unlockedUpgrades', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.unlockedUpgrades[0] = 'Cheap hoes';
+            manualSave.unlockedUpgrades[1] = 'Kitten helpers';
+            let jsonSave = CCSave.fromObject({unlockedUpgrades: ['Kitten helpers', 10]});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({unlockedUpgrades: ['invalid upgrade']});
+            }).toThrow('source.unlockedUpgrades[0] is not an upgrade');
+        });
+
+        test('complaining about owned upgrades', () => {
+            expect(() => {
+                CCSave.fromObject({
+                    ownedUpgrades: ['Cheap hoes', 'Kitten helpers'],
+                    unlockedUpgrades: ['Cheap hoes', 'Kitten experts'],
+                });
+            }).toThrow('Upgrade "Cheap hoes" appears in both source.ownedUpgrades and source.unlockedUpgrades');
+        });
+    });
 });

@@ -2764,36 +2764,72 @@ export class CCSave {
             }
         }
 
-        if('vault' in _obj) {
-            // TODO: maybe eliminate duplicates?
-            if(!Array.isArray(_obj.vault)) {
-                onError(`source.vault is not an array`);
-            } else {
-                for(let i = 0; i < _obj.vault.length; i++) {
-                    if(typeof _obj.vault[i] == 'string') {
-                        let upgrade: string = _obj.vault[i];
-                        if(upgrade in UpgradesByName || upgrade == '') {
-                            save.vault.push(upgrade);
-                        } else {
-                            onError(`source.vault[${i}] is not an upgrade (typo?)`);
-                        }
-                    } else if(typeof _obj.vault[i] == 'number') {
-                        let id: number = _obj.vault[i];
-                        if(Number.isInteger(id) && id >= -1 && id < UpgradesById.length) {
-                            save.vault.push(UpgradesById[id]);
-                        } else {
-                            onError(`source.vault[${i}] is not an upgrade id (typo?)`);
-                        }
-                    } else {
-                        onError(`source.vault[${i}] is not a number or a string`);
-                    }
+        /* Converts ids to the corresponding upgrade,
+         * passes strings through,
+         * and for everything else complains and returns null.
+         */
+        function toUpgrade(u: unknown, subobjectName: string) {
+            if(typeof u == 'string') {
+                if(u in UpgradesByName) {
+                    return u;
+                } else {
+                    onError(`source${subobjectName} is not an upgrade (typo?)`);
                 }
-                save.vault.sort((u, v) => UpgradesByName[u] - UpgradesByName[v]);
+            } else if(typeof u == 'number') {
+                if(Number.isInteger(u) && u >= 0 && u < UpgradesById.length) {
+                    return UpgradesById[u];
+                } else {
+                    onError(`source${subobjectName} is not an upgrade id (typo?)`);
+                }
+            } else {
+                onError(`source${subobjectName} is not a number or a string`);
             }
+            return null;
+        }
+
+        /* Convert whatever is given to a list of upgrades,
+         * and sort by id.
+         */
+        function toSortedUpgradeList(u: unknown, subobjectName: string) {
+            if(!Array.isArray(u)) {
+                onError(`source${subobjectName} is not an array`);
+                return [];
+            } else {
+                return u.map( (u: unknown, i: number) => {
+                    return toUpgrade(u, `${subobjectName}[${i}]`);
+                }).filter( (u: string | null): u is string => {
+                    return u != null;
+                }).sort((u, v) => UpgradesByName[u] - UpgradesByName[v]);
+            }
+        }
+
+        if('vault' in _obj) {
+            save.vault = toSortedUpgradeList(_obj.vault, '.vault');
         }
 
         if('buildings' in _obj) {
             save.buildings = CCBuildingsData.fromObject(_obj.buildings, onError, '.buildings');
+        }
+
+        if('ownedUpgrades' in _obj) {
+            save.ownedUpgrades = toSortedUpgradeList(_obj.ownedUpgrades, '.ownedUpgrades');
+        }
+
+        if('unlockedUpgrades' in _obj) {
+            save.unlockedUpgrades = toSortedUpgradeList(_obj.unlockedUpgrades, '.unlockedUpgrades');
+        }
+
+        // Remove upgrades both in unlockedUpgrades and ownedUpgrades
+        {
+            let ownedSet = new Set(save.ownedUpgrades);
+            save.unlockedUpgrades = save.unlockedUpgrades.filter( u => {
+                if(ownedSet.has(u)) {
+                    onError(`Upgrade "${u}" appears in both source.ownedUpgrades` +
+                            ` and source.unlockedUpgrades`);
+                    return false;
+                }
+                return true;
+            });
         }
 
         return save;
