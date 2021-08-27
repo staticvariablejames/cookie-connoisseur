@@ -2832,6 +2832,34 @@ export class CCSave {
             });
         }
 
+        if('achievements' in _obj) {
+            // TODO: maybe eliminate duplicates?
+            if(!Array.isArray(_obj.achievements)) {
+                onError(`source.achievements is not an array`);
+            } else {
+                for(let i = 0; i < _obj.achievements.length; i++) {
+                    if(typeof _obj.achievements[i] == 'string') {
+                        let achievement: string = _obj.achievements[i];
+                        if(achievement in AchievementsByName) {
+                            save.achievements.push(achievement);
+                        } else {
+                            onError(`source.achievements[${i}] is not an achievement (typo?)`);
+                        }
+                    } else if(typeof _obj.achievements[i] == 'number') {
+                        let id: number = _obj.achievements[i];
+                        if(Number.isInteger(id) && id >= 0 && id < AchievementsById.length) {
+                            save.achievements.push(AchievementsById[id]);
+                        } else {
+                            onError(`source.achievements[${i}] is not an achievement id (typo?)`);
+                        }
+                    } else {
+                        onError(`source.achievements[${i}] is not a number or a string`);
+                    }
+                }
+                save.achievements.sort((u, v) => AchievementsByName[u] - AchievementsByName[v]);
+            }
+        }
+
         return save;
     }
 };

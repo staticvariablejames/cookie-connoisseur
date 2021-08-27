@@ -2052,4 +2052,43 @@ test.describe('CCSave.fromObject', () => {
             }).toThrow('Upgrade "Cheap hoes" appears in both source.ownedUpgrades and source.unlockedUpgrades');
         });
     });
+
+    test.describe('handles .achievements', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.achievements[0] = 'Wake and bake';
+            manualSave.achievements[1] = 'Gaseous assets';
+            let jsonSave = CCSave.fromObject({achievements: [0, 'Gaseous assets']});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('sorting the achievements if necessary', () => {
+            let manualSave = new CCSave();
+            manualSave.achievements[0] = 'Wake and bake';
+            manualSave.achievements[1] = 'Gaseous assets';
+            let jsonSave = CCSave.fromObject({achievements: ['Gaseous assets', 0]});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({achievements: 'all of them'});
+            }).toThrow('source.achievements is not an array');
+            expect(() => {
+                CCSave.fromObject({achievements: ['invalid achievement']});
+            }).toThrow('source.achievements[0] is not an achievement');
+            expect(() => {
+                CCSave.fromObject({achievements: [10, -5]});
+            }).toThrow('source.achievements[1] is not an achievement id');
+            expect(() => {
+                CCSave.fromObject({achievements: [10, 11, 3.14]});
+            }).toThrow('source.achievements[2] is not an achievement id');
+            expect(() => {
+                CCSave.fromObject({achievements: [10, 11, 12, 31415926535]});
+            }).toThrow('source.achievements[3] is not an achievement id');
+            expect(() => {
+                CCSave.fromObject({achievements: [10, 11, 12, 13, true]});
+            }).toThrow('source.achievements[4] is not a number or a string');
+        });
+    });
 });
