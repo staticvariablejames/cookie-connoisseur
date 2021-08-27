@@ -2470,6 +2470,26 @@ export class CCModSaveData {
         }
         return str;
     }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        let data = new CCModSaveData();
+        if(Array.isArray(obj)) {
+            onError(`target${subobjectName} is not an array`);
+            return data;
+        }
+        if(typeof obj != 'object' || obj === null) {
+            onError(`source${subobjectName} is not an object`);
+            return data;
+        }
+        for(let [key, value] of Object.entries(obj)) {
+            if(typeof value == 'string' || typeof value == 'object') {
+                data[key] = value;
+            } else {
+                onError(`source${subobjectName}["${key}"] is not an object or a string`);
+            }
+        }
+        return data;
+    }
 }
 
 export class CCSave {
@@ -2915,6 +2935,10 @@ export class CCSave {
                     }
                 }
             }
+        }
+
+        if('modSaveData' in _obj) {
+            save.modSaveData = CCModSaveData.fromObject(_obj.modSaveData, onError, `.modSaveData`);
         }
 
         return save;

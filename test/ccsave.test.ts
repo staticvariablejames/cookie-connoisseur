@@ -2181,4 +2181,33 @@ test.describe('CCSave.fromObject', () => {
             }).toThrow('target.buffs[0].multCpS does not exist');
         });
     });
+
+    test.describe('handles .modSaveData', () => {
+        test('with correct inputs', () => {
+            let manualSave = new CCSave();
+            manualSave.modSaveData.mod1 = 'a string';
+            manualSave.modSaveData.mod2 = {anObject: true};
+            manualSave.modSaveData.mod3 = {trickyString: '|;'};
+            let jsonSave = CCSave.fromObject({modSaveData: {
+                mod1: 'a string',
+                mod2: {anObject: true},
+                mod3: {trickyString: '|;'},
+            }});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('throwing readable error messages', () => {
+            expect(() => {
+                CCSave.fromObject({modSaveData: 'data'});
+            }).toThrow('source.modSaveData is not an object');
+            expect(() => {
+                CCSave.fromObject({modSaveData: []});
+            }).toThrow('target.modSaveData is not an array');
+            expect(() => {
+                CCSave.fromObject({modSaveData: {
+                    mod1: 42,
+                }});
+            }).toThrow('source.modSaveData["mod1"] is not an object or a string');
+        });
+    });
 });
