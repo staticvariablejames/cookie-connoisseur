@@ -530,7 +530,7 @@ export class CCMarketMinigame {
 };
 
 export class CCPantheonMinigame {
-    diamondSlot: string = '';
+    diamondSlot: string = ''; // '' represents no spirit slotted
     rubySlot: string = '';
     jadeSlot: string = '';
     swaps: number = 3;
@@ -555,15 +555,37 @@ export class CCPantheonMinigame {
 
     static GodsByName = invertMap(CCPantheonMinigame.GodsById);
 
+    /* Converts a spirit id to a spirit name.
+     * It is here as a separate function specifically to handle the id == -1 case.
+     */
+    static godNameFromId(id: number) {
+        if(!Number.isInteger(id) || id == -1) {
+            return '';
+        } else {
+            return CCPantheonMinigame.GodsById[id];
+        }
+    }
+
+    /* Converts a spirit name to its in-game id.
+     * It is here as a separate function specifically to handle the name == '' case.
+     */
+    static godIdFromName(name: string) {
+        if(name == '') {
+            return -1;
+        } else {
+            return CCPantheonMinigame.GodsByName[name];
+        }
+    }
+
     static fromStringSave(str: string) {
         if(str === '') return null;
 
         let m = new CCPantheonMinigame();
         let data = str.split(' ');
         let gods = data[0].split('/');
-        m.diamondSlot = CCPantheonMinigame.GodsById[Number(gods[0])];
-        m.rubySlot = CCPantheonMinigame.GodsById[Number(gods[1])];
-        m.jadeSlot = CCPantheonMinigame.GodsById[Number(gods[2])];
+        m.diamondSlot = CCPantheonMinigame.godNameFromId(Number(gods[0]));
+        m.rubySlot = CCPantheonMinigame.godNameFromId(Number(gods[1]));
+        m.jadeSlot = CCPantheonMinigame.godNameFromId(Number(gods[2]));
         m.swaps = Number(data[1]);
         m.swapT = Number(data[2]);
         m.onMinigame = Boolean(Number(data[3]));
@@ -572,9 +594,9 @@ export class CCPantheonMinigame {
 
     static toStringSave(m: CCPantheonMinigame | null) {
         if(m === null) return '';
-        return CCPantheonMinigame.GodsByName[m.diamondSlot] + '/' +
-            CCPantheonMinigame.GodsByName[m.rubySlot] + '/' +
-            CCPantheonMinigame.GodsByName[m.jadeSlot] + ' ' +
+        return CCPantheonMinigame.godIdFromName(m.diamondSlot) + '/' +
+            CCPantheonMinigame.godIdFromName(m.rubySlot) + '/' +
+            CCPantheonMinigame.godIdFromName(m.jadeSlot) + ' ' +
             m.swaps + ' ' + m.swapT +
             ' ' + Number(m.onMinigame);
     }
