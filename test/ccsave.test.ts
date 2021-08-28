@@ -1551,6 +1551,10 @@ test('Written saves can be recovered', async() => {
     expect(CCSave.fromStringSave(str)).toEqual(saveAsObject);
 });
 
+test('The JSON save is properly converted to a Cookie Clicker save', () => {
+    expect(CCSave.toStringSave(saveAsObject)).toEqual(saveAsString);
+});
+
 test.describe('CCSave.fromObject', () => {
     test('Can parse entire save objects', () => {
         // This is an "integration test" of sorts

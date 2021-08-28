@@ -506,7 +506,7 @@ export class CCMarketMinigame {
             m.brokers + ':' +
             Number(m.graphLines) + ':' +
             m.profit + ':' +
-            m.graphCols + ':' +
+            Number(m.graphCols) + ':' +
             ' ' +
             CCMarketStockList.toStringSave(m.goods) + ' ' +
             Number(m.onMinigame);
@@ -2362,6 +2362,22 @@ export function parseBuffFromString(str: string) : CCBuff {
     return buff;
 }
 
+/* Writes the buff to a string in the format produced by Cookie Clicker.
+ * It includes the trailing semicolon (as in Cookie Clicker).
+ *
+ * As a special provision,
+ * for sugar blessing buffs,
+ * it includes the ',1' in the string.
+ * This ',1' represents the argument 'pow' in the function
+ * Game.buffTypesByName['sugar blessing'].func,
+ * but this argument is always 1, has no effect in the game whatsoever
+ * and isn't even included by the function in the object it returns.
+ *
+ * This attribute only appears in the save file
+ * due to the same mechanism that appends ,0,0 to e.g. Frenzies which were saved,
+ * then parsed, and then saved again.
+ * Adding it manually keeps consistency with the save files produced by Cookie Clicker.
+ */
 export function writeBuffToString(buff: CCBuff) {
     let str = BuffIdsByName[buff.name] + ',' + buff.maxTime + ',' + buff.time;
     if('multCpS' in buff)
@@ -2372,10 +2388,12 @@ export function writeBuffToString(buff: CCBuff) {
         str += ',' + buff.power;
     if('building' in buff)
         str += ',' + buff.building;
+    if(buff.name === 'sugar blessing')
+        str += ',1';
     if(buff.name === 'unknown')
         str += ',' + buff.arg1 + ',' + buff.arg2 + ',' + buff.arg3;
 
-    return str;
+    return str + ';';
 }
 
 export function parseBuffFromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
@@ -2653,7 +2671,7 @@ export class CCSave {
         saveString += achievements.join('');
 
         saveString += '|';
-        saveString += save.buffs.map(writeBuffToString).join(';');
+        saveString += save.buffs.map(writeBuffToString).join('');
 
         saveString += '|';
         saveString += CCModSaveData.toStringSave(save.modSaveData);
