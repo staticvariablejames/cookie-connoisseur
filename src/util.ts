@@ -15,6 +15,14 @@ export type ErrorHandler = (msg: string) => void;
 
 /* Simple implementation of an ErrorHandler,
  * which simply throws an error with the given message.
+ *
+ * This is the default value of the onError argument for the .fromObject static methods.
+ * Rationale:
+ * The intended usage of CCSave.fromObject is in test cases,
+ * always passing an object defined locally
+ * (as opposed to e.g. user input).
+ * So having the function loudly crash the test ensures correctness,
+ * as opposed to silently igonring the error.
  */
 export const throwOnError: ErrorHandler = (msg: string) => {
     throw new Error(msg);
@@ -35,6 +43,24 @@ export const throwOnError: ErrorHandler = (msg: string) => {
  * The subobjectName attribute is used to generate more helpful error messages.
  * By default, the function complains that e.g. "source.amount is not a number".
  * Setting subobjectName to '.wrinklers' changes it to "source.wrinklers.amount is not a number".
+ *
+ *
+ * Rationale:
+ *
+ * The classes in `ccsave.ts` have many attributes, but all of them have default values.
+ * It makes sense to provide a way to construct objects of those classes
+ * by choosing a few values, and leave the remaining values with their default value.
+ * This function is meant to aid this operation;
+ * `target` is meant to be a default-constructed object,
+ * and `source` is meant to be a list of attributes to override.
+ * Complaining about extraneous keys in `source` avoids typos,
+ * and type-checking allows for `source` to be any object, including the output from JSON.parse.
+ *
+ * This function does not operate on attributes which are functions, arrays and objects
+ * because these have more complex behavior and should be handled manually.
+ *
+ * Since it is expected that many of those nested objects to be handled using pseudoObjectAssign,
+ * the argument subobjectName makes the error messages more helpful.
  */
 export function pseudoObjectAssign<T>(
     target: T,
