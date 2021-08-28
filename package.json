@@ -7,6 +7,7 @@
   "bin": {
     "ccsave-to-json": "bin/ccsave-to-json.js",
     "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js",
+    "json-to-ccsave": "bin/json-to-ccsave.js",
     "launch-cookie-clicker-instance": "bin/launch-cookie-clicker-instance.js"
   },
   "scripts": {
