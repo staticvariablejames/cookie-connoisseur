@@ -1608,6 +1608,33 @@ test.describe('CCSave.toStringSave edge cases:', () => {
             'Carpal tunnel prevention cream',
         ]);
     });
+
+    test('Default-initialized CCSave contains minigame data', () => {
+        let save = new CCSave();
+        expect(save.buildings['Farm'].minigame).not.toBeNull();
+        expect(save.buildings['Bank'].minigame).not.toBeNull();
+        expect(save.buildings['Temple'].minigame).not.toBeNull();
+        expect(save.buildings['Wizard tower'].minigame).not.toBeNull();
+    });
+
+    test('Minigame data is not included for level 0 buildings', () => {
+        let withMinigames = new CCSave();
+        let withoutMinigames = new CCSave();
+        withoutMinigames.buildings['Farm'].minigame = null;
+        withoutMinigames.buildings['Bank'].minigame = null;
+        withoutMinigames.buildings['Temple'].minigame = null;
+        withoutMinigames.buildings['Wizard tower'].minigame = null;
+        expect(CCSave.toStringSave(withMinigames)).toEqual(CCSave.toStringSave(withoutMinigames));
+    });
+
+    test('Absent minigame data is parsed back to null', () => {
+        let save = CCSave.fromStringSave(CCSave.toStringSave(new CCSave()));
+        let withoutMinigames = new CCSave();
+        expect(save.buildings['Farm'].minigame).toBeNull();
+        expect(save.buildings['Bank'].minigame).toBeNull();
+        expect(save.buildings['Temple'].minigame).toBeNull();
+        expect(save.buildings['Wizard tower'].minigame).toBeNull();
+    });
 });
 
 test.describe('CCSave.fromObject', () => {
@@ -1770,9 +1797,10 @@ test.describe('CCSave.fromObject', () => {
     });
 
     test.describe('handles the Garden minigame', () => {
-        test('leaving it alone if level == 0', () => {
+        test('setting it to null if level == 0', () => {
             let manualSave = new CCSave();
             manualSave.buildings["Farm"].level = 0;
+            manualSave.buildings["Farm"].minigame = null;
             let jsonSave = CCSave.fromObject({buildings: {"Farm": {level: 0}}});
             expect(jsonSave).toEqual(manualSave);
         });
@@ -1904,9 +1932,10 @@ test.describe('CCSave.fromObject', () => {
     });
 
     test.describe('handles the Stock Market minigame', () => {
-        test('leaving it alone if level == 0', () => {
+        test('setting it to null if level == 0', () => {
             let manualSave = new CCSave();
             manualSave.buildings["Bank"].level = 0;
+            manualSave.buildings["Bank"].minigame = null;
             let jsonSave = CCSave.fromObject({buildings: {"Bank": {level: 0}}});
             expect(jsonSave).toEqual(manualSave);
         });
@@ -1972,9 +2001,10 @@ test.describe('CCSave.fromObject', () => {
     });
 
     test.describe('handles the Pantheon minigame', () => {
-        test('leaving it alone if level == 0', () => {
+        test('setting it to null if level == 0', () => {
             let manualSave = new CCSave();
             manualSave.buildings["Temple"].level = 0;
+            manualSave.buildings["Temple"].minigame = null;
             let jsonSave = CCSave.fromObject({buildings: {"Temple": {level: 0}}});
             expect(jsonSave).toEqual(manualSave);
         });
@@ -2024,9 +2054,10 @@ test.describe('CCSave.fromObject', () => {
     });
 
     test.describe('handles the Grimoire minigame', () => {
-        test('leaving it alone if level == 0', () => {
+        test('setting it to null if level == 0', () => {
             let manualSave = new CCSave();
             manualSave.buildings["Wizard tower"].level = 0;
+            manualSave.buildings["Wizard tower"].minigame = null;
             let jsonSave = CCSave.fromObject({buildings: {"Wizard tower": {level: 0}}});
             expect(jsonSave).toEqual(manualSave);
         });

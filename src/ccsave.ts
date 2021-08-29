@@ -117,15 +117,20 @@ export class CCPlainBuilding { // Building without minigame data
         return obj;
     }
 
+    /* If the object's level is greater than zero,
+     * the provided minigame data is written in the appropriate portion of the save.
+     */
     static toStringSave(obj: CCPlainBuilding, minigameData: string = '') {
         return obj.amount + ',' +
             obj.bought + ',' +
             obj.totalCookies + ',' +
             obj.level + ',' +
-            minigameData + ',' +
+            (obj.level > 0 ? minigameData : '') + ',' +
             Number(obj.muted) + ',' +
             obj.highest;
     }
+
+    // no fromObject function; this is handled by the CCBuildingsData class.
 };
 
 export class CCGardenMinigame {
@@ -646,7 +651,9 @@ export class CCMinigameBuilding<MinigameData> extends CCPlainBuilding {
      * the game does not include the minigame data in the save file.
      * We represent this situation by letting minigame === null.
      */
-    minigame: MinigameData | null = null;
+    constructor(public minigame: MinigameData | null) {
+        super();
+    }
 };
 
 export function parseCCBuildingWithMinigame<MinigameData>(
@@ -664,12 +671,12 @@ export function parseCCBuildingWithMinigame<MinigameData>(
 export class CCBuildingsData { // Aggregates all buildings
     'Cursor': CCPlainBuilding = new CCPlainBuilding();
     'Grandma': CCPlainBuilding = new CCPlainBuilding();
-    'Farm' = new CCMinigameBuilding<CCGardenMinigame>();
+    'Farm' = new CCMinigameBuilding(new CCGardenMinigame());
     'Mine': CCPlainBuilding = new CCPlainBuilding();
     'Factory': CCPlainBuilding = new CCPlainBuilding();
-    'Bank' = new CCMinigameBuilding<CCMarketMinigame>();
-    'Temple' = new CCMinigameBuilding<CCPantheonMinigame>();
-    'Wizard tower' = new CCMinigameBuilding<CCGrimoireMinigame>();
+    'Bank' = new CCMinigameBuilding(new CCMarketMinigame());
+    'Temple' = new CCMinigameBuilding(new CCPantheonMinigame());
+    'Wizard tower' = new CCMinigameBuilding(new CCGrimoireMinigame());
     'Shipment': CCPlainBuilding = new CCPlainBuilding();
     'Alchemy lab': CCPlainBuilding = new CCPlainBuilding();
     'Portal': CCPlainBuilding = new CCPlainBuilding();
@@ -765,7 +772,9 @@ export class CCBuildingsData { // Aggregates all buildings
             function handleMinigame(name: 'Wizard tower', minigameClass: minigameT<CCGrimoireMinigame>): void;
             function handleMinigame(name: string, minigameClass: any) {
                 if(building === name) {
-                    if('minigame' in (obj as any)[name]) {
+                    if((obj as any)[name].level === 0) {
+                        (buildings as any)[name].minigame = null;
+                    } else if('minigame' in (obj as any)[name]) {
                         (buildings as any)[name].minigame = minigameClass.fromObject(
                             (obj as any)[name].minigame,
                             onError,
