@@ -2608,8 +2608,6 @@ export class CCSave {
 
     static currentVersion = 2.031;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
-    static upgradeCount = 729;
-    static achievementCount = 538;
 
     static toStringSave(save: CCSave): string {
         let saveString = '';
@@ -2682,7 +2680,7 @@ export class CCSave {
         saveString += CCBuildingsData.toStringSave(save.buildings);
 
         saveString += '|';
-        let upgrades = '00'.repeat(CCSave.upgradeCount).split('');
+        let upgrades = '00'.repeat(UpgradesById.length).split('');
         for(let upgrade of save.ownedUpgrades) {
             let i = UpgradesByName[upgrade];
             upgrades[2*i] = upgrades[2*i+1] = '1';
@@ -2694,7 +2692,7 @@ export class CCSave {
         saveString += upgrades.join('');
 
         saveString += '|';
-        let achievements = '0'.repeat(CCSave.achievementCount).split('');
+        let achievements = '0'.repeat(AchievementsById.length).split('');
         for(let achievement of save.achievements) {
             let i = AchievementsByName[achievement];
             achievements[i] = '1';
@@ -2796,14 +2794,14 @@ export class CCSave {
 
         saveObject.buildings = CCBuildingsData.fromStringSave(data[5]);
 
-        for(let i = 0; i < CCSave.upgradeCount; i++) {
+        for(let i = 0; i < UpgradesById.length; i++) {
             if(data[6].charAt(2*i) == '1' && data[6].charAt(2*i+1) == '1')
                 saveObject.ownedUpgrades.push(UpgradesById[i]);
             if(data[6].charAt(2*i) == '1' && data[6].charAt(2*i+1) == '0')
                 saveObject.unlockedUpgrades.push(UpgradesById[i]);
         }
 
-        for(let i = 0; i < CCSave.achievementCount; i++) {
+        for(let i = 0; i < AchievementsById.length; i++) {
             if(data[7].charAt(i) == '1')
                 saveObject.achievements.push(AchievementsById[i]);
         }
