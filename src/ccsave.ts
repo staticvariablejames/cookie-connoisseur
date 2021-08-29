@@ -2536,7 +2536,7 @@ export class CCSave {
     // Attribute names have the same name in game
     version: number = 2.031;
     startDate: TimePoint = 1.6e12; // Run start date
-    fullDate: TimePoint = 1.6e12; // Legacy start date
+    fullDate: TimePoint = 1.6e12; // Legacy start date; NaN for very old save files
     lastDate: TimePoint = 1.6e12; // when the save was made; used to compute offline production
     bakeryName: string = "Test"; // Matches [A-Za-z0-9_ ]{1,28}
     seed: string = "aaaaa"; // Matches [a-z]{5}
@@ -2812,15 +2812,24 @@ export class CCSave {
          * Why, TypeScript, why?
          * TODO: add better types
          */
-        let _obj = obj as any;
-
-        if(_obj === null) {
+        if(obj === null) {
             return save;
         }
 
-        if(typeof _obj != 'object') {
+        if(typeof obj != 'object') {
             onError('source is not an object');
             return save;
+        }
+
+        let _obj = {...obj} as Record<string, unknown>;
+
+        /* Special handling of fullDate.
+         * If more of these special handlings appear,
+         * we should modify pseudoObjectAssign.
+         */
+        if('fullDate' in _obj && _obj.fullDate === null) {
+            _obj.fullDate = NaN;
+            // This tricks pseudoObjectAssign into doing the right thing without complaining
         }
 
         pseudoObjectAssign(save, _obj, onError);
