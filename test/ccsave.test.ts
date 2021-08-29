@@ -1575,6 +1575,7 @@ test.describe('CCSave.toStringSave edge cases:', () => {
         await page.evaluate( () => Game.Objects['Temple'].levelUp() ); // Unlock Pantheon
         // We must wait for the minigame to load before Game.WriteSave.
         await page.waitForFunction( () => Game.isMinigameReady(Game.Objects['Temple']) );
+
         let strSave = await page.evaluate( () => Game.WriteSave(1) );
         let jsonSave = CCSave.fromStringSave(strSave);
         expect(jsonSave.buildings['Temple'].minigame.diamondSlot).toBe('');
@@ -1594,6 +1595,18 @@ test.describe('CCSave.toStringSave edge cases:', () => {
         jsonSave = CCSave.fromStringSave(strSave);
         expect(jsonSave.fullDate).toBe(NaN);
         expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+    });
+
+    test('Vault is sorted', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate( () => Game.Upgrades['Carpal tunnel prevention cream'].vault() );
+        await page.evaluate( () => Game.Upgrades['Reinforced index finger'].vault() );
+        let strSave = await page.evaluate( () => Game.WriteSave(1) );
+        let jsonSave = CCSave.fromStringSave(strSave);
+        expect(jsonSave.vault).toEqual([
+            'Reinforced index finger',
+            'Carpal tunnel prevention cream',
+        ]);
     });
 });
 

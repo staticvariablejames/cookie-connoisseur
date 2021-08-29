@@ -2775,7 +2775,11 @@ export class CCSave {
         saveObject.lumpT = Number(generalData[44]);
         saveObject.lumpRefill = Number(generalData[45]);
         saveObject.lumpCurrentType = SugarLumpTypesById[Number(generalData[46])];
-        saveObject.vault = generalData[47].split(',').filter(s => s != '').map(s => UpgradesById[Number(s)]);
+        saveObject.vault = generalData[47]
+            .split(',')
+            .filter(s => s != '') // If generalData[47] == '', this turns the array to []
+            .sort( (id1, id2) => Number(id1) - Number(id2) )
+            .map(s => UpgradesById[Number(s)]);
         saveObject.heralds = Number(generalData[48]);
         saveObject.fortuneGC = generalData[49] == '1';
         saveObject.fortuneCPS = generalData[50] == '1';
