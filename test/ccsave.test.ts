@@ -10,6 +10,7 @@ import {
     CCPantheonMinigame,
     CCSave
 } from '../src/ccsave';
+import { openCookieClickerPage } from '../src/cookie-clicker-page';
 
 const saveAsString =
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+
@@ -1553,6 +1554,47 @@ test('Written saves can be recovered', async() => {
 
 test('The JSON save is properly converted to a Cookie Clicker save', () => {
     expect(CCSave.toStringSave(saveAsObject)).toEqual(saveAsString);
+});
+
+test.describe('CCSave.toStringSave edge cases:', () => {
+    test('Sugar blessing includes the trailing ,1', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate( () => Game.gainBuff('sugar blessing',24*60*60,1) );
+        let strSave = await page.evaluate( () => Game.WriteSave(1) );
+        let jsonSave = CCSave.fromStringSave(strSave);
+        expect(jsonSave.buffs[0].name).toBe('sugar blessing');
+        // strSave includes the trailing ",1" so we can just test for equality:
+        expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+    });
+
+    test('Empty pantheon slots parse from -1 and back', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate( () => Game.Earn(1e9) ); // Unlock lumps
+        await page.evaluate( () => {Game.lumps = 1;} ); // Get one lump
+        await page.evaluate( () => Game.Objects['Temple'].getFree(1) ); // Get a temple
+        await page.evaluate( () => Game.Objects['Temple'].levelUp() ); // Unlock Pantheon
+        // We must wait for the minigame to load before Game.WriteSave.
+        await page.waitForFunction( () => Game.isMinigameReady(Game.Objects['Temple']) );
+        let strSave = await page.evaluate( () => Game.WriteSave(1) );
+        let jsonSave = CCSave.fromStringSave(strSave);
+        expect(jsonSave.buildings['Temple'].minigame.diamondSlot).toBe('');
+        expect(jsonSave.buildings['Temple'].minigame.rubySlot).toBe('');
+        expect(jsonSave.buildings['Temple'].minigame.jadeSlot).toBe('');
+        // strSave saves the pantheon as -1/-1/-1 so we can just test for equality:
+        expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+    });
+
+    test('Saves started a long while ago are preserved', async ({ browser }) => {
+        let jsonSave = new CCSave();
+        jsonSave.fullDate = NaN;
+        let page = await openCookieClickerPage(browser, {saveGame: CCSave.toStringSave(jsonSave)});
+        let fullDate = await page.evaluate( () => Game.fullDate );
+        expect(fullDate).toBe(NaN);
+        let strSave = await page.evaluate( () => Game.WriteSave(1) );
+        jsonSave = CCSave.fromStringSave(strSave);
+        expect(jsonSave.fullDate).toBe(NaN);
+        expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+    });
 });
 
 test.describe('CCSave.fromObject', () => {
