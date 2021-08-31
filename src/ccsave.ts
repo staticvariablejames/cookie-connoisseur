@@ -2601,7 +2601,7 @@ export class CCSave {
 
     buildings: CCBuildingsData = new CCBuildingsData();
     ownedUpgrades: string[] = [];
-    unlockedUpgrades: string[] = []; // Upgrades which are currently unlocked but non owned
+    unlockedUpgrades: string[] = []; // Upgrades which are currently unlocked but not owned
     achievements: string[] = []; // Achievements won
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
