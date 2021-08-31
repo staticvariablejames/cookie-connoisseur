@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 0.1.2 - 2021-08-31
 - Added; Class `CCSave`, a JSON-like representation of a Cookie Clicker save.
 - Added: Command line utility for parsing Cookie Clicker saves to a human-readable JSON format.
 - Added: Field `saveGame` in `CCPageOptions` may be an object,
