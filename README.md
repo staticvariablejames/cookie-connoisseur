@@ -27,10 +27,11 @@ See the section [API](#api) below for a full list of features.
 Installation
 ============
 
-    npm install --save-dev cookie-connoisseur
+    npm install --save-dev --save-exact cookie-connoisseur
 
 This istalls the library and the binaries.
 It comes with TypeScript typings.
+(As the API is still unstable, `--save-exact` is recommended to minimize breakage.)
 
 Before using Cookie Connoisseur,
 you must run
