@@ -3,6 +3,8 @@
 ## Unreleased
 - Added; Class `CCSave`, a JSON-like representation of a Cookie Clicker save.
 - Added: Command line utility for parsing Cookie Clicker saves to a human-readable JSON format.
+- Added: Field `saveGame` in `CCPageOptions` may be an object,
+    which will be converted to `CCSave`.
 - Added: Property `localDirectories` in the configuration file to reroute to entire directories.
 - Change: `customURLs` in the configuration file that redirect to local files
     are now located under the `localFiles` attribute. (**breaking**)

@@ -77,20 +77,20 @@ with the following exceptions:
     In-game, this is derived from a network query.
 
 
-```javascript
+```typescript
     CCSave.toStringSave(save: CCSave): string;
 ```
 
 Converts the `CCSave` object to Cookie Clicker's native save format.
 
-```
+```typescript
     CCSave.fromStringSave(saveString: string): CCSave;
 ```
 
 Parses the Cookie Clicker's native save format into a `CCSave` object.
 
 
-```
+```typescript
     CCSave.fromObject(obj: unknown, onError: (msg: string) => void = throwOnError): CCSave;
 ```
 

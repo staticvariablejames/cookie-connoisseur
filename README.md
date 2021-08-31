@@ -1,7 +1,10 @@
 Cookie Connoisseur
 ==================
 
-**[Changelog](CHANGELOG.md) | [API](#api) | [Configuration file](#configuration-file)**
+**[Changelog](CHANGELOG.md)
+| [API](#api)
+| [Configuration file](#configuration-file)
+| [CCSave](doc/CCSave.md)**
 
 Cookie Connoisseur is a Node.js library to automate the testing of Cookie Clicker mods.
 
@@ -19,6 +22,7 @@ The library can
     so that you can choose to run the tests e.g. during Christmas
 - Download copies of third-party mods,
     to aid integration with other mods
+- Parse Cookie Clicker's native save format into a JSON format and back
 - Block ads.
 
 See the section [API](#api) below for a full list of features.
@@ -60,8 +64,19 @@ setTimeout(async () => {
      * The second argument is a list of options for configuring the page.
      * For example, the line below sets the date to December 21st, 2012,
      * so you should see the Christmas theme, regardless of the real date!
+     * We also choose the save game so that we start with a 6x6 garden.
      */
-    let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2012, 11, 21)});
+    let page = await openCookieClickerPage(browser, {
+        mockedDate: Date.UTC(2012, 11, 21),
+        saveGame: {
+            buildings: {
+                'Farm': {
+                    amount: 1,
+                    level: 9,
+                },
+            },
+        },
+    });
 
     /* You can run any Playwright command in the page.
      */
@@ -88,7 +103,7 @@ setTimeout(async () => {
 });
 ```
 
-You can find an example of how Cookie Connoisseur is used for testing
+You can find examples of how Cookie Connoisseur is used for testing
 in the [test directory of Choose Your Own Lump](
     https://github.com/staticvariablejames/ChooseYourOwnLump/tree/master/test
 ).
@@ -97,7 +112,7 @@ in the [test directory of Choose Your Own Lump](
 Executables
 ===========
 
-Cookie Connoiseur comes with two executable scripts.
+Cookie Connoiseur comes with four executable scripts.
 
     npx fetch-cookie-clicker-files
 
@@ -119,14 +134,22 @@ It exists mainly to provide a simple test that `npx fetch-cookie-clicker-files` 
 If any file needed by Cookie Clicker is not downloaded,
 it is written in the terminal.
 
+    npx ccsave-to-json
+    npx json-to-ccsave
+
+These commands read Cookie Clicker's native save format from stdin
+and write a corresponding JSON to stdout,
+and vice-versa, respectively.
+They are documented in more details [here](doc/CCSave.md#executables).
+
 
 API
 ===
 
 The main function is
 
-```javascript
-async function openCookieClickerPage(browser, options = {}): 
+```typescript
+function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}): Promise<Page>
 ```
 
 Given a [browser](https://playwright.dev/docs/api/class-browser/)
@@ -142,27 +165,31 @@ most notably <https://pagead2.googlesyndication.com>.
 
 Available options:
 
--   `heralds` <number>: Heralds and Patreon-submitted grandma names are obtained by querying
+-   `heralds: number` - Heralds and Patreon-submitted grandma names are obtained by querying
         <https://orteil.dashnet.org/patreon/grab.php>. Cookie Connoisseur intercepts this query;
         `options.heralds` is the number used in the response.
         Defaults to 42.
 
--   `grandmaNames` <string[]>: list of names that some grandmas get if "Custom grandmas" is "ON".
+-   `grandmaNames: string[]` - list of names that some grandmas get if "Custom grandmas" is "ON".
         Names must not contain the pipe `|` character.
         Defaults to `["Custom grandma names", "See cookie-clicker-page.ts for details"]`.
 
--   `updatesResponse` <string>: Every 30 minutes Cookie Clicker checks for updates;
+-   `updatesResponse: string` - Every 30 minutes Cookie Clicker checks for updates;
         this is the string fed to Game.CheckUpdatesResponse.
         The default value is '2.029|new stock market minigame!'.
 
--   `cookieConsent` <boolean>: Unless set to 'false',
+-   `cookieConsent: boolean` - Unless set to 'false',
         the page includes the browser cookie `cookieconsent_dismissed=yes`,
         which dismisses the cookie consent dialog.
 
--   `saveGame` <string>: String to be used as the stored save game.
+-   `saveGame: string|object` - The starting save game.
+        If it is a string, the value is stored as-is into `window.localStorage`
+        prior to loading the game.
+        If it is an object, it is first converted to a string using
+        [`CCSave.fromObject` and `CCSave.toStringSave`](doc/CCSave.md#API)
         Defaults to empty.
 
--   `mockedDate` <number>: Initial value of CConnoisseur.mockedDate; see below.
+-   `mockedDate: number` - Initial value of CConnoisseur.mockedDate; see below.
         Defaults to 1.6e12.
 
 The first three options
@@ -175,10 +202,9 @@ changing these options in the object will update the response issued by Cookie C
 in the next query.
 
 Routing is done via [page.route](https://playwright.dev/docs/api/class-page#page-route).
-Since Playwright 1.13,
-if you register conflicting routes,
-[the later routes take precedence](https://github.com/microsoft/playwright/issues/7394).
-So you may override any route established by Cookie Connoisseur
+If you register conflicting routes,
+[the later routes take precedence](https://github.com/microsoft/playwright/issues/7394),
+so you may override any route established by Cookie Connoisseur
 by just registering a new route.
 
 Additionally,
