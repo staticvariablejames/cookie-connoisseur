@@ -4,6 +4,7 @@ import { cacheURLs } from './url-list';
 import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
+import { CCSave } from './ccsave';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,
@@ -14,7 +15,7 @@ export type CCPageOptions = {
     grandmaNames?: string[],
     updatesResponse?: string,
     cookieConsent?: boolean,
-    saveGame?: string,
+    saveGame?: string | object,
     mockedDate?: number,
 };
 
@@ -236,10 +237,16 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
     }
 
     if(options.saveGame) {
+        let saveGame: string;
+        if(typeof options.saveGame == 'string') {
+            saveGame = options.saveGame;
+        } else {
+            saveGame = CCSave.toStringSave(CCSave.fromObject(options.saveGame));
+        }
         storageState.origins = [{
             origin: 'https://orteil.dashnet.org/cookieclicker/',
             localStorage: [
-                {name: 'CookieClickerGame', value: options.saveGame}
+                {name: 'CookieClickerGame', value: saveGame}
             ]
         }];
     }

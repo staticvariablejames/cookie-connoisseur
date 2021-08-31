@@ -1,5 +1,7 @@
 /* Basic test for openCookieClickerPage.
  *
+ * The "saveGame" option is tested in `cookie-clicker-page-savegame.test.ts`.
+ *
  * Note: bin/fetch-cookie-clicker-files.js must be run before running this test.
  */
 import { test, expect } from '@playwright/test';
@@ -63,16 +65,5 @@ test('Updates check is properly intercepted', async ({browser}) => {
         expect.stringContaining('New version available')
     );
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
-    await page.close();
-});
-
-test('Save games can be set', async ({browser}) => {
-    let page = await openCookieClickerPage(browser);
-    await page.click('#bigCookie');
-    let save:string = await page.evaluate(() => Game.WriteSave(1));
-    await page.close();
-
-    page = await openCookieClickerPage(browser, {saveGame: save});
-    expect(await page.evaluate(() => Game.cookies)).toEqual(1);
     await page.close();
 });
