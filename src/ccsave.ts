@@ -36,6 +36,12 @@ export class CCPreferences {
     customGrandmas: boolean = true; // Show Patreon grandma names
     timeout: boolean = false; // If true, may switch to offline mode under lag; see Game.Timeout()
 
+    // 2.04-specific; except for notScary, only works in the Steam version
+    cloudSave: boolean = true; // save to the Steam cloud
+    bgMusic: boolean = true; // whether background music should play even while unfocused
+    notScary: boolean = false; // Changes a few sprites to make the game a bit less scary
+    fullscreen: boolean = false;
+
     static toBitstring(prefs: CCPreferences) {
         let str = '';
         for(let [_key, value] of Object.entries(prefs)) {
@@ -2585,7 +2591,7 @@ export class CCSave {
     dragonAura: number = 0; // Id of the first aura
     dragonAura2: number = 0; // Id of the second aura
     chimeType: number = 0; // Golden cookie sound selector; 0 = no sound, 1 = chime
-    volume: number = 50; // Volume of game sounds
+    volume: number = 75; // Volume of game sounds
     lumps: number = -1; // Number of sugar lumps; -1 if sugar lumps hasn't been unlocked yet
     lumpsTotal: number = -1; // Total number of lumps collected across ascensions
     lumpT: TimePoint = 1.6e12; // Time when the current coalescing lump started growing
@@ -2597,6 +2603,9 @@ export class CCSave {
     fortuneCPS: boolean = false; // Whether the hour-of-CpS fortune appeared or not
     cookiesPsRawHighest: number = 0; // Highest raw CpS in this ascension (used in the stock market)
 
+    // 2.04-specific
+    volumeMusic: number = 50; // Background music volume
+
     // The following attributes have no direct counterpart in the `Game` namespace.
 
     buildings: CCBuildingsData = new CCBuildingsData();
@@ -2606,7 +2615,7 @@ export class CCSave {
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
 
-    static currentVersion = 2.031;
+    static maxVersion = 2.04;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
 
     static toStringSave(save: CCSave): string {
@@ -2624,7 +2633,12 @@ export class CCSave {
             save.seed;
 
         saveString += '|';
-        saveString += CCPreferences.toBitstring(save.prefs)
+        if(save.version >= 2.04) {
+            saveString += CCPreferences.toBitstring(save.prefs)
+        } else {
+            // The last four bits of the bitstring are 2.04-specific
+            saveString += CCPreferences.toBitstring(save.prefs).slice(0, -4);
+        }
 
         saveString += '|';
         saveString += save.cookies + ';' +
@@ -2676,6 +2690,10 @@ export class CCSave {
             Number(save.fortuneCPS) + ';' +
             save.cookiesPsRawHighest + ';';
 
+        if(save.version >= 2.04) {
+            saveString += save.volumeMusic + ';';
+        }
+
         saveString += '|';
         saveString += CCBuildingsData.toStringSave(save.buildings);
 
@@ -2720,8 +2738,8 @@ export class CCSave {
             console.log(`Old save (version ${saveObject.version}, min is ${CCSave.minVersion}),`
                         +' may not be parsed properly.');
         }
-        if(saveObject.version > CCSave.currentVersion) {
-            console.log(`Future version save (${saveObject.version}, max is ${CCSave.minVersion}),`
+        if(saveObject.version > CCSave.maxVersion) {
+            console.log(`Future version save (${saveObject.version}, max is ${CCSave.maxVersion}),`
                         +' may not be parsed properly.');
         }
 
@@ -2791,6 +2809,9 @@ export class CCSave {
         saveObject.fortuneGC = generalData[49] == '1';
         saveObject.fortuneCPS = generalData[50] == '1';
         saveObject.cookiesPsRawHighest = Number(generalData[51]);
+
+        // Introduced in 2.04
+        if(generalData[52]) saveObject.volumeMusic = Number(generalData[52]);
 
         saveObject.buildings = CCBuildingsData.fromStringSave(data[5]);
 
