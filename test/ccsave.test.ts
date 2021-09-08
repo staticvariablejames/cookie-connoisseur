@@ -121,6 +121,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
         bgMusic:  true,
         notScary:  false,
         fullscreen: false,
+        screenreader: false,
     },
 
     cookies: 2.8669364395786304e+64,
@@ -1650,7 +1651,8 @@ const saveAsObject2_04 = {
         cloudSave: true,
         bgMusic: false,
         notScary: false,
-        fullscreen: false
+        fullscreen: false,
+        screenreader: false,
     },
 
     cookies: 1.3973262311814115e+28,

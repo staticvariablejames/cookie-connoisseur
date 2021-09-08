@@ -68,15 +68,19 @@ export class CCPreferences {
     customGrandmas: boolean = true; // Show Patreon grandma names
     timeout: boolean = false; // If true, may switch to offline mode under lag; see Game.Timeout()
 
-    // 2.04-specific; except for notScary, only works in the Steam version
+    // Introduced in 2.04; except for notScary, only works in the Steam version
     cloudSave: boolean = true; // save to the Steam cloud
     bgMusic: boolean = true; // whether background music should play even while unfocused
     notScary: boolean = false; // Changes a few sprites to make the game a bit less scary
     fullscreen: boolean = false;
 
+    // Introduced in 2.042
+    screenreader: boolean = false; // Add some DOM attributes to help screenreaders
+
     static attributeCount(version: number) {
         if(version <= 2.031) return 21;
-        return 25; // version 2.04
+        if(version <= 2.040) return 25;
+        return 26; // version 2.042
     }
 
     static toStringSave(prefs: CCPreferences, version: number) {
@@ -2652,7 +2656,7 @@ export class CCSave {
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
 
-    static maxVersion = 2.04;
+    static maxVersion = 2.042;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
 
     static toStringSave(save: CCSave): string {
