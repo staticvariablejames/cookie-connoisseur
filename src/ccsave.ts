@@ -13,9 +13,21 @@
  * only static methods.
  *
  * Most classes implement the following three static methods:
- *  static toStringSave(obj: Class): string;
+ *  static toStringSave(obj: Class, version: number): string;
  *  static fromStringSave(str: string): Class;
  *  static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string): Class;
+ *
+ * Not all classes use the version number.
+ * CCSave.toStringSave extracts the version from the object itself.
+ * The minimum and maximum supported versions are in CCSave.minVersion and CCSave.maxVersion.
+ *
+ * The rationale for explicitly supporting different game versions
+ * (as opposed to e.g. only supporting the last version)
+ * is to allow supporting newer versions without invalidating the existing test cases.
+ * For example,
+ * version 2.04 introduces four new settings in Game.prefs,
+ * so simply updating a save file from 2.031 to 2.04 introduces several bytes,
+ * changing the text representation of the save.
  *
  * Note that onError and subobjectName are mandatory parameters;
  * this helps make the code corret,
@@ -62,12 +74,17 @@ export class CCPreferences {
     notScary: boolean = false; // Changes a few sprites to make the game a bit less scary
     fullscreen: boolean = false;
 
-    static toStringSave(prefs: CCPreferences) {
+    static attributeCount(version: number) {
+        if(version <= 2.031) return 21;
+        return 25; // version 2.04
+    }
+
+    static toStringSave(prefs: CCPreferences, version: number) {
         let str = '';
         for(let [_key, value] of Object.entries(prefs)) {
             str += value ? '1' : '0';
         }
-        return str;
+        return str.substring(0, CCPreferences.attributeCount(version));
     }
 
     static fromStringSave(str: string) {
@@ -146,7 +163,7 @@ export class CCPlainBuilding { // Building without minigame data
     /* If the object's level is greater than zero,
      * the provided minigame data is written in the appropriate portion of the save.
      */
-    static toStringSave(obj: CCPlainBuilding, minigameData: string = '') {
+    static toStringSave(obj: CCPlainBuilding, _version: number, minigameData: string = '') {
         return obj.amount + ',' +
             obj.bought + ',' +
             obj.totalCookies + ',' +
@@ -280,7 +297,7 @@ export class CCGardenMinigame {
         return m;
     }
 
-    static toStringSave(m: CCGardenMinigame | null) {
+    static toStringSave(m: CCGardenMinigame | null, _version: number) {
         if(m === null) return '';
         let str = '';
         str += m.nextStep + ':' +
@@ -418,7 +435,7 @@ export class CCMarketStock {
         return s;
     }
 
-    static toStringSave(s: CCMarketStock) {
+    static toStringSave(s: CCMarketStock, _version: number) {
         return Math.round(100 * s.val) + ':' +
             CCMarketStock.ModesByName[s.mode] + ':' +
             Math.round(100 * s.d) + ':' +
@@ -474,10 +491,10 @@ export class CCMarketStockList {
         return l;
     }
 
-    static toStringSave(l: CCMarketStockList) {
+    static toStringSave(l: CCMarketStockList, version: number) {
         let str = '';
         for(let [_key, value] of Object.entries(l)) {
-            str += CCMarketStock.toStringSave(value) + '!';
+            str += CCMarketStock.toStringSave(value, version) + '!';
         }
         return str;
     }
@@ -530,7 +547,7 @@ export class CCMarketMinigame {
         return m;
     }
 
-    static toStringSave(m: CCMarketMinigame | null) {
+    static toStringSave(m: CCMarketMinigame | null, version: number) {
         if(m === null) return '';
 
         return m.officeLevel + ':' +
@@ -539,7 +556,7 @@ export class CCMarketMinigame {
             m.profit + ':' +
             Number(m.graphCols) + ':' +
             ' ' +
-            CCMarketStockList.toStringSave(m.goods) + ' ' +
+            CCMarketStockList.toStringSave(m.goods, version) + ' ' +
             Number(m.onMinigame);
     }
 
@@ -623,7 +640,7 @@ export class CCPantheonMinigame {
         return m;
     }
 
-    static toStringSave(m: CCPantheonMinigame | null) {
+    static toStringSave(m: CCPantheonMinigame | null, _version: number) {
         if(m === null) return '';
         return CCPantheonMinigame.godIdFromName(m.diamondSlot) + '/' +
             CCPantheonMinigame.godIdFromName(m.rubySlot) + '/' +
@@ -657,7 +674,7 @@ export class CCGrimoireMinigame {
         return m;
     }
 
-    static toStringSave(m: CCGrimoireMinigame | null) {
+    static toStringSave(m: CCGrimoireMinigame | null, _version: number) {
         if(m === null) return '';
 
         return m.magic + ' ' +
@@ -739,34 +756,34 @@ export class CCBuildingsData { // Aggregates all buildings
         return buildings;
     }
 
-    static toStringSave(buildings: CCBuildingsData) {
+    static toStringSave(buildings: CCBuildingsData, version: number) {
         let str = '';
-        str += CCPlainBuilding.toStringSave(buildings['Cursor']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Grandma']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Farm'],
-                    CCGardenMinigame.toStringSave(buildings['Farm'].minigame)
+        str += CCPlainBuilding.toStringSave(buildings['Cursor'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Grandma'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Farm'], version,
+                    CCGardenMinigame.toStringSave(buildings['Farm'].minigame, version)
                 )+ ';';
-        str += CCPlainBuilding.toStringSave(buildings['Mine']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Factory']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Bank'],
-                    CCMarketMinigame.toStringSave(buildings['Bank'].minigame)
+        str += CCPlainBuilding.toStringSave(buildings['Mine'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Factory'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Bank'], version,
+                    CCMarketMinigame.toStringSave(buildings['Bank'].minigame, version)
                 ) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Temple'],
-                    CCPantheonMinigame.toStringSave(buildings['Temple'].minigame)
+        str += CCPlainBuilding.toStringSave(buildings['Temple'], version,
+                    CCPantheonMinigame.toStringSave(buildings['Temple'].minigame, version)
                 ) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Wizard tower'],
-                    CCGrimoireMinigame.toStringSave(buildings['Wizard tower'].minigame)
+        str += CCPlainBuilding.toStringSave(buildings['Wizard tower'], version,
+                    CCGrimoireMinigame.toStringSave(buildings['Wizard tower'].minigame, version)
                 ) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Shipment']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Alchemy lab']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Portal']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Time machine']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Antimatter condenser']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Prism']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Chancemaker']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Fractal engine']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Javascript console']) + ';';
-        str += CCPlainBuilding.toStringSave(buildings['Idleverse']) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Shipment'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Alchemy lab'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Portal'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Time machine'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Antimatter condenser'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Prism'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Chancemaker'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Fractal engine'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Javascript console'], version) + ';';
+        str += CCPlainBuilding.toStringSave(buildings['Idleverse'], version) + ';';
         return str;
     }
 
@@ -2535,7 +2552,7 @@ export class CCModSaveData {
         return modSaveData;
     }
 
-    static toStringSave(modSaveData: CCModSaveData) {
+    static toStringSave(modSaveData: CCModSaveData, _version: number) {
         let str = '';
         for(let name in modSaveData) {
             let rawData = modSaveData[name];
@@ -2653,12 +2670,7 @@ export class CCSave {
             save.seed;
 
         saveString += '|';
-        if(save.version >= 2.04) {
-            saveString += CCPreferences.toStringSave(save.prefs)
-        } else {
-            // The last four bits of the bitstring are 2.04-specific
-            saveString += CCPreferences.toStringSave(save.prefs).slice(0, -4);
-        }
+        saveString += CCPreferences.toStringSave(save.prefs, save.version)
 
         saveString += '|';
         saveString += save.cookies + ';' +
@@ -2715,7 +2727,7 @@ export class CCSave {
         }
 
         saveString += '|';
-        saveString += CCBuildingsData.toStringSave(save.buildings);
+        saveString += CCBuildingsData.toStringSave(save.buildings, save.version);
 
         saveString += '|';
         let upgrades = '00'.repeat(UpgradesById.length).split('');
@@ -2741,7 +2753,7 @@ export class CCSave {
         saveString += save.buffs.map(writeBuffToString).join('');
 
         saveString += '|';
-        saveString += CCModSaveData.toStringSave(save.modSaveData);
+        saveString += CCModSaveData.toStringSave(save.modSaveData, save.version);
 
         saveString = Buffer.from(saveString).toString('base64');
         return encodeURIComponent(saveString) + '%21END%21';
