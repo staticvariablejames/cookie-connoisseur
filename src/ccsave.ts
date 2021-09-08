@@ -3,6 +3,26 @@
  *
  * The name of the attributes match their names in the `Game` namespace,
  * but several boolean attributes are in fact either 0 or 1 in the game code.
+ *
+ ******************************************************************************
+ *
+ *      Implementation notes
+ *
+ * To simplify implementation and testing,
+ * classes in this file have no instance methods,
+ * only static methods.
+ *
+ * Most classes implement the following three static methods:
+ *  static toStringSave(obj: Class): string;
+ *  static fromStringSave(str: string): Class;
+ *  static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string): Class;
+ *
+ * Note that onError and subobjectName are mandatory parameters;
+ * this helps make the code corret,
+ * as there's no chance of accidentally forgetting to pass e.g. `onError` down
+ * and have it be the default, throwing error handler.
+ * Since CCSave.fromObject is the only one meant to be used outside Cookie Connoisseur,
+ * it is the only one that provides a cleaner interface.
  */
 
 import { invertMap, ErrorHandler, throwOnError, pseudoObjectAssign } from './util';
