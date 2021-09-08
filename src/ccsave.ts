@@ -62,7 +62,7 @@ export class CCPreferences {
     notScary: boolean = false; // Changes a few sprites to make the game a bit less scary
     fullscreen: boolean = false;
 
-    static toBitstring(prefs: CCPreferences) {
+    static toStringSave(prefs: CCPreferences) {
         let str = '';
         for(let [_key, value] of Object.entries(prefs)) {
             str += value ? '1' : '0';
@@ -70,7 +70,7 @@ export class CCPreferences {
         return str;
     }
 
-    static fromBitstring(str: string) {
+    static fromStringSave(str: string) {
         let prefs = new CCPreferences();
         let keys = Object.keys(prefs) as Array<keyof CCPreferences>;
         for(let i = 0; i < Math.min(keys.length, str.length); i++) {
@@ -2654,10 +2654,10 @@ export class CCSave {
 
         saveString += '|';
         if(save.version >= 2.04) {
-            saveString += CCPreferences.toBitstring(save.prefs)
+            saveString += CCPreferences.toStringSave(save.prefs)
         } else {
             // The last four bits of the bitstring are 2.04-specific
-            saveString += CCPreferences.toBitstring(save.prefs).slice(0, -4);
+            saveString += CCPreferences.toStringSave(save.prefs).slice(0, -4);
         }
 
         saveString += '|';
@@ -2770,7 +2770,7 @@ export class CCSave {
         saveObject.bakeryName = saveMetadata[3] ?? 'Test';
         saveObject.seed = saveMetadata[4];
 
-        saveObject.prefs = CCPreferences.fromBitstring(data[3]);
+        saveObject.prefs = CCPreferences.fromStringSave(data[3]);
 
         let generalData = data[4].split(';');
         saveObject.cookies = Number(generalData[0]);
