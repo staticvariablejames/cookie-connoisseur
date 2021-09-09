@@ -5,10 +5,7 @@
   "repository": "github:staticvariablejames/cookie-connoisseur",
   "main": "lib/index.js",
   "bin": {
-    "ccsave-to-json": "bin/ccsave-to-json.js",
-    "fetch-cookie-clicker-files": "bin/fetch-cookie-clicker-files.js",
-    "json-to-ccsave": "bin/json-to-ccsave.js",
-    "launch-cookie-clicker-instance": "bin/launch-cookie-clicker-instance.js"
+    "cookie-connoisseur": "bin/cookie-connoisseur"
   },
   "scripts": {
     "build": "npx tsc",

@@ -57,17 +57,19 @@ function formatSaveForPrinting(save: CCSave) {
     return str;;
 }
 
-process.stdin.on('readable', () => {
-    let str = process.stdin.read();
-    if(!str) return;
+export function writeJsonSaveFormat() {
+    process.stdin.on('readable', () => {
+        let str = process.stdin.read();
+        if(!str) return;
 
-    let save = CCSave.fromStringSave(str);
+        let save = CCSave.fromStringSave(str);
 
-    let otherMods = save.modSaveData;
-    save.modSaveData = {};
-    for(let key of Object.keys(otherMods).sort()) {
-        save.modSaveData[key] = otherMods[key];
-    }
+        let otherMods = save.modSaveData;
+        save.modSaveData = {};
+        for(let key of Object.keys(otherMods).sort()) {
+            save.modSaveData[key] = otherMods[key];
+        }
 
-    console.log(formatSaveForPrinting(save));
-});
+        console.log(formatSaveForPrinting(save));
+    });
+}

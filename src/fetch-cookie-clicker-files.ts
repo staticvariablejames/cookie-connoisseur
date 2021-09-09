@@ -33,18 +33,20 @@ async function fetchUrl(page: Page, url: string) {
     });
 };
 
-setTimeout(async () => {
-    let config = await parseConfigFile();
-    let browser = await chromium.launch();
-    let page = await browser.newPage();
+export function fetchFiles() {
+    setTimeout(async () => {
+        let config = await parseConfigFile();
+        let browser = await chromium.launch();
+        let page = await browser.newPage();
 
-    for(let url in cacheURLs) {
-        await fetchUrl(page, url);
-    }
-    for(let url in config.customURLs) {
-        await fetchUrl(page, url);
-    }
+        for(let url in cacheURLs) {
+            await fetchUrl(page, url);
+        }
+        for(let url in config.customURLs) {
+            await fetchUrl(page, url);
+        }
 
-    await page.close();
-    await browser.close();
-});
+        await page.close();
+        await browser.close();
+    });
+}
