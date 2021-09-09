@@ -213,18 +213,18 @@ the `modSaveData` attribute also accepts objects (like the output of `JSON.strin
 Executables
 ===========
 
-There are two executables based on `CCSave`,
+There are two commands based on `CCSave`,
 which essentially convert back and forth between Cookie Clicker's native format
 and `CCSave`.
 
-    npx ccsave-to-json
+    npx cookie-connoisseur native-to-json
 
 Reads from stdin a save in Cookie Clicker's native save format,
 converts that to a `CCSave`,
 and prints the `JSON.stringify`cation of it to stdout.
 (It makes a bit of effort to pretty-print the save.)
 
-    npx json-to-ccsave
+    npx cookie-connoisseur json-to-native
 
 Does the opposite: `JSON.parse`s the input,
 pipes to `CCSave.fromObject`,

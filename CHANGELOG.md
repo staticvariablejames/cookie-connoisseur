@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Change: the executable scripts are now aggregated under a single executable. (**breaking**)
 
 ## 0.1.2 - 2021-08-31
 - Added: Class `CCSave`, a JSON-like representation of a Cookie Clicker save.

@@ -40,7 +40,7 @@ It comes with TypeScript typings.
 Before using Cookie Connoisseur,
 you must run
 
-    npx fetch-cookie-clicker-files
+    npx cookie-connoisseur fetch
 
 to download a copy of Cookie Clicker.
 The files will be stored to `.cookie-connoisseur`.
@@ -112,30 +112,30 @@ in the [test directory of Choose Your Own Lump](
 Executables
 ===========
 
-Cookie Connoiseur comes with four executable scripts.
+Cookie Connoiseur has a command-line interface with a few commands.
 
-    npx fetch-cookie-clicker-files
+    npx cookie-connoisseur fetch
 
-This script downloads the files needed to run a Cookie Clicker instance
+This downloads the files needed to run a Cookie Clicker instance
 (`index.html`, `main.js`, minigame scripts, assets, Google fonts)
 and stores it to the directory `.cookie-connoisseur`,
 in the project's root.
 
-This script also downloads the custom URLs listed in the [configuration file](#configuration-file);
+It also downloads the custom URLs listed in the [configuration file](#configuration-file);
 see below for details.
 
 Note that some unused assets available in <https://orteil.dashnet.org/cookieclicker/>
 are not downloaded by this script.
 
-    npx launch-cookie-clicker-instance
+    npx cookie-connoisseur launch
 
 This is a simple script that launches a Cookie Clicker instance using Firefox.
 It exists mainly to provide a simple test that `npx fetch-cookie-clicker-files` worked.
 If any file needed by Cookie Clicker is not downloaded,
 it is written in the terminal.
 
-    npx ccsave-to-json
-    npx json-to-ccsave
+    npx cookie-connoisseur ccsave-to-json
+    npx cookie-connoisseur json-to-ccsave
 
 These commands read Cookie Clicker's native save format from stdin
 and write a corresponding JSON to stdout,
@@ -275,7 +275,7 @@ Known Issues
 ============
 
 Favicons are not downloaded.
-`fetch-cookie-clicker-files` simply uses Playwright to download files,
+`npx cookie-connoisseur fetch` simply uses Playwright to download files,
 and favicon requests
 are [explicitly filtered out](https://github.com/microsoft/playwright/issues/7493).
 I did not implement a fallback yet.
