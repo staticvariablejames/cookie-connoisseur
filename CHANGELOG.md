@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Added: Class `CCSave` can now handle Cookie Clicker versions up to 2.042
+    (the current version of the Steam port).
 - Change: the executable scripts are now aggregated under a single executable. (**breaking**)
 
 ## 0.1.2 - 2021-08-31
