@@ -2,8 +2,8 @@
  */
 import { fetchFiles } from './fetch-cookie-clicker-files';
 import { launchCookieClickerInstance } from './launch-cookie-clicker-instance';
-import { writeNativeSaveFormat } from './json-to-ccsave';
-import { writeJsonSaveFormat } from './ccsave-to-json';
+import { CCSave } from './ccsave';
+import { prettyPrintCCSave } from './pretty-print-ccsave';
 
 process.stdin.setEncoding('utf8');
 
@@ -19,6 +19,28 @@ let helpString =
     "";
 
 let args = process.argv.slice(2);
+
+function writeJsonSaveFormat() {
+    process.stdin.on('readable', () => {
+        let str = process.stdin.read();
+        if(!str) return;
+
+        let save = CCSave.fromStringSave(str);
+        console.log(prettyPrintCCSave(save));
+    });
+}
+
+function writeNativeSaveFormat() {
+    process.stdin.on('readable', () => {
+        let str = process.stdin.read();
+        if(!str) return;
+        str = str.trim();
+
+        let save = CCSave.fromObject(JSON.parse(str), console.error);
+
+        console.log(CCSave.toStringSave(save));
+    });
+};
 
 if(args.length !== 1) {
     console.error(helpString);

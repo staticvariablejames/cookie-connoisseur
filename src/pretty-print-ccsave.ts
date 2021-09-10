@@ -9,13 +9,20 @@ const goodsSet = new Set([
     'HNY', 'CKI', 'RCP', 'SBD',
 ]);
 
-
 /* "Pretty-prints" the save to a string.
+ * This function will change save.otherMods so that they are sorted alphabetically.
+ *
  * Additionally,
  * it makes sure that the rows in the Garden minigame stays on a single line,
  * and also that each good in the Stock Market minigame stay on a single line.
  */
-function formatSaveForPrinting(save: CCSave) {
+export function prettyPrintCCSave(save: CCSave) {
+    let otherMods = save.modSaveData;
+    save.modSaveData = {};
+    for(let key of Object.keys(otherMods).sort()) {
+        save.modSaveData[key] = otherMods[key];
+    }
+
     let needsGardenDestringification = false;
     let needsMarketDestringification = false;
 
@@ -55,21 +62,4 @@ function formatSaveForPrinting(save: CCSave) {
     }
 
     return str;;
-}
-
-export function writeJsonSaveFormat() {
-    process.stdin.on('readable', () => {
-        let str = process.stdin.read();
-        if(!str) return;
-
-        let save = CCSave.fromStringSave(str);
-
-        let otherMods = save.modSaveData;
-        save.modSaveData = {};
-        for(let key of Object.keys(otherMods).sort()) {
-            save.modSaveData[key] = otherMods[key];
-        }
-
-        console.log(formatSaveForPrinting(save));
-    });
 }
