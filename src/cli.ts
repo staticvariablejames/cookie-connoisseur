@@ -1,7 +1,9 @@
 /* This file handles the command-line interface for Cookie Connoisseur.
  */
+const package_json = require('../package.json');
 import { fetchFiles } from './cli-fetch';
-import { launchCookieClickerInstance } from './launch-cookie-clicker-instance';
+import { firefox } from 'playwright';
+import { openCookieClickerPage } from './cookie-clicker-page';
 import { CCSave } from './ccsave';
 import { prettyPrintCCSave } from './pretty-print-ccsave';
 
@@ -20,7 +22,12 @@ let helpString =
 
 let args = process.argv.slice(2);
 
-function writeJsonSaveFormat() {
+function writeJsonSaveFormat(args: string[]) {
+    if(args.length != 0) {
+        console.error('usage: npx cookie-connoisseur native-to-json');
+        process.exit(1);
+    }
+
     process.stdin.on('readable', () => {
         let str = process.stdin.read();
         if(!str) return;
@@ -30,7 +37,12 @@ function writeJsonSaveFormat() {
     });
 }
 
-function writeNativeSaveFormat() {
+function writeNativeSaveFormat(args: string[]) {
+    if(args.length != 0) {
+        console.error('usage: npx cookie-connoisseur json-to-native');
+        process.exit(1);
+    }
+
     process.stdin.on('readable', () => {
         let str = process.stdin.read();
         if(!str) return;
@@ -42,9 +54,22 @@ function writeNativeSaveFormat() {
     });
 };
 
-if(args.length !== 1) {
-    console.error(helpString);
-    process.exit(1);
+function launchCookieClickerInstance(args: string[]) {
+    if(args.length != 0) {
+        console.error('usage: npx cookie-connoisseur launch');
+        process.exit(1);
+    }
+
+    setTimeout(async () => {
+        let browser = await firefox.launch( {headless: false} );
+        let page = await openCookieClickerPage(browser);
+        await new Promise(resolve => {
+            page.on('close', () => {
+                resolve(true);
+            });
+        });
+        await browser.close();
+    });
 }
 
 switch(args[0]) {
@@ -52,16 +77,19 @@ switch(args[0]) {
         fetchFiles();
         break;
     case 'launch':
-        launchCookieClickerInstance();
+        launchCookieClickerInstance(args.splice(1));
         break;
     case 'native-to-json':
-        writeJsonSaveFormat();
+        writeJsonSaveFormat(args.splice(1));
         break;
     case 'json-to-native':
-        writeNativeSaveFormat();
+        writeNativeSaveFormat(args.splice(1));
         break;
     case '--help':
         console.log(helpString);
+        break;
+    case '--version':
+        console.log(package_json.version);
         break;
     default:
         console.error(helpString);
