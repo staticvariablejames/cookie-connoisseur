@@ -1,7 +1,7 @@
 import { Browser, BrowserContextOptions, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list';
-import { isForbiddenURL, localPathOfURL } from './cookie-clicker-cache';
+import { isForbiddenURL, localPathOfURL } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 import { CCSave } from './ccsave';

@@ -1,6 +1,6 @@
 import { promises as fsPromises } from 'fs';
 import { dirname } from 'path';
-import { localPathOfURL } from './cookie-clicker-cache';
+import { localPathOfURL } from './local-cc-instance';
 import { chromium, Page, Response } from 'playwright';
 import { cacheURLs } from './url-list';
 import { parseConfigFile } from './parse-config';
