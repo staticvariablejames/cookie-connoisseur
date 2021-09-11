@@ -1,6 +1,6 @@
 /* This file handles the command-line interface for Cookie Connoisseur.
  */
-import { fetchFiles } from './fetch-cookie-clicker-files';
+import { fetchFiles } from './cli-fetch';
 import { launchCookieClickerInstance } from './launch-cookie-clicker-instance';
 import { CCSave } from './ccsave';
 import { prettyPrintCCSave } from './pretty-print-ccsave';
