@@ -1,7 +1,7 @@
 import { Browser, BrowserContextOptions, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list';
-import { isForbiddenURL, localPathOfURL } from './local-cc-instance';
+import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 import { CCSave } from './ccsave';
@@ -18,17 +18,6 @@ export type CCPageOptions = {
     saveGame?: string | object,
     mockedDate?: number,
 };
-
-/* Helper function.
- * For some reason, some URLs have a version attached at the end
- * (like 'main.js?v=2.089' instead of just 'main.js'),
- * even though accessing 'https://orteil.dashnet.org/cookieclicker/main.js'
- * yields the same page as 'main.js?v=2.089' and 'main.js?v=2.058'.
- * This function strips that version number if present.
- */
-function normalizeURL(url: string) {
-    return url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
-}
 
 /* Helper function.
  * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
@@ -90,7 +79,10 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
 /* Helper function.
  * If the route queries a URL that is cached by Cookie Connoisseur by default,
  * this function fulfills the request with the appropriate file and returns true.
- * It returns false otherwise.
+ * If the file is not cached, it installs a self-deregistering listener
+ * to download the file and simply `continue()`s the route instead.
+ *
+ * It returns false if the URL is not cached by Cookie Connoisseur.
  */
 async function handleCacheFile(route: Route) {
     let url = normalizeURL(route.request().url());
@@ -109,7 +101,8 @@ async function handleCacheFile(route: Route) {
                 console.log(`Couldn't deliver cached page ${url}: ${reason}`);
         });
     } else {
-        console.log(`File ${path} not cached`);
+        console.log(`Downloading file ${path}...`);
+        route.request().frame().page().on('response', makeDownloadingListener(url));
         await route.continue();
     }
     return true;
@@ -123,14 +116,15 @@ async function handleCustomURL(route: Route, config: CookieConnoisseurConfig) {
     if(!(url in config.customURLs))
         return false;
 
-    let options = {path: localPathOfURL(url)};
-    if(existsSync(options.path)) {
-        await route.fulfill(options).catch(reason => {
+    let path = localPathOfURL(url);
+    if(existsSync(path)) {
+        await route.fulfill({path}).catch(reason => {
             if(process.env.DEBUG)
                 console.log(`Couldn't deliver custom URL ${url}: ${reason}`);
         });
     } else {
-        console.log(`File ${options.path} not cached`);
+        console.log(`Downloading file ${path}...`);
+        route.request().frame().page().on('response', makeDownloadingListener(url));
         await route.continue();
     }
 
@@ -138,7 +132,8 @@ async function handleCustomURL(route: Route, config: CookieConnoisseurConfig) {
 }
 
 /* Helper function.
- * Similar to handleCacheFile, but for local files instead.
+ * Similar to handleCacheFile, but for local files instead,
+ * except it does not try to download the file if it is not cached.
  */
 async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
     let url = normalizeURL(route.request().url());
@@ -161,7 +156,7 @@ async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
 }
 
 /* Helper function.
- * Similar to handleCacheFile, but for local directory reroutes instead.
+ * Similar to handleLocalFile, but for local directory reroutes instead.
  */
 async function handleLocalDirectory(route: Route, config: CookieConnoisseurConfig) {
     let url = normalizeURL(route.request().url());
@@ -185,7 +180,7 @@ async function handleLocalDirectory(route: Route, config: CookieConnoisseurConfi
 }
 
 /* Helper function.
- * If the requested URL is a forbidden URL, the route is aborted and the function returs true.
+ * If the requested URL is a forbidden URL, the route is aborted and the function returns true.
  * It returns false otherwise.
  */
 async function handleForbiddenURLs(route: Route) {
