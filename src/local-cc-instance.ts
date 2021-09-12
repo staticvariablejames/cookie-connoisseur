@@ -8,6 +8,7 @@
  */
 import { Response } from 'playwright';
 import { promises as fsPromises } from 'fs';
+import { dirname } from 'path';
 import { urlsToDrop } from './url-list';
 
 export function localPathOfURL(url: string) {
@@ -37,14 +38,26 @@ export function normalizeURL(url: string) {
  * If the page gets a successful response for the specified URL,
  * it saves the response body to localPathofURL
  * and remove itself from the page listener list.
+ *
+ * Options:
+ *  - prefix: where the '.cookie-connoisseur' directory is located.
+ *      Defaults to './'.
+ *  - callback: Function that is called after the file path is written.
+ *      Defaults to () => {}.
  */
-export function makeDownloadingListener(url: string) {
+export function makeDownloadingListener(url: string, options = {
+    prefix: './',
+    callback: async () => {},
+})
+{
     url = normalizeURL(url);
-    let path = localPathOfURL(url);
+    let path = options.prefix + '/' + localPathOfURL(url);
     let handler = async (response: Response) => {
         if(response.ok() && normalizeURL(response.url()) == url) { // Success
+            await fsPromises.mkdir(dirname(path), {recursive: true});
             await fsPromises.writeFile(path, await response.body());
             await response.frame().page().removeListener('response', handler);
+            await options.callback();
         }
     };
     return handler;
