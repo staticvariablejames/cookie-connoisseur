@@ -287,8 +287,14 @@ whenever the `customURLs` list is changed.
 Known Issues
 ============
 
+The core functionality is still somewhat unstable,
+so some tests might fail due to crashes inside Cookie Connoisseur.
+
 Favicons are not downloaded.
 `npx cookie-connoisseur fetch` simply uses Playwright to download files,
 and favicon requests
 are [explicitly filtered out](https://github.com/microsoft/playwright/issues/7493).
 I did not implement a fallback yet.
+
+Files which are downloaded to `.cookie-connoisseur`
+are not automatically removed if they are not needed anymore.
