@@ -8,8 +8,8 @@ Cookie Connoisseur
 
 Cookie Connoisseur is a Node.js library to automate the testing of Cookie Clicker mods.
 
-First,
-a [script](#executables) downloads a local copy of <https://orteil.dashnet.org/cookieclicker/>.
+Upon installation,
+Cookie Connoisseur downloads a local copy of <https://orteil.dashnet.org/cookieclicker/>.
 Then,
 the function [`openCookieClickerPage`](#api)
 constructs a [Playwright Page](https://playwright.dev/docs/api/class-page)
@@ -31,19 +31,23 @@ See the section [API](#api) below for a full list of features.
 Installation
 ============
 
-    npm install --save-dev --save-exact cookie-connoisseur
+    npm --foreground-scripts install --save-dev --save-exact cookie-connoisseur
 
-This istalls the library and the binaries.
-It comes with TypeScript typings.
-(As the API is still unstable, `--save-exact` is recommended to minimize breakage.)
+This istalls the library,
+the `cookie-connoisseur` binary,
+and downloads a copy of <https://orteil.dashnet.org/cookieclicker>.
+(The files will be stored to `.cookie-connoisseur`.)
 
-Before using Cookie Connoisseur,
-you must run
+By default,
+NPM [gobbles the output](https://docs.npmjs.com/cli/v7/using-npm/config#foreground-scripts)
+from install scripts.
+**If you forget the `--foregound-scripts` flag**,
+`npm install` will look like it is frozen for a minute.
+The download will still happen, though.
 
-    npx cookie-connoisseur fetch
+The library comes with TypeScript typings.
 
-to download a copy of Cookie Clicker.
-The files will be stored to `.cookie-connoisseur`.
+As the API is still unstable, `--save-exact` is recommended to minimize breakage.
 
 
 Example Script
@@ -124,18 +128,24 @@ in the project's root.
 It also downloads the custom URLs listed in the [configuration file](#configuration-file);
 see below for details.
 
+Strictly speaking it is not necessary to run this command manually,
+as it is run on `npx install`,
+and `openCookieClickerPage` downloads any missing files on-the-fly.
+However this means that the very first test to be run after changing the configuration file
+will need extra time to download the missing files,
+so it is useful to run it manually in this case
+to make sure that network latency does not interfere with your tests.
+
 Note that some unused assets available in <https://orteil.dashnet.org/cookieclicker/>
 are not downloaded by this script.
 
     npx cookie-connoisseur launch
 
 This is a simple script that launches a Cookie Clicker instance using Firefox.
-It exists mainly to provide a simple test that `npx fetch-cookie-clicker-files` worked.
-If any file needed by Cookie Clicker is not downloaded,
-it is written in the terminal.
+It exists mainly to provide a simple test that the installation worked.
 
-    npx cookie-connoisseur ccsave-to-json
-    npx cookie-connoisseur json-to-ccsave
+    npx cookie-connoisseur native-to-json
+    npx cookie-connoisseur json-to-native
 
 These commands read Cookie Clicker's native save format from stdin
 and write a corresponding JSON to stdout,
@@ -208,7 +218,7 @@ so you may override any route established by Cookie Connoisseur
 by just registering a new route.
 
 Additionally,
-Cookie Connoisseur injects in the page's global scope the object `CCoinnosseur`,
+Cookie Connoisseur injects in the page's global scope the object `CConnoisseur`,
 which currently has only one attribute:
 -   `mockedDate` <number>: The Cookie Connoisseur implementation of a `Date.now()` mock.
         There are several game mechanics that rely on `Date.now()` advancing normally,
@@ -254,8 +264,11 @@ Available options:
 
 -   `customURLs`: `{url: string}[]`
         List of URLs that are handled in the same way as Cookie Clicker files.
-        These files are downloaded by `npx fetch-cookie-clicker-files`
-        and the local copy is used used by Cookie Connoisseur whenever that URL is requested.
+        If they are missing, these files are downloaded to `.cookie-connoisseur`
+        in the first time they are needed,
+        and the local copy is used used afterwards whenever that URL is requested.
+        Alternatively,
+        you can download all these files at once by running `npx cookie-connoisseur fetch`.
 
 -   `localFiles`: `{url: string, path: string}[]`
         List of URLs that are redirected to local files.
@@ -267,7 +280,7 @@ Available options:
         Whenever a URL starting with `url` is requested,
         that prefix is replaced with `path`, and the resulting path is provided instead.
 
-You must re-run `npx fetch-cookie-clicker-files`
+It is advised to re-run `npx cookie-connoisseur fetch`
 whenever the `customURLs` list is changed.
 
 

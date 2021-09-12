@@ -1,8 +1,6 @@
 /* Basic test for openCookieClickerPage.
  *
  * The "saveGame" option is tested in `ccpageoptions-savegame.test.ts`.
- *
- * Note: bin/fetch-cookie-clicker-files.js must be run before running this test.
  */
 import { test, expect } from '@playwright/test';
 

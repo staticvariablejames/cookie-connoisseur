@@ -1,6 +1,4 @@
 /* Basic test for the browser utilities installed by src/init-browser-utilities.
- *
- * Note: bin/fetch-cookie-clicker-files.js must be run before running this test.
  */
 
 /// <reference path="../src/browser-utilities.d.ts" />
