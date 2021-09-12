@@ -74,7 +74,7 @@ function launchCookieClickerInstance(args: string[]) {
 
 switch(args[0]) {
     case 'fetch':
-        fetchFiles();
+        fetchFiles(args.splice(1));
         break;
     case 'launch':
         launchCookieClickerInstance(args.splice(1));
