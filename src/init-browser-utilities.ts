@@ -5,11 +5,11 @@
 /// <reference path="../src/browser-utilities.d.ts" />
 
 export type BrowserUtilitiesOptions = {
-    mockedDate?: number;
+    mockedDate: number;
 }
 
-export function initBrowserUtilities(options: BrowserUtilitiesOptions = {}) {
-    let mockedDate = options.mockedDate ?? 1.6e12; // 2020-09-13 12:26:40 UTC
+export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
+    let mockedDate = options.mockedDate;
     let currentDate = Date.now();
     let realDate = Date;
 

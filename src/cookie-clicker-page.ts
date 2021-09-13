@@ -11,14 +11,83 @@ import { CCSave } from './ccsave';
  * functions in this file pass around the entire `options` object to each other.
  */
 export type CCPageOptions = {
-    heralds?: number,
-    grandmaNames?: string[],
-    updatesResponse?: string,
+    heralds?: number | (() => number),
+    grandmaNames?: string[] | (() => string[]),
+    updatesResponse?: string | (() => string),
     cookieConsent?: boolean,
     saveGame?: string | object,
     mockedDate?: number,
 };
 
+/* The first three options may be requested multiple times,
+ * and their values can change each time.
+ * Therefore they may be functions.
+ *
+ * The following utility functions return the value of the option,
+ * regardless of the type,
+ * or their default value if they don't exist.
+ *
+ * For uniformity, there are helper functions for all options.
+ */
+function getHeralds(options: CCPageOptions) {
+    if(typeof options.heralds == 'number') {
+        return options.heralds;
+    } else if (typeof options.heralds == 'function') {
+        return options.heralds();
+    } else {
+        return 42;
+    }
+}
+
+function getGrandmaNames(options: CCPageOptions) {
+    if(Array.isArray(options.grandmaNames)) {
+        return options.grandmaNames;
+    } else if (typeof options.grandmaNames == 'function') {
+        return options.grandmaNames();
+    } else {
+        return [
+            "Custom grandma names",
+            "See cookie-clicker-page.ts for details"
+        ];
+    }
+}
+
+function getUpdatesResponse(options: CCPageOptions) {
+    if(typeof options.updatesResponse == 'string') {
+        return options.updatesResponse;
+    } else if (typeof options.updatesResponse == 'function') {
+        return options.updatesResponse();
+    } else {
+        return '2.029|new stock market minigame!';
+    }
+}
+
+function getCookieConsent(options: CCPageOptions) {
+    if(typeof options.cookieConsent == 'boolean') {
+        return options.cookieConsent;
+    } else {
+        return true;
+    }
+}
+
+// We'll handle the conversion through CCSave right here.
+function getSaveGame(options: CCPageOptions) {
+    if(typeof options.saveGame == 'string') {
+        return options.saveGame;
+    } else if(typeof options.saveGame == 'object') {
+        return CCSave.toStringSave(CCSave.fromObject(options.saveGame));
+    } else {
+        return '';
+    }
+}
+
+function getMockedDate(options: CCPageOptions) {
+    if(typeof options.mockedDate == 'number') {
+        return options.mockedDate;
+    } else {
+        return 1.6e12; // 2020-09-13 12:26:40 UTC
+    }
+}
 /* Helper function.
  * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
  * this function fulfills the request with the format that the game expects
@@ -30,16 +99,9 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions) {
     if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
         return false;
 
-    let heralds = options.heralds ?? 42;
-    let grandmaNamesList = options.grandmaNames ?? [
-        "Custom grandma names",
-        "See cookie-clicker-page.ts for details"
-    ];
-    let grandmaNames = grandmaNamesList.join('|');
-
     let response = JSON.stringify({
-        herald: heralds,
-        grandma: grandmaNames,
+        herald: getHeralds(options),
+        grandma: getGrandmaNames(options).join('|'),
     });
 
     await route.fulfill({
@@ -64,11 +126,10 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
     if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
         return false;
 
-    let serverResponse = options.updatesResponse ?? '2.029|new stock market minigame!';
     await route.fulfill({
         status: 200,
         contentType: 'text/html',
-        body: serverResponse,
+        body: getUpdatesResponse(options),
     }).catch(reason => {
         if(process.env.DEBUG)
             console.log(`Couldn't deliver answer to updates query: ${reason}`);
@@ -223,7 +284,7 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
     let config = await parseConfigFile();
     let storageState: Exclude<BrowserContextOptions['storageState'], string> = {};
 
-    if(options.cookieConsent !== false) {
+    if(getCookieConsent(options)) {
         storageState.cookies = [{
             name: 'cookieconsent_dismissed',
             value: 'yes',
@@ -231,25 +292,18 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
         }];
     }
 
-    if(options.saveGame) {
-        let saveGame: string;
-        if(typeof options.saveGame == 'string') {
-            saveGame = options.saveGame;
-        } else {
-            saveGame = CCSave.toStringSave(CCSave.fromObject(options.saveGame));
-        }
-        storageState.origins = [{
-            origin: 'https://orteil.dashnet.org/cookieclicker/',
-            localStorage: [
-                {name: 'CookieClickerGame', value: saveGame}
-            ]
-        }];
-    }
+    storageState.origins = [{
+        origin: 'https://orteil.dashnet.org/cookieclicker/',
+        localStorage: [
+            {name: 'CookieClickerGame', value: getSaveGame(options)}
+        ]
+    }];
 
     let context = await browser.newContext({storageState});
 
-    let utilOptions: BrowserUtilitiesOptions = {};
-    if(options.mockedDate) utilOptions.mockedDate = options.mockedDate;
+    let utilOptions: BrowserUtilitiesOptions = {
+        mockedDate: getMockedDate(options),
+    };
     await context.addInitScript(initBrowserUtilities, utilOptions);
 
     let page = await context.newPage();

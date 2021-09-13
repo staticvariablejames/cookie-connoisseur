@@ -14,17 +14,30 @@ test('Page loads and game works', async ({browser}) => {
     await page.close();
 });
 
-test('Heralds and grandma names work', async ({browser}) => {
-    let page = await openCookieClickerPage(browser);
-    expect(await page.evaluate(() => Game.heralds)).toEqual(42);
-    expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Custom grandma names");
-    await page.close();
+test.describe('Heralds and grandma names can be set', () => {
+    test('directly', async ({browser}) => {
+        let page = await openCookieClickerPage(browser);
+        expect(await page.evaluate(() => Game.heralds)).toEqual(42);
+        expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Custom grandma names");
+        await page.close();
 
-    page = await openCookieClickerPage(browser, {heralds: 72, grandmaNames: ["Test1", "Test3"]});
-    expect(await page.evaluate(() => Game.heralds)).toEqual(72);
-    expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Test1");
-    expect(await page.evaluate(() => Game.customGrandmaNames[1])).toEqual("Test3");
-    await page.close();
+        page = await openCookieClickerPage(browser, {heralds: 72, grandmaNames: ["Test1", "Test3"]});
+        expect(await page.evaluate(() => Game.heralds)).toEqual(72);
+        expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Test1");
+        expect(await page.evaluate(() => Game.customGrandmaNames[1])).toEqual("Test3");
+        await page.close();
+    });
+
+    test('with functions', async ({browser}) => {
+        let page = await openCookieClickerPage(browser, {
+            heralds: () => 72,
+            grandmaNames: () => ["Test1", "Test3"]
+        });
+        expect(await page.evaluate(() => Game.heralds)).toEqual(72);
+        expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Test1");
+        expect(await page.evaluate(() => Game.customGrandmaNames[1])).toEqual("Test3");
+        await page.close();
+    });
 });
 
 test('Updates check is properly intercepted', async ({browser}) => {
@@ -49,16 +62,19 @@ test('Updates check is properly intercepted', async ({browser}) => {
     );
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
     await page.close();
+});
 
-    // Chceck changing the options object works
-    let options: CCPageOptions = {};
-    page = await openCookieClickerPage(browser, options);
+test('Updates check can be changed dynamically', async ({browser}) => {
+    let updatesResponse = '2.027|Old version';
+    let page = await openCookieClickerPage(browser, {updatesResponse: () => updatesResponse});
     await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
+    // Nothing changes because it is an old version
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("");
-    options.updatesResponse = '2.71828|Logarithms!';
+    updatesResponse = '3.141592|Circles!';
     await page.evaluate(() => Game.T = 2 * Game.fps * 30 * 60 - 1);
     await page.waitForFunction(() => Game.T > 2 * Game.fps * 30 * 60 + 1);
+    // Now things change because it is a new version
     expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
         expect.stringContaining('New version available')
     );
