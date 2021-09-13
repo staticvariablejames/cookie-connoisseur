@@ -3,12 +3,16 @@
 ## Unreleased
 - Added: Class `CCSave` can now handle Cookie Clicker versions up to 2.042
     (the current version of the Steam port).
-- Change: the executable scripts are now aggregated under a single executable. (**breaking**)
-- Change: Cookie Connoisseur now automatically downloads a copy of Cookie Clicker on installation,
-    so running `npx cookie-conoisseur fetch` right after installation is not necessary anymore.
 - Added: if a file which should be downloaded by `npx cookie-connoisseur fetch` is missing
     (for example, right after adding a new file to `cookie-connoisseur.config.json`),
     it is downloaded on-the-fly.
+- Change: the executable scripts are now aggregated under a single executable. (**breaking**)
+- Change: Cookie Connoisseur now automatically downloads a copy of Cookie Clicker on installation,
+    so running `npx cookie-conoisseur fetch` right after installation is not necessary anymore.
+- Change: Options `heralds`, `grandmaNames` and `updatesResponse` for `openCookieClickerPage`
+    are no longer queried dynamically from the options object.
+    A function can be provided instead for this functionality.
+    (**breaking**)
 
 ## 0.1.2 - 2021-08-31
 - Added: Class `CCSave`, a JSON-like representation of a Cookie Clicker save.

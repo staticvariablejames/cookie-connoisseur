@@ -175,41 +175,46 @@ most notably <https://pagead2.googlesyndication.com>.
 
 Available options:
 
--   `heralds: number` - Heralds and Patreon-submitted grandma names are obtained by querying
+-   `heralds: number | (() => number)`
+        Heralds and Patreon-submitted grandma names are obtained by querying
         <https://orteil.dashnet.org/patreon/grab.php>. Cookie Connoisseur intercepts this query;
         `options.heralds` is the number used in the response.
         Defaults to 42.
 
--   `grandmaNames: string[]` - list of names that some grandmas get if "Custom grandmas" is "ON".
+-   `grandmaNames: string[] (() => string[])`
+        list of names that some grandmas get if "Custom grandmas" is "ON".
         Names must not contain the pipe `|` character.
         Defaults to `["Custom grandma names", "See cookie-clicker-page.ts for details"]`.
 
--   `updatesResponse: string` - Every 30 minutes Cookie Clicker checks for updates;
+-   `updatesResponse: string | (() => string)`
+        Every 30 minutes Cookie Clicker checks for updates;
         this is the string fed to Game.CheckUpdatesResponse.
         The default value is '2.029|new stock market minigame!'.
 
--   `cookieConsent: boolean` - Unless set to 'false',
+-   `cookieConsent: boolean`
+        Unless set to 'false',
         the page includes the browser cookie `cookieconsent_dismissed=yes`,
         which dismisses the cookie consent dialog.
 
--   `saveGame: string|object` - The starting save game.
+-   `saveGame: string|object`
+        The starting save game.
         If it is a string, the value is stored as-is into `window.localStorage`
         prior to loading the game.
         If it is an object, it is first converted to a string using
         [`CCSave.fromObject` and `CCSave.toStringSave`](doc/CCSave.md#API)
         Defaults to empty.
 
--   `mockedDate: number` - Initial value of CConnoisseur.mockedDate; see below.
+-   `mockedDate: number`
+        Initial value of CConnoisseur.mockedDate; see below.
         Defaults to 1.6e12.
 
 The first three options
 (`heralds`, `grandmaNames` and `updatesResponse`)
 are updated by the game every 30 minutes,
 querying an appropriate page.
-These options can be changed dynamically:
-If you create an options object and pass it to `openCookieClickerPage`,
-changing these options in the object will update the response issued by Cookie Connoisseur
-in the next query.
+If you provide a function for these options,
+the function will be called every time it is needed,
+so you can use that to change those options dynamically.
 
 Routing is done via [page.route](https://playwright.dev/docs/api/class-page#page-route).
 If you register conflicting routes,

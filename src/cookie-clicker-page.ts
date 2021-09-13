@@ -259,25 +259,22 @@ async function handleForbiddenURLs(route: Route) {
  *
  * The second argument is an object with the optional arguments.
  * Some options can be changed dynamically; to do so,
- * create a local object of type CCPageOptions and pass it to openCookieClickerPage.
- * That object will be queried whenever that option is relevant.
+ * provide a function returning the option instead of providing the option directly.
  *
  * Possible attributes of options:
  *  heralds <number>: Heralds and Patreon-submitted grandma names are obtained by querying
  *      https://orteil.dashnet.org/patreon/grab.php. Cookie Connoisseur intercepts this query;
  *      options.heralds is the number used in the response.
- *      This option can be changed dynamically.
  *  grandmaNames <string[]>: list of names that some grandmas get if "Custom grandmas" is "ON".
  *      Names must not contain the pipe (|) character.
- *      This option can be changed dynamically.
  *  updatesResponse <string>: Every 30 minutes Cookie Clicker checks for updates;
  *      this is the string fed to Game.CheckUpdatesResponse.
  *      The default value is '2.029|new stock market minigame!'.
- *      This option can be changed dynamically.
  *  cookieConsent <boolean>: Unless set to 'false',
  *      the page includes the browser cookie `cookieconsent_dismissed=yes`,
  *      which dismisses the cookie consent dialog.
- *  saveGame <string>: String to be used as the stored save game.
+ *  saveGame <string | object>: String to be used as the stored save game.
+ *      If it is an object, it is parsed by CCSave beforehand.
  *  mockedDate <number>: Initial value of CConnoisseur.mockedDate; see browser-utilities.d.ts.
  */
 export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
