@@ -160,15 +160,26 @@ The main function is
 
 ```typescript
 function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}): Promise<Page>
+function openCookieClickerPage(context: BrowserContext, options: CCPageOptions = {}): Promise<Page>
+function setupCookieClickerPage(page: Page, options: CCPageOptions = {}): Promise<Page>
 ```
 
-Given a [browser](https://playwright.dev/docs/api/class-browser/)
+Given either a [browser](https://playwright.dev/docs/api/class-browser/)
+or a [browser context](https://playwright.dev/docs/api/class-browsercontext/)
 and an options abject,
-this function returns a [Page](https://playwright.dev/docs/api/class-page)
+the first function returns a [Page](https://playwright.dev/docs/api/class-page)
 that already navigated to <https://orteil.dashnet.org/cookieclicker/index.html>
 and waited for `Game.ready` to be true.
 The page [reroutes](https://playwright.dev/docs/api/class-route)
 requests to <https://orteil.dashnet.org/cookieclicker/> to the local copy of Cookie Clicker.
+
+The other function,
+`setupCookieClickerPage`,
+manipulates the given page
+(installing its routes, adding cookies,
+navigating to <https://orteil.dashnet.org/cookieclicker/> etc.)
+according to the options and returns it.
+The functions behave exactly the same otherwise.
 
 A few URLs are dropped;
 most notably <https://pagead2.googlesyndication.com>.

@@ -1,4 +1,4 @@
-import { Browser, BrowserContextOptions, Route } from 'playwright';
+import { Browser, BrowserContext, Page, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
@@ -253,8 +253,8 @@ async function handleForbiddenURLs(route: Route) {
     return true;
 }
 
-/* Uses the given browser to navigate to https://orteil.dashnet.org/cookieclicker/index.html
- * in a new page.
+/* Creates a new page using the given browser or browserContext,
+ * and navigates to https://orteil.dashnet.org/cookieclicker/index.html.
  * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
  *
  * The second argument is an object with the optional arguments.
@@ -277,28 +277,31 @@ async function handleForbiddenURLs(route: Route) {
  *      If it is an object, it is parsed by CCSave beforehand.
  *  mockedDate <number>: Initial value of CConnoisseur.mockedDate; see browser-utilities.d.ts.
  */
-export async function openCookieClickerPage(browser: Browser, options: CCPageOptions = {}) {
-    let config = await parseConfigFile();
-    let storageState: Exclude<BrowserContextOptions['storageState'], string> = {};
+export async function openCookieClickerPage(browser: Browser, options?: CCPageOptions): Promise<Page>;
+export async function openCookieClickerPage(context: BrowserContext, options?: CCPageOptions): Promise<Page>;
+export async function openCookieClickerPage(pageMaker: Browser | BrowserContext, options: CCPageOptions = {}) {
+    return await setupCookieClickerPage(await pageMaker.newPage(), options);
+}
 
+/* Similar to openCookieClickerPage,
+ * but operates on the given page instead of creating a new one.
+ * Returns the page itself.
+ */
+export async function setupCookieClickerPage(page: Page, options: CCPageOptions = {}) {
+    let config = await parseConfigFile();
     if(getCookieConsent(options)) {
-        storageState.cookies = [{
+        page.context().addCookies([{
             name: 'cookieconsent_dismissed',
             value: 'yes',
             url: 'https://orteil.dashnet.org/cookieclicker/',
-        }];
+        }]);
     }
-
-    let context = await browser.newContext({storageState});
 
     let utilOptions: BrowserUtilitiesOptions = {
         mockedDate: getMockedDate(options),
         saveGame: getSaveGame(options),
     };
-    await context.addInitScript(initBrowserUtilities, utilOptions);
-
-    let page = await context.newPage();
-    await page.on('close', async () => await context.close() );
+    await page.addInitScript(initBrowserUtilities, utilOptions);
 
     await page.route('**/*', async route => {
         if(await handlePatreonGrabs(route, options))

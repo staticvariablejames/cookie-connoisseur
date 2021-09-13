@@ -6,6 +6,8 @@
 - Added: if a file which should be downloaded by `npx cookie-connoisseur fetch` is missing
     (for example, right after adding a new file to `cookie-connoisseur.config.json`),
     it is downloaded on-the-fly.
+- Added: `openCookieClickerPage` also accepts `BrowserContext`,
+    and added a `setupCookieClickerPage` function accepting a `Page`.
 - Change: the executable scripts are now aggregated under a single executable. (**breaking**)
 - Change: Cookie Connoisseur now automatically downloads a copy of Cookie Clicker on installation,
     so running `npx cookie-conoisseur fetch` right after installation is not necessary anymore.
