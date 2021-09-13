@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 0.1.3 - 2021-09-13
 - Added: Class `CCSave` can now handle Cookie Clicker versions up to 2.042
     (the current version of the Steam port).
 - Added: if a file which should be downloaded by `npx cookie-connoisseur fetch` is missing
