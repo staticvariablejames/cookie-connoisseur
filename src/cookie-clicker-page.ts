@@ -289,17 +289,11 @@ export async function openCookieClickerPage(browser: Browser, options: CCPageOpt
         }];
     }
 
-    storageState.origins = [{
-        origin: 'https://orteil.dashnet.org/cookieclicker/',
-        localStorage: [
-            {name: 'CookieClickerGame', value: getSaveGame(options)}
-        ]
-    }];
-
     let context = await browser.newContext({storageState});
 
     let utilOptions: BrowserUtilitiesOptions = {
         mockedDate: getMockedDate(options),
+        saveGame: getSaveGame(options),
     };
     await context.addInitScript(initBrowserUtilities, utilOptions);
 

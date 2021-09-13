@@ -6,9 +6,14 @@
 
 export type BrowserUtilitiesOptions = {
     mockedDate: number;
+    saveGame: string;
 }
 
 export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
+    if(options.saveGame != '') {
+        window.localStorage.setItem('CookieClickerGame', options.saveGame);
+    }
+
     let mockedDate = options.mockedDate;
     let currentDate = Date.now();
     let realDate = Date;
