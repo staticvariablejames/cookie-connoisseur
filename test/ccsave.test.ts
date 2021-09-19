@@ -2597,6 +2597,14 @@ test.describe('CCSave.fromObject', () => {
             expect(jsonSave).toEqual(manualSave);
         });
 
+        test('assigning building.highest if needed', () => {
+            let manualSave = new CCSave();
+            manualSave.buildings["Grandma"].amount = 25;
+            manualSave.buildings["Grandma"].highest = 25;
+            let jsonSave = CCSave.fromObject({buildings: {"Grandma": {amount: 25}}});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
         test('throwing readable error messages', () => {
             expect(() => {
                 CCSave.fromObject({buildings: 'all of them'});

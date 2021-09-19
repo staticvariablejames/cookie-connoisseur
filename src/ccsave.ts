@@ -792,22 +792,28 @@ export class CCBuildingsData { // Aggregates all buildings
     }
 
     static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
-        let buildings = new CCBuildingsData();
+        let buildingsData = new CCBuildingsData();
         if(typeof obj != 'object' || obj === null) {
             onError(`source${subobjectName} is not an object`);
-            return buildings;
+            return buildingsData;
         }
-        for(let building of Object.keys(obj)) {
-            if(!(building in buildings)) {
-                onError(`target${subobjectName}.${building} does not exist (typo?)`);
+        for(let buildingName of Object.keys(obj)) {
+            if(!(buildingName in buildingsData)) {
+                onError(`target${subobjectName}.${buildingName} does not exist (typo?)`);
                 continue;
             }
+            let sourceBuilding: Record<string, unknown> = (obj as any)[buildingName];
+            let targetBuilding = buildingsData[buildingName as keyof CCBuildingsData];
             pseudoObjectAssign(
-                buildings[building as keyof CCBuildingsData],
-                (obj as any)[building],
+                targetBuilding,
+                sourceBuilding,
                 onError,
-                `${subobjectName}["${building}"]`
+                `${subobjectName}["${buildingName}"]`
             );
+
+            if(!('highest' in sourceBuilding)) {
+                targetBuilding.highest = targetBuilding.amount;
+            }
 
             type minigameT<T> = {
                 fromObject: (obj: unknown, onError: ErrorHandler, subobjectName: string) => T | null;
@@ -818,18 +824,18 @@ export class CCBuildingsData { // Aggregates all buildings
             function handleMinigame(name: 'Temple', minigameClass: minigameT<CCPantheonMinigame>): void;
             function handleMinigame(name: 'Wizard tower', minigameClass: minigameT<CCGrimoireMinigame>): void;
             function handleMinigame(name: string, minigameClass: any) {
-                if(building === name) {
-                    if((obj as any)[name].level === 0) {
-                        (buildings as any)[name].minigame = null;
-                    } else if('minigame' in (obj as any)[name]) {
-                        (buildings as any)[name].minigame = minigameClass.fromObject(
-                            (obj as any)[name].minigame,
+                if(buildingName === name) {
+                    if(sourceBuilding.level === 0) {
+                        (targetBuilding as any).minigame = null;
+                    } else if('minigame' in sourceBuilding) {
+                        (targetBuilding as any).minigame = minigameClass.fromObject(
+                            sourceBuilding.minigame,
                             onError,
                             `${subobjectName}["${name}"].minigame`
                         );
-                    } else if((buildings as any)[name].level > 0) {
+                    } else if((buildingsData as any)[name].level > 0) {
                         // source.minigame has to be explicitly null to avoid this conditional
-                        (buildings as any)[name].minigame = new minigameClass();
+                        (targetBuilding as any).minigame = new minigameClass();
                     }
                 }
             }
@@ -839,7 +845,7 @@ export class CCBuildingsData { // Aggregates all buildings
             handleMinigame('Wizard tower', CCGrimoireMinigame);
         }
 
-        return buildings;
+        return buildingsData;
     }
 }
 

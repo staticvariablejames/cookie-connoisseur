@@ -279,3 +279,10 @@ behave idiosyncratically.
     `CCSave.fullDate` may also be `NaN`.
     Since `JSON.stringify` outputs `NaN` as `null`,
     `CCSave.fromObject` interprets `null` as `NaN` for `fullDate`.
+
+-   Buildings have a `.highest` attribute that's always higher than `.amount` in-game.
+    If `.highest` is not present, `CCSave.fromObject` sets it to `.amount`.
+    Rationale: a few parts of the game (most notably the Stock market minigame)
+    don't work properly if `.highest = 0`,
+    so this allows us to explicitly set `.amount` only,
+    without worrying about `.highest`.
