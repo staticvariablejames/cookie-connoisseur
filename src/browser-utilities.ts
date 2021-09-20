@@ -3,11 +3,11 @@
  */
 
 declare global {
-    export const CConnoisseur: {
-        mockedDate: number,
-        clearNewsTickerText: () => void,
-    };
     interface Window {
+        /* The global CConnoisseur is declared in src/index.ts
+         * This ensures that CConnoisseur is exported in lib/index.d.ts
+         * without having to explicitly import this file in src/index.ts.
+         */
         CConnoisseur: typeof CConnoisseur,
     }
 }

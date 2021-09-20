@@ -1,3 +1,9 @@
 export * from './cookie-clicker-page';
 export * from './ccsave';
-export * from './browser-utilities';
+
+declare global {
+    export const CConnoisseur: {
+        mockedDate: number,
+        clearNewsTickerText: () => void,
+    };
+}
