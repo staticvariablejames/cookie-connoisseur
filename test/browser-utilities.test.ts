@@ -1,7 +1,6 @@
-/* Basic test for the browser utilities installed by src/init-browser-utilities.
+/* Basic test for the browser utilities installed by src/browser-utilities.
  */
 
-/// <reference path="../src/browser-utilities.d.ts" />
 import { test, expect } from '@playwright/test';
 import { CCPageOptions, openCookieClickerPage } from '../src/cookie-clicker-page';
 

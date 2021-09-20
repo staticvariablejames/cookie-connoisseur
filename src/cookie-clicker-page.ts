@@ -2,7 +2,7 @@ import { Browser, BrowserContext, Page, Route } from 'playwright';
 import { existsSync } from 'fs';
 import { cacheURLs } from './url-list';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
-import { BrowserUtilitiesOptions, initBrowserUtilities } from './init-browser-utilities';
+import { BrowserUtilitiesOptions, initBrowserUtilities } from './browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 import { CCSave } from './ccsave';
 

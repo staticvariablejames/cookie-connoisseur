@@ -2,7 +2,14 @@
  * before index.html is loaded.
  */
 
-/// <reference path="../src/browser-utilities.d.ts" />
+declare global {
+    export const CConnoisseur: {
+        mockedDate: number,
+    };
+    interface Window {
+        CConnoisseur: typeof CConnoisseur,
+    }
+}
 
 export type BrowserUtilitiesOptions = {
     mockedDate: number;

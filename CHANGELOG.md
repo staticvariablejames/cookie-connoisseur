@@ -2,7 +2,7 @@
 
 ## Unreleased
 - Added: `CCSave.fromObject` automatically sets `building.highest` if absent.
-- Fixed: `setupCookieClickerPage` was not exported.
+- Fixed: `setupCookieClickerPage` and `CConnoisseur` were not being exported.
 
 ## 0.1.3 - 2021-09-13
 - Added: Class `CCSave` can now handle Cookie Clicker versions up to 2.042
