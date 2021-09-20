@@ -5,6 +5,7 @@
 declare global {
     export const CConnoisseur: {
         mockedDate: number,
+        clearNewsTickerText: () => void,
     };
     interface Window {
         CConnoisseur: typeof CConnoisseur,
@@ -47,5 +48,10 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     // @ts-ignore (I couldn't figure out how to convince Typescript that this works)
     Date = newDate;
 
-    window.CConnoisseur = {mockedDate};
+    let clearNewsTickerText = () => {
+        Game.tickerL.innerHTML = '';
+        Game.tickerBelowL.innerHTML = '';
+    }
+
+    window.CConnoisseur = {mockedDate, clearNewsTickerText};
 }

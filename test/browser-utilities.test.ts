@@ -60,3 +60,10 @@ test('Seasons can be chosen via date mocking', async({ browser }) => {
     expect(season).toEqual('easter');
     await page.close();
 });
+
+test('News ticker gets cleared', async ({ browser }) => {
+    let page = await openCookieClickerPage(browser);
+    await page.evaluate(() => window.CConnoisseur.clearNewsTickerText());
+    let tickerText = await page.evaluate(() => Game.tickerL.innerText + Game.tickerBelowL.innerText);
+    expect(tickerText.trim()).toEqual('');
+});
