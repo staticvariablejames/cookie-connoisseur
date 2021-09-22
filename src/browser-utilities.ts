@@ -53,5 +53,19 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         Game.tickerBelowL.innerHTML = '';
     }
 
-    window.CConnoisseur = {mockedDate, clearNewsTickerText};
+    let setSliderValue = (e: Element, value: number) => {
+        if(!(e instanceof HTMLInputElement)) {
+            throw new Error(`Element is not an HTMLInputElement`);
+        }
+        e.value = String(value);
+        e.dispatchEvent(new Event('input'));
+        e.dispatchEvent(new Event('change'));
+        return value;
+    }
+
+    window.CConnoisseur = {
+        mockedDate,
+        clearNewsTickerText,
+        setSliderValue,
+    };
 }

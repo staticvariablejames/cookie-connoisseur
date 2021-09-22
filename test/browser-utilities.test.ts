@@ -67,3 +67,10 @@ test('News ticker gets cleared', async ({ browser }) => {
     let tickerText = await page.evaluate(() => Game.tickerL.innerText + Game.tickerBelowL.innerText);
     expect(tickerText.trim()).toEqual('');
 });
+
+test('Range inputs get slided', async ({ browser }) => {
+    let page = await openCookieClickerPage(browser);
+    await page.click('text=Options');
+    await page.$eval('text=Volume50% >> input', e => CConnoisseur.setSliderValue(e, 15));
+    expect(await page.evaluate(() => Game.volume)).toEqual(15);
+});
