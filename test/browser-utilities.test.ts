@@ -2,7 +2,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { CCPageOptions, openCookieClickerPage } from '../src/cookie-clicker-page';
+import { CCPageOptions, openCookieClickerPage } from '../src/index';
 
 test('The game always starts on 2020', async({ browser }) => {
     let page = await openCookieClickerPage(browser);

@@ -4,7 +4,7 @@
  */
 import { test, expect } from '@playwright/test';
 
-import { openCookieClickerPage } from '../src/cookie-clicker-page';
+import { openCookieClickerPage } from '../src/index';
 
 test.describe('Save games can be set', () => {
     test('by directly using a save string', async ({ browser }) => {

@@ -8,9 +8,9 @@ import {
     CCGrimoireMinigame,
     CCMarketMinigame,
     CCPantheonMinigame,
-    CCSave
-} from '../src/ccsave';
-import { openCookieClickerPage } from '../src/cookie-clicker-page';
+    CCSave,
+    openCookieClickerPage,
+} from '../src/index';
 
 const saveAsString2_031 = // 2.031 save game
    'Mi4wMzF8fDE2MDY1Mjg0MzYyNjI7MTU5MTQ2NTM1NTUyMDsxNjA2NjE3ODUyNTQwO1N0YXRpYzt1'+

@@ -1,9 +1,8 @@
 /* Simple test for the configuration file.
  */
-/// <reference path="../src/browser-utilities.d.ts" />
 import { test, expect } from '@playwright/test';
 
-import { CCPageOptions, openCookieClickerPage } from '../src/cookie-clicker-page';
+import { CCPageOptions, openCookieClickerPage } from '../src/index';
 import { parseConfigFile } from '../src/parse-config';
 
 const testURL = 'https://example.com/test.js'
