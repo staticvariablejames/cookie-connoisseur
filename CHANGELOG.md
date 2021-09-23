@@ -4,6 +4,8 @@
 - Added: `CCSave.fromObject` automatically sets `building.highest` if absent.
 - Added: `CConnoisseur.clearNewsTickerText`, which makes the text in the news ticker empty.
 - Added: `CConnoisseur.setSliderValue`, which sets the value of a range input.
+- Change: Rename `CCSave.fromStringSave` to `CCSave.fromNativeSave`
+    and `CCSave.toStringSave` to `CCSave.toNativeSave`. (**breaking**)
 - Fixed: `setupCookieClickerPage` and `CConnoisseur` were not being exported.
 
 ## 0.1.3 - 2021-09-13

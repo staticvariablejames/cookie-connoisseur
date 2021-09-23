@@ -2355,33 +2355,33 @@ const saveAsObject2_04 = {
 } as CCSave;
 
 test('The save game is properly parsed', async() => {
-    expect(CCSave.fromStringSave(saveAsString2_031)).toEqual(saveAsObject2_031);
+    expect(CCSave.fromNativeSave(saveAsString2_031)).toEqual(saveAsObject2_031);
 });
 
 test.describe('Written saves can be recovered', () => {
     test('for v2.031', async () => {
-        let str = CCSave.toStringSave(saveAsObject2_031);
-        expect(CCSave.fromStringSave(str)).toEqual(saveAsObject2_031);
+        let str = CCSave.toNativeSave(saveAsObject2_031);
+        expect(CCSave.fromNativeSave(str)).toEqual(saveAsObject2_031);
     });
     test('for v2.04', async () => {
-        let str = CCSave.toStringSave(saveAsObject2_04);
-        expect(CCSave.fromStringSave(str)).toEqual(saveAsObject2_04);
+        let str = CCSave.toNativeSave(saveAsObject2_04);
+        expect(CCSave.fromNativeSave(str)).toEqual(saveAsObject2_04);
     });
 });
 
 test('The JSON save is properly converted to a Cookie Clicker save', () => {
-    expect(CCSave.toStringSave(saveAsObject2_031)).toEqual(saveAsString2_031);
+    expect(CCSave.toNativeSave(saveAsObject2_031)).toEqual(saveAsString2_031);
 });
 
-test.describe('CCSave.toStringSave edge cases:', () => {
+test.describe('CCSave.toNativeSave edge cases:', () => {
     test('Sugar blessing includes the trailing ,1', async ({ browser }) => {
         let page = await openCookieClickerPage(browser);
         await page.evaluate( () => Game.gainBuff('sugar blessing',24*60*60,1) );
         let strSave = await page.evaluate( () => Game.WriteSave(1) );
-        let jsonSave = CCSave.fromStringSave(strSave);
+        let jsonSave = CCSave.fromNativeSave(strSave);
         expect(jsonSave.buffs[0].name).toBe('sugar blessing');
         // strSave includes the trailing ",1" so we can just test for equality:
-        expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+        expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
     });
 
     test('Empty pantheon slots parse from -1 and back', async ({ browser }) => {
@@ -2394,24 +2394,24 @@ test.describe('CCSave.toStringSave edge cases:', () => {
         await page.waitForFunction( () => Game.isMinigameReady(Game.Objects['Temple']) );
 
         let strSave = await page.evaluate( () => Game.WriteSave(1) );
-        let jsonSave = CCSave.fromStringSave(strSave);
+        let jsonSave = CCSave.fromNativeSave(strSave);
         expect(jsonSave.buildings['Temple'].minigame.diamondSlot).toBe('');
         expect(jsonSave.buildings['Temple'].minigame.rubySlot).toBe('');
         expect(jsonSave.buildings['Temple'].minigame.jadeSlot).toBe('');
         // strSave saves the pantheon as -1/-1/-1 so we can just test for equality:
-        expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+        expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
     });
 
     test('Saves started a long while ago are preserved', async ({ browser }) => {
         let jsonSave = new CCSave();
         jsonSave.fullDate = NaN;
-        let page = await openCookieClickerPage(browser, {saveGame: CCSave.toStringSave(jsonSave)});
+        let page = await openCookieClickerPage(browser, {saveGame: CCSave.toNativeSave(jsonSave)});
         let fullDate = await page.evaluate( () => Game.fullDate );
         expect(fullDate).toBe(NaN);
         let strSave = await page.evaluate( () => Game.WriteSave(1) );
-        jsonSave = CCSave.fromStringSave(strSave);
+        jsonSave = CCSave.fromNativeSave(strSave);
         expect(jsonSave.fullDate).toBe(NaN);
-        expect(CCSave.toStringSave(jsonSave)).toEqual(strSave);
+        expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
     });
 
     test('Vault is sorted', async ({ browser }) => {
@@ -2419,7 +2419,7 @@ test.describe('CCSave.toStringSave edge cases:', () => {
         await page.evaluate( () => Game.Upgrades['Carpal tunnel prevention cream'].vault() );
         await page.evaluate( () => Game.Upgrades['Reinforced index finger'].vault() );
         let strSave = await page.evaluate( () => Game.WriteSave(1) );
-        let jsonSave = CCSave.fromStringSave(strSave);
+        let jsonSave = CCSave.fromNativeSave(strSave);
         expect(jsonSave.vault).toEqual([
             'Reinforced index finger',
             'Carpal tunnel prevention cream',
@@ -2441,11 +2441,11 @@ test.describe('CCSave.toStringSave edge cases:', () => {
         withoutMinigames.buildings['Bank'].minigame = null;
         withoutMinigames.buildings['Temple'].minigame = null;
         withoutMinigames.buildings['Wizard tower'].minigame = null;
-        expect(CCSave.toStringSave(withMinigames)).toEqual(CCSave.toStringSave(withoutMinigames));
+        expect(CCSave.toNativeSave(withMinigames)).toEqual(CCSave.toNativeSave(withoutMinigames));
     });
 
     test('Absent minigame data is parsed back to null', () => {
-        let save = CCSave.fromStringSave(CCSave.toStringSave(new CCSave()));
+        let save = CCSave.fromNativeSave(CCSave.toNativeSave(new CCSave()));
         let withoutMinigames = new CCSave();
         expect(save.buildings['Farm'].minigame).toBeNull();
         expect(save.buildings['Bank'].minigame).toBeNull();

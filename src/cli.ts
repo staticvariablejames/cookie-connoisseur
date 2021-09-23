@@ -32,7 +32,7 @@ function writeJsonSaveFormat(args: string[]) {
         let str = process.stdin.read();
         if(!str) return;
 
-        let save = CCSave.fromStringSave(str);
+        let save = CCSave.fromNativeSave(str);
         console.log(prettyPrintCCSave(save));
     });
 }
@@ -50,7 +50,7 @@ function writeNativeSaveFormat(args: string[]) {
 
         let save = CCSave.fromObject(JSON.parse(str), console.error);
 
-        console.log(CCSave.toStringSave(save));
+        console.log(CCSave.toNativeSave(save));
     });
 };
 

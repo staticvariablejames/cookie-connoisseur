@@ -54,7 +54,7 @@ and Rigidel slotted in the diamond slot.
     });
 
     let page = await openCookieClickerPage(browser, {
-        saveGame: CCSave.toStringSave(save),
+        saveGame: CCSave.toNativeSave(save),
     });
 ...
 ```
@@ -78,13 +78,13 @@ with the following exceptions:
 
 
 ```typescript
-    CCSave.toStringSave(save: CCSave): string;
+    CCSave.toNativeSave(save: CCSave): string;
 ```
 
 Converts the `CCSave` object to Cookie Clicker's native save format.
 
 ```typescript
-    CCSave.fromStringSave(saveString: string): CCSave;
+    CCSave.fromNativeSave(saveString: string): CCSave;
 ```
 
 Parses the Cookie Clicker's native save format into a `CCSave` object.
@@ -113,8 +113,8 @@ constructed with the minigame default constructors,
 even in situations in which this does not make sense
 (like the Garden minigame).
 This simplifies the process of constructing a CCSave according to your specifications.
-`CCSave.toStringSave` knows not to output the minigame data if the building level is 0.
-`CCSave.fromStringSave`, on the other hand,
+`CCSave.toNativeSave` knows not to output the minigame data if the building level is 0.
+`CCSave.fromNativeSave`, on the other hand,
 does _not_ provide a default-constructed minigame data if the data is absent from the native save.
 `CCSave.fromObject` stays in-between:
 if no `minigame` key is defined,
@@ -235,7 +235,7 @@ Idiosyncrasies
 ==============
 
 To accomodate for some quirks of the game,
-some parts of `CCSave.fromStringSave`, `CCSave.toStringSave` and `CCSave.fromObject`
+some parts of `CCSave.fromNativeSave`, `CCSave.toNativeSave` and `CCSave.fromObject`
 behave idiosyncratically.
 
 -   Cookie Clicker has a bug in `minigamePantheon.js`, function `M.slotGod`.
@@ -249,7 +249,7 @@ behave idiosyncratically.
     meaning spirit 10 (Rigidel) slotted on diamond, 8 (Mokalsium) on ruby,
     6 (Muridal) on jade, and 2 (Godzamok) in the -1 slot.
 
-    `CCSave.fromStringSave` silently discards this last slot,
+    `CCSave.fromNativeSave` silently discards this last slot,
     so it does not show up when converting back to Cookie Clicker's native save format.
 
 -   When creating a buff for the first time,
@@ -258,13 +258,13 @@ behave idiosyncratically.
     But when parsing a buff, it fills nonexistent arguments with zeros.
     Therefore, a frenzy which was originally saved as `0,2310,2310,7`
     will be saved as `0,2310,2310,7,0,0` if loaded and saved again.
-    `CCSave.toStringSave` never writes the spurious `,0,0`.
+    `CCSave.toNativeSave` never writes the spurious `,0,0`.
 
 -   `Game.vault` is a list of the vaulted upgrades.
     This list is constructed as the player vaults upgrades.
     and therefore may be out of order.
     (This has no gameplay effect.)
-    Both `CCSave.fromObject` and `CCSave.fromStringSave`
+    Both `CCSave.fromObject` and `CCSave.fromNativeSave`
     sort the vault according to upgrade id.
 
 -   `fullDate` registers the date of the beginning of the run.

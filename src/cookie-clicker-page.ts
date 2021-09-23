@@ -75,7 +75,7 @@ function getSaveGame(options: CCPageOptions) {
     if(typeof options.saveGame == 'string') {
         return options.saveGame;
     } else if(typeof options.saveGame == 'object') {
-        return CCSave.toStringSave(CCSave.fromObject(options.saveGame));
+        return CCSave.toNativeSave(CCSave.fromObject(options.saveGame));
     } else {
         return '';
     }
