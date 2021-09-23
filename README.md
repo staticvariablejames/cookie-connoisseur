@@ -202,22 +202,22 @@ https://github.com/staticvariablejames/ChooseYourOwnLump/blob/master/cookie-conn
 Available options:
 
 -   `customURLs`: `{url: string}[]`
-        List of URLs that are handled in the same way as Cookie Clicker files.
-        If they are missing, these files are downloaded to `.cookie-connoisseur`
-        in the first time they are needed,
-        and the local copy is used used afterwards whenever that URL is requested.
-        Alternatively,
-        you can download all these files at once by running `npx cookie-connoisseur fetch`.
+    List of URLs that are handled in the same way as Cookie Clicker files.
+    If they are missing, these files are downloaded to `.cookie-connoisseur`
+    in the first time they are needed,
+    and the local copy is used used afterwards whenever that URL is requested.
+    Alternatively,
+    you can download all these files at once by running `npx cookie-connoisseur fetch`.
 
 -   `localFiles`: `{url: string, path: string}[]`
-        List of URLs that are redirected to local files.
-        Whenever a URL from this list is requested,
-        the local file located in `path` is provided instead.
+    List of URLs that are redirected to local files.
+    Whenever a URL from this list is requested,
+    the local file located in `path` is provided instead.
 
 -   `localDirectories`: `{url: string, path: string}[]`
-        List of URL prefixes that are redirected to local directories.
-        Whenever a URL starting with `url` is requested,
-        that prefix is replaced with `path`, and the resulting path is provided instead.
+    List of URL prefixes that are redirected to local directories.
+    Whenever a URL starting with `url` is requested,
+    that prefix is replaced with `path`, and the resulting path is provided instead.
 
 It is advised to re-run `npx cookie-connoisseur fetch`
 whenever the `customURLs` list is changed.
