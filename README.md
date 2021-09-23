@@ -168,7 +168,7 @@ It uses the given browser to open a page,
 which already navigated to <https://orteil.dashnet.org/cookieclicker/index.html>
 and waited for `Game.ready` to be true.
 [More details here](doc/openCookieClickerPage.md),
-including related function and a breakdown of the options.
+including related functions and a breakdown of the options.
 
 Additionally,
 Cookie Connoisseur injects in the page's global scope the object `CConnoisseur`,

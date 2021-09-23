@@ -47,7 +47,7 @@ only in the browser environment.
     Currently,
     [Playwright cannot change range inputs](https://github.com/microsoft/playwright/issues/4231#issuecomment-716049872),
     like changing the volume slider;
-    this function mitigates it.
+    this function mitigates this issue.
 
     This function can be used with
     [`page.$eval`](https://playwright.dev/docs/api/class-page#page-eval-on-selector);

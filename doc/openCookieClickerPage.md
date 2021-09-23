@@ -55,11 +55,11 @@ Available options:
     If it is a string, the value is stored as-is into `window.localStorage`
     prior to loading the game.
     If it is an object, it is first converted to a string using
-    [`CCSave.fromObject` and `CCSave.toStringSave`](doc/CCSave.md#API)
+    [`CCSave.fromObject` and `CCSave.toStringSave`](doc/CCSave.md#API).
     Defaults to empty.
 
 -   `mockedDate: number`
-    Initial value of CConnoisseur.mockedDate; see below.
+    Initial value of CConnoisseur.mockedDate; see [here](./cconnoisseur.md) for details.
     Defaults to 1.6e12.
 
 The first three options
