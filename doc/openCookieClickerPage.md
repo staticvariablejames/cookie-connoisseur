@@ -59,7 +59,7 @@ Available options:
     Defaults to empty.
 
 -   `mockedDate: number`
-    Initial value of CConnoisseur.mockedDate; see [here](./cconnoisseur.md) for details.
+    Initial value of CConnoisseur.mockedDate; see [here](./BrowserUtilities.md) for details.
     Defaults to 1.6e12.
 
 The first three options

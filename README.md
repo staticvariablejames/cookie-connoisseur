@@ -157,7 +157,7 @@ API
 ===
 
 **[openCookieClickerPage](doc/openCookieClickerPage.md)
-| [CConnoisseur](doc/cconnoisseur.md)**
+| [Browser Utilities](doc/BrowserUtilities.md)**
 
 The main function is
 ```typescript
@@ -172,7 +172,7 @@ including related functions and a breakdown of the options.
 
 Additionally,
 Cookie Connoisseur injects in the page's global scope the object `CConnoisseur`,
-[whose documentation can be found here](doc/cconnoisseur.md).
+[whose documentation can be found here](doc/BrowserUtilities.md).
 
 
 Configuration File
