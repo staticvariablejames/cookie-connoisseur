@@ -54,6 +54,7 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     }
 
     let setSliderValue = (e: Element, value: number) => {
+        // From https://github.com/microsoft/playwright/issues/4231#issuecomment-716049872
         if(!(e instanceof HTMLInputElement)) {
             throw new Error(`Element is not an HTMLInputElement`);
         }
