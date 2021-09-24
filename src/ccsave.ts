@@ -417,7 +417,7 @@ export class CCGardenMinigame {
 
 // Represents a single stock from the market minigame
 export class CCMarketStock {
-    val: number = 0; // 100 * current value of the stock
+    val: number = 1; // Current value of the stock, within the nearest hundreth of a $
     mode: string = 'stable'; // One of the six stock market modes
     d: number = 0; // 100 * current stock delta
     dur: number = 0; // Number of stock market ticks that the stock will stay in its current mode
