@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 0.1.4 - 2021-09-25
 - Added: `CCSave.fromObject` automatically sets `building.highest` if absent.
 - Added: `CConnoisseur.clearNewsTickerText`, which makes the text in the news ticker empty.
 - Added: `CConnoisseur.setSliderValue`, which sets the value of a range input.
