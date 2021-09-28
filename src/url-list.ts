@@ -6,7 +6,7 @@ export const cacheURLs: {
     }
 } = {
     'https://orteil.dashnet.org/cookieclicker/base64.js': {},
-    'https://orteil.dashnet.org/cookieclicker/index.html': {},
+    'https://orteil.dashnet.org/cookieclicker/index.html': {contentType: 'text/html; charset=UTF-8'}, // see encoding.test.ts
     'https://orteil.dashnet.org/cookieclicker/main.js': {},
     'https://orteil.dashnet.org/cookieclicker/minigameGarden.js': {},
     'https://orteil.dashnet.org/cookieclicker/minigameGrimoire.js': {},

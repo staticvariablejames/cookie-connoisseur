@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added: Explicit support for Firefox.
+- Fixed: Lack of encoding was generating garbled text on upgrade tooltips.
 
 ## 0.1.4 - 2021-09-25
 - Added: `CCSave.fromObject` automatically sets `building.highest` if absent.
