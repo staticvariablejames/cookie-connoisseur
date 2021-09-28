@@ -29,36 +29,48 @@ test('Overwritten Date class works properly', async({ browser }) => {
     await page.close();
 });
 
-test('Seasons can be chosen via date mocking', async({ browser }) => {
-    let page = await openCookieClickerPage(browser); // No seasonal event on 2020-09-13 12:26:40
-    let season = await page.evaluate(() => Game.baseSeason);
-    expect(season).toEqual('');
-    await page.close();
+test.describe('Date mocking can set the season', () => {
+    test('(no season by default)', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser); // No seasonal event on 2020-09-13 12:26:40
+        let season = await page.evaluate(() => Game.baseSeason);
+        expect(season).toEqual('');
+        await page.close();
+    });
 
-    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 9, 30, 12)});
-    season = await page.evaluate(() => Game.baseSeason);
-    expect(season).toEqual('halloween');
-    await page.close();
+    test('to Halloween', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 9, 30, 12)});
+        let season = await page.evaluate(() => Game.baseSeason);
+        expect(season).toEqual('halloween');
+        await page.close();
+    });
 
-    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 11, 25, 12)});
-    season = await page.evaluate(() => Game.baseSeason);
-    expect(season).toEqual('christmas');
-    await page.close();
+    test('to Christmas', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 11, 25, 12)});
+        let season = await page.evaluate(() => Game.baseSeason);
+        expect(season).toEqual('christmas');
+        await page.close();
+    });
 
-    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 1, 13, 12)});
-    season = await page.evaluate(() => Game.baseSeason);
-    expect(season).toEqual('valentines');
-    await page.close();
+    test('to Valentines', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 1, 13, 12)});
+        let season = await page.evaluate(() => Game.baseSeason);
+        expect(season).toEqual('valentines');
+        await page.close();
+    });
 
-    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 3, 1, 12)});
-    season = await page.evaluate(() => Game.baseSeason);
-    expect(season).toEqual('fools');
-    await page.close();
+    test('to April fools', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 3, 1, 12)});
+        let season = await page.evaluate(() => Game.baseSeason);
+        expect(season).toEqual('fools');
+        await page.close();
+    });
 
-    page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 3, 11, 12)});
-    season = await page.evaluate(() => Game.baseSeason);
-    expect(season).toEqual('easter');
-    await page.close();
+    test('to Easter', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 3, 11, 12)});
+        let season = await page.evaluate(() => Game.baseSeason);
+        expect(season).toEqual('easter');
+        await page.close();
+    });
 });
 
 test('News ticker gets cleared', async ({ browser }) => {
