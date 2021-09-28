@@ -237,3 +237,8 @@ I did not implement a fallback yet.
 
 Files which are downloaded to `.cookie-connoisseur`
 are not automatically removed if they are not needed anymore.
+
+Cookie Connoisseur does not work very well with WebKit.
+In particular,
+clicks that trigger sounds (like clicking the big cookie)
+crash the WebKit browser on Linux.

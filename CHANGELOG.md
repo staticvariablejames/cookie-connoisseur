@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Added: Explicit support for Firefox.
 
 ## 0.1.4 - 2021-09-25
 - Added: `CCSave.fromObject` automatically sets `building.highest` if absent.
