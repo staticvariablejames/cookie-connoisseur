@@ -2382,6 +2382,7 @@ test.describe('CCSave.toNativeSave edge cases:', () => {
         expect(jsonSave.buffs[0].name).toBe('sugar blessing');
         // strSave includes the trailing ",1" so we can just test for equality:
         expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
+        await page.close();
     });
 
     test('Empty pantheon slots parse from -1 and back', async ({ browser }) => {
@@ -2400,6 +2401,7 @@ test.describe('CCSave.toNativeSave edge cases:', () => {
         expect(jsonSave.buildings['Temple'].minigame.jadeSlot).toBe('');
         // strSave saves the pantheon as -1/-1/-1 so we can just test for equality:
         expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
+        await page.close();
     });
 
     test('Saves started a long while ago are preserved', async ({ browser }) => {
@@ -2412,6 +2414,7 @@ test.describe('CCSave.toNativeSave edge cases:', () => {
         jsonSave = CCSave.fromNativeSave(strSave);
         expect(jsonSave.fullDate).toBe(NaN);
         expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
+        await page.close();
     });
 
     test('Vault is sorted', async ({ browser }) => {
@@ -2424,6 +2427,7 @@ test.describe('CCSave.toNativeSave edge cases:', () => {
             'Reinforced index finger',
             'Carpal tunnel prevention cream',
         ]);
+        await page.close();
     });
 
     test('Default-initialized CCSave contains minigame data', () => {
