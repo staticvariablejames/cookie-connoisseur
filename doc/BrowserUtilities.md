@@ -58,3 +58,15 @@ only in the browser environment.
     sets the volume slider to 15%.
     (The `text=Volume50%` is a trick to get Playwright to pick the entire `div`
     containing the slider, rather than just the `Volume` label.)
+
+-   `gainLumps: (lumpsToGain: number) => void`
+    Awards the given number of lumps.
+
+    In Cookie Clicker,
+    sugar lumps can only be gained (and used)
+    if the player has more than a billion cookies baked all time.
+    If the player has less than this,
+    this function first `Game.Earn`s the minimum amount needed before calling `Game.gainLumps`,
+    so that all lump-related abilities
+    (like leveling up buildings)
+    can be used right after `CConnoisseur.gainLumps`.

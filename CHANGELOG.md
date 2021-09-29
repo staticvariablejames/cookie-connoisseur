@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added: Explicit support for Firefox.
+- Added: Browser utility `CConnoisseur.gainLumps`.
 - Fixed: Lack of encoding was generating garbled text on upgrade tooltips.
 
 ## 0.1.4 - 2021-09-25

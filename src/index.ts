@@ -6,5 +6,6 @@ declare global {
         mockedDate: number,
         clearNewsTickerText: () => void,
         setSliderValue: (e: Element, value: number) => number,
+        gainLumps: (lumpsToGain: number) => void,
     };
 }

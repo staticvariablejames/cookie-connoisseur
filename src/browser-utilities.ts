@@ -64,9 +64,17 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         return value;
     }
 
+    let gainLumps = (lumpsToGain: number) => {
+        if(Game.cookiesEarned+Game.cookiesReset < 1000000000) {
+            Game.Earn(1e9 - Game.cookiesEarned - Game.cookiesReset);
+        }
+        Game.gainLumps(lumpsToGain);
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
         setSliderValue,
+        gainLumps,
     };
 }
