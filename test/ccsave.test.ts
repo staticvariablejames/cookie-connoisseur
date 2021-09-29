@@ -2387,8 +2387,7 @@ test.describe('CCSave.toNativeSave edge cases:', () => {
 
     test('Empty pantheon slots parse from -1 and back', async ({ browser }) => {
         let page = await openCookieClickerPage(browser);
-        await page.evaluate( () => Game.Earn(1e9) ); // Unlock lumps
-        await page.evaluate( () => {Game.lumps = 1;} ); // Get one lump
+        await page.evaluate( () => CConnoisseur.gainLumps(1) ); // Unlock lumps
         await page.evaluate( () => Game.Objects['Temple'].getFree(1) ); // Get a temple
         await page.evaluate( () => Game.Objects['Temple'].levelUp() ); // Unlock Pantheon
         // We must wait for the minigame to load before Game.WriteSave.
