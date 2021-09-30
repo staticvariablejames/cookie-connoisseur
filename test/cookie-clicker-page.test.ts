@@ -45,16 +45,16 @@ test.describe('Heralds and grandma names can be set', () => {
 test.describe('Updates check is properly intercepted', () => {
     test('if there is nothing to show', async ({browser}) => {
         let page = await openCookieClickerPage(browser);
-        await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-        await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
+        await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
+        await page.waitForFunction(() => Game.T > Game.fps * 60 * 60);
         expect(await page.evaluate(() => document.getElementById("alert")?.style.display)).toEqual("");
         await page.close();
     });
 
     test('displaying an alert', async ({browser}) => {
         let page = await openCookieClickerPage(browser, {updatesResponse: 'alert|Hello!'});
-        await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-        await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
+        await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
+        await page.waitForFunction(() => Game.T > Game.fps * 60 * 60);
         expect(await page.evaluate(() => document.getElementById("alert")?.innerHTML)).toEqual("Hello!");
         expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
         await page.close();
@@ -62,8 +62,8 @@ test.describe('Updates check is properly intercepted', () => {
 
     test('informing new version', async ({browser}) => {
         let page = await openCookieClickerPage(browser, {updatesResponse: '2.71828|Logarithms!'});
-        await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-        await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
+        await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
+        await page.waitForFunction(() => Game.T > Game.fps * 60 * 60);
         expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
             expect.stringContaining('New version available')
         );
@@ -75,17 +75,19 @@ test.describe('Updates check is properly intercepted', () => {
 test('Updates check can be changed dynamically', async ({browser}) => {
     let updatesResponse = '2.027|Old version';
     let page = await openCookieClickerPage(browser, {updatesResponse: () => updatesResponse});
-    await page.evaluate(() => Game.T = Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > Game.fps * 30 * 60 + 1);
+    await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
+    await page.waitForFunction(() => Game.T > Game.fps * 60 * 60 + 1);
     // Nothing changes because it is an old version
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("");
+
     updatesResponse = '3.141592|Circles!';
-    await page.evaluate(() => Game.T = 2 * Game.fps * 30 * 60 - 1);
-    await page.waitForFunction(() => Game.T > 2 * Game.fps * 30 * 60 + 1);
+    await page.evaluate(() => CConnoisseur.warpTimeToFrame(2 * Game.fps * 60 * 60 - 1));
+    await page.waitForFunction(() => Game.T > 2 * Game.fps * 60 * 60 + 1);
     // Now things change because it is a new version
     expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
         expect.stringContaining('New version available')
     );
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
+
     await page.close();
 });
