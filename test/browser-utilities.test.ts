@@ -139,3 +139,28 @@ test.describe('Lumps are gained', () => {
         expect(await page.evaluate(() => Game.Objects['Cursor'].level)).toEqual(1);
     });
 });
+
+test.describe('Time can be warped', () => {
+    test('by advancing both Game.T and Date.now', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        let fps = await page.evaluate(() => Game.fps);
+        await page.evaluate(t => CConnoisseur.warpTimeToFrame(t), 30 * fps);
+        expect(await page.evaluate(() => Game.T)).toBeGreaterThanOrEqual(30 * fps);
+        expect(await page.evaluate(() => Date.now())).toBeGreaterThanOrEqual(1.6e12 + 30000);
+    });
+
+    test('triggering the check hook', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => Game.registerHook('check', () => {(window as any).test = true}));
+        await page.evaluate(() => CConnoisseur.warpTimeToFrame(30 * Game.fps - 1));
+        await page.waitForFunction(() => Game.T > 30 * Game.fps);
+        expect(await page.evaluate(() => (window as any).test)).toBe(true);
+    });
+
+    test('without triggering save games', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.warpTimeToFrame(60 * Game.fps - 1));
+        await page.waitForFunction(() => Game.T > 60 * Game.fps);
+        expect(await page.evaluate(() => localStorage.getItem('CookieClickerGame'))).toBeNull();
+    });
+});

@@ -70,3 +70,32 @@ only in the browser environment.
     so that all lump-related abilities
     (like leveling up buildings)
     can be used right after `CConnoisseur.gainLumps`.
+
+-   `warpTimeToFrame: (frame: number) => void`
+    Sets the variable `Game.T` to `frame`,
+    advances `Game.mockedDate` by the corresponding amount,
+    and sets `Game.prefs.autosave` to `0` if there are no save games.
+    It silently does nothing if `Game.T >= frame`.
+
+    `Game.T` is essentially a frame counter.
+    It is set to zero on initialization, game loading, ascension and wipe save,
+    and incremented by one every frame (`1000/Game.fps` ms).
+    It is one of the things Cookie Clicker used by Cookie Clicker to keep track of time
+    (the other one being `Date.now()`).
+    For example, the `check` hook is run whenever `Game.T` is a multiple of `5 * Game.fps`,
+    resulting in one check every 5 seconds.
+
+    Note that this function does _not_ add cookies, tick minigames etc.,
+    just `Game.T` and `Date.now()` are forwarded in time.
+
+    Caution regarding save games:
+    if Cookie Clicker fails to load a save game at the very beginning,
+    it will try to load the save game again 500ms later.
+    Therefore, if the test started without save games,
+    no game should be saved between the game loading and this 500ms window passing,
+    lest `Game.T` will be reset to `0` again.
+    This is why `warpTimeToFrame` sets `Game.prefs.autosave` to `0` if there are no save games;
+    the game saves once per minute,
+    so by calling e.g. `Game.warpTimeToFrame(60 * Game.fps - 1)` in the beginning of a test
+    a save game could be written within the 500ms window
+    if `Game.prefs.autosave` wasn't set to `0`.

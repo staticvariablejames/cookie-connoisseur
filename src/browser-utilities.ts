@@ -71,10 +71,24 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         Game.gainLumps(lumpsToGain);
     }
 
+    let warpTimeToFrame = (frame: number) => {
+        let deltaFrames = frame - Game.T;
+        if(deltaFrames <= 0) {
+            // Nothing to skip
+            return;
+        }
+        Game.T = frame;
+        CConnoisseur.mockedDate += Math.round(1000 * deltaFrames / Game.fps);
+        if(!window.localStorage.getItem('CookieClickerGame')) {
+            Game.prefs.autosave = 0;
+        }
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
         setSliderValue,
         gainLumps,
+        warpTimeToFrame,
     };
 }
