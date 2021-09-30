@@ -64,7 +64,7 @@ Available options:
 
 The first three options
 (`heralds`, `grandmaNames` and `updatesResponse`)
-are updated by the game every 30 minutes,
+are updated by the game every 60 minutes,
 querying an appropriate page.
 If you provide a function for these options,
 the function will be called every time it is needed,
