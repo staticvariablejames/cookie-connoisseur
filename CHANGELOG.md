@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 0.2.0 - 2021-10-01
 - Added: Explicit support for Firefox.
 - Added: Browser utility `CConnoisseur.gainLumps`.
 - Added: Browser utility `CConnoisseur.warpTimeToFrame`.
