@@ -99,3 +99,11 @@ only in the browser environment.
     so by calling e.g. `Game.warpTimeToFrame(60 * Game.fps - 1)` in the beginning of a test
     a save game could be written within the 500ms window
     if `Game.prefs.autosave` wasn't set to `0`.
+
+-   `ascend: () => void`
+    Ascends, skipping the ascension animation and stopping at the legacy upgrade tree.
+    It does nothing if it is already on the ascension screen.
+
+-   `reincarnate: () => void`
+    Reincarnates, skipping the reincarnation animation.
+    It does nothing if it is already out the ascension screen.

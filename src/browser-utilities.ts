@@ -84,11 +84,32 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         }
     }
 
+    let ascend = () => {
+        if(Game.AscendTimer > 0 || Game.OnAscend) {
+            // Already ascending, nothing to do
+            return;
+        }
+        Game.Ascend(true);
+        Game.AscendTimer=Game.AscendDuration;
+        Game.UpdateAscendIntro();
+    }
+
+    let reincarnate = () => {
+        if(Game.ReincarnateTimer > 0 || !Game.OnAscend) {
+            return;
+        }
+        Game.Reincarnate(true);
+        Game.ReincarnateTimer = Game.ReincarnateDuration;
+        Game.UpdateReincarnateIntro();
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
         setSliderValue,
         gainLumps,
         warpTimeToFrame,
+        ascend,
+        reincarnate,
     };
 }

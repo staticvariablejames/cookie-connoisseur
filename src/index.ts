@@ -8,5 +8,7 @@ declare global {
         setSliderValue: (e: Element, value: number) => number,
         gainLumps: (lumpsToGain: number) => void,
         warpTimeToFrame: (frame: number) => void,
+        ascend: () => void,
+        reincarnate: () => void,
     };
 }

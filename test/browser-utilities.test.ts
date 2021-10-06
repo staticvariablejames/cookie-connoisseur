@@ -164,3 +164,62 @@ test.describe('Time can be warped', () => {
         expect(await page.evaluate(() => localStorage.getItem('CookieClickerGame'))).toBeNull();
     });
 });
+
+test.describe('Ascend, reincarnate:', () => {
+    test('Ascends under normal conditions', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.ascend());
+        await expect(await page.locator('#heavenlyUpgrade363')).toBeVisible();
+        expect(await page.evaluate(() => Game.OnAscend)).toBeTruthy();
+        await page.close();
+    });
+
+    test('Ascending twice does nothing', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.ascend());
+        await page.evaluate(() => CConnoisseur.ascend());
+        await expect(await page.locator('#heavenlyUpgrade363')).toBeVisible();
+        expect(await page.evaluate(() => Game.OnAscend)).toBeTruthy();
+        await page.close();
+    });
+
+    test('Autoascending while manually ascending does nothing', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.click('text=Legacy');
+        await page.click('text=Yes!');
+        await page.evaluate(() => CConnoisseur.ascend());
+        expect(await page.evaluate(() => Game.AscendTimer)).toBeGreaterThan(0);
+        expect(await page.evaluate(() => Game.OnAscend)).toBeFalsy();
+        await page.close();
+    });
+
+    test('Reincarnates under normal conditions', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.ascend());
+        await page.evaluate(() => CConnoisseur.reincarnate());
+        await expect(await page.locator('#bigCookie')).toBeVisible();
+        expect(await page.evaluate(() => Game.OnAscend)).toBeFalsy();
+        await page.close();
+    });
+
+    test('Reincarnating twice does nothing', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.ascend());
+        await page.evaluate(() => CConnoisseur.reincarnate());
+        await page.evaluate(() => CConnoisseur.reincarnate());
+        await expect(await page.locator('#bigCookie')).toBeVisible();
+        expect(await page.evaluate(() => Game.OnAscend)).toBeFalsy();
+        await page.close();
+    });
+
+    test('Reincarnating before ascending does nothing', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => Game.Earn(1));
+        await page.evaluate(() => CConnoisseur.reincarnate());
+        await expect(await page.locator('#bigCookie')).toBeVisible();
+        expect(await page.evaluate(() => Game.AscendTimer)).toBe(0);
+        expect(await page.evaluate(() => Game.OnAscend)).toBeFalsy();
+        expect(await page.evaluate(() => Game.cookies)).toBe(1);
+        await page.close();
+    });
+});
