@@ -78,6 +78,7 @@ test('News ticker gets cleared', async ({ browser }) => {
     await page.evaluate(() => window.CConnoisseur.clearNewsTickerText());
     let tickerText = await page.evaluate(() => Game.tickerL.innerText + Game.tickerBelowL.innerText);
     expect(tickerText.trim()).toEqual('');
+    await page.close();
 });
 
 test('Range inputs get slided', async ({ browser }) => {
@@ -85,6 +86,7 @@ test('Range inputs get slided', async ({ browser }) => {
     await page.click('text=Options');
     await page.$eval('text=Volume50% >> input', e => CConnoisseur.setSliderValue(e, 15));
     expect(await page.evaluate(() => Game.volume)).toEqual(15);
+    await page.close();
 });
 
 test.describe('Lumps are gained', () => {
@@ -94,6 +96,7 @@ test.describe('Lumps are gained', () => {
         expect(await page.evaluate(() => Game.lumps)).toEqual(1);
         expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e9);
         expect(await page.evaluate(() => Game.canLumps())).toBe(true);
+        await page.close();
     });
 
     test('if I have some cookies', async ({ browser }) => {
@@ -103,6 +106,7 @@ test.describe('Lumps are gained', () => {
         await page.evaluate(() => CConnoisseur.gainLumps(2));
         expect(await page.evaluate(() => Game.lumps)).toEqual(2);
         expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e9);
+        await page.close();
     });
 
     test('if I have plenty of cookies', async ({ browser }) => {
@@ -112,6 +116,7 @@ test.describe('Lumps are gained', () => {
         await page.evaluate(() => CConnoisseur.gainLumps(4));
         expect(await page.evaluate(() => Game.lumps)).toEqual(4);
         expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e10);
+        await page.close();
     });
 
     test('if I already have lumps', async ({ browser }) => {
@@ -124,6 +129,7 @@ test.describe('Lumps are gained', () => {
         expect(await page.evaluate(() => Game.lumps)).toEqual(15);
         expect(await page.evaluate(() => Game.lumpsTotal)).toEqual(16);
         expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e10);
+        await page.close();
     });
 
     test('and immediately allow leveling buildings up', async ({ browser }) => {
@@ -137,6 +143,8 @@ test.describe('Lumps are gained', () => {
 
         await page.evaluate(() => {CConnoisseur.gainLumps(1); Game.Objects['Cursor'].levelUp();});
         expect(await page.evaluate(() => Game.Objects['Cursor'].level)).toEqual(1);
+
+        await page.close();
     });
 });
 
@@ -147,6 +155,7 @@ test.describe('Time can be warped', () => {
         await page.evaluate(t => CConnoisseur.warpTimeToFrame(t), 30 * fps);
         expect(await page.evaluate(() => Game.T)).toBeGreaterThanOrEqual(30 * fps);
         expect(await page.evaluate(() => Date.now())).toBeGreaterThanOrEqual(1.6e12 + 30000);
+        await page.close();
     });
 
     test('triggering the check hook', async ({ browser }) => {
@@ -155,6 +164,7 @@ test.describe('Time can be warped', () => {
         await page.evaluate(() => CConnoisseur.warpTimeToFrame(30 * Game.fps - 1));
         await page.waitForFunction(() => Game.T > 30 * Game.fps);
         expect(await page.evaluate(() => (window as any).test)).toBe(true);
+        await page.close();
     });
 
     test('without triggering save games', async ({ browser }) => {
@@ -162,6 +172,7 @@ test.describe('Time can be warped', () => {
         await page.evaluate(() => CConnoisseur.warpTimeToFrame(60 * Game.fps - 1));
         await page.waitForFunction(() => Game.T > 60 * Game.fps);
         expect(await page.evaluate(() => localStorage.getItem('CookieClickerGame'))).toBeNull();
+        await page.close();
     });
 });
 
