@@ -10,5 +10,6 @@ declare global {
         warpTimeToFrame: (frame: number) => void,
         ascend: () => void,
         reincarnate: () => void,
+        redrawMarketMinigame: () => void,
     };
 }

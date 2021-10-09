@@ -2,7 +2,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { CCPageOptions, openCookieClickerPage } from '../src/index';
+import { CCPageOptions, CCSave, openCookieClickerPage } from '../src/index';
 
 test('The game always starts on 2020', async({ browser }) => {
     let page = await openCookieClickerPage(browser);
@@ -231,6 +231,66 @@ test.describe('Ascend, reincarnate:', () => {
         expect(await page.evaluate(() => Game.AscendTimer)).toBe(0);
         expect(await page.evaluate(() => Game.OnAscend)).toBeFalsy();
         expect(await page.evaluate(() => Game.cookies)).toBe(1);
+        await page.close();
+    });
+});
+
+test.describe('The market redraws', () => {
+    let saveGame = CCSave.fromObject({
+        buildings: {
+            "Bank": {
+                amount: 156,
+                level: 1,
+            },
+        },
+    });
+
+    test('the good panels', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame});
+        let bankGoodPanel = await page.$('#bankGood-3');
+
+        await page.evaluate(() => {
+            Game.Objects['Bank'].minigame.goods['Bank'].val = 21.72;
+            Game.Objects['Bank'].minigame.goods['Bank'].vals[0] = 21.72;
+            Game.Objects['Bank'].minigame.goods['Bank'].vals[1] = 22.72;
+            Game.Objects['Bank'].minigame.goods['Bank'].d = -0.75;
+            Game.Objects['Bank'].minigame.goods['Bank'].stock = 86;
+            CConnoisseur.redrawMarketMinigame();
+        });
+
+        expect(await bankGoodPanel!.screenshot()).toMatchSnapshot('redrawnBankPanel.png');
+        await page.close();
+    });
+
+    test('the office status', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame});
+        let officeName = await page.locator('#bankOfficeName');
+        let firstLoan = await page.locator('#bankLoan1');
+
+        await page.evaluate(() => {
+            Game.Objects['Bank'].minigame.goods['Bank'].val = 21.72;
+            Game.Objects['Bank'].minigame.goods['Bank'].vals[0] = 21.72;
+            Game.Objects['Bank'].minigame.goods['Bank'].vals[1] = 22.72;
+            Game.Objects['Bank'].minigame.goods['Bank'].d = -0.75;
+            Game.Objects['Bank'].minigame.goods['Bank'].stock = 86;
+
+            Game.Objects['Bank'].minigame.officeLevel = 2;
+            CConnoisseur.redrawMarketMinigame();
+        });
+        expect(await officeName.innerText()).toEqual('Loaning company');
+        await expect(firstLoan).toBeVisible();
+        await page.close();
+    });
+
+    test("without crashing if there's no stock market", async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.redrawMarketMinigame());
+        await page.pause();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Bank']))).toBeFalsy();
+
+        await page.evaluate(() => Game.Objects['Bank'].getFree(156));
+        await page.evaluate(() => CConnoisseur.redrawMarketMinigame());
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Bank']))).toBeFalsy();
         await page.close();
     });
 });

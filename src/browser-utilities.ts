@@ -103,6 +103,17 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         Game.UpdateReincarnateIntro();
     }
 
+    let redrawMarketMinigame = () => {
+        // TODO: remove the "as any" as soon as @types/cookieclicker is fixed
+        if(!(Game.isMinigameReady(Game.Objects['Bank']) as any)) return;
+
+        let M = Game.Objects['Bank'].minigame;
+        M.toRedraw = 1;
+        M.lastTickDrawn = M.ticks - 2;
+        Game.drawT += 10 - (Game.drawT % 10); // Forces Game.drawT % 10 == 0
+        M.draw!();
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
@@ -111,5 +122,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         warpTimeToFrame,
         ascend,
         reincarnate,
+        redrawMarketMinigame,
     };
 }

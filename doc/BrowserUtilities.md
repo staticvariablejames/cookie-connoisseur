@@ -107,3 +107,11 @@ only in the browser environment.
 -   `reincarnate: () => void`
     Reincarnates, skipping the reincarnation animation.
     It does nothing if it is already out the ascension screen.
+
+-   `redrawMarketMinigame: () => void`
+    Forces the stock market to redraw all of its good panels and data like office level.
+
+    In order to force a full redraw,
+    this function increases `Game.drawT` a few times.
+
+    Nothing happens if the minigame hasn't loaded.
