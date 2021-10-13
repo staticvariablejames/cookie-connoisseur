@@ -3,6 +3,7 @@
 ## Unreleased
 - Added: Browser utilities `CConnoisseur.ascend` and `CConnoisseur.reincarnate`.
 - Added: Browser utility `CConnoisseur.redrawBankMinigame`.
+- Added: Browser utility `CConnoisseur.startGrandmapocalypse`.
 
 ## 0.2.0 - 2021-10-01
 - Added: Explicit support for Firefox.

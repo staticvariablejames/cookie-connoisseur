@@ -294,3 +294,96 @@ test.describe('The market redraws', () => {
         await page.close();
     });
 });
+
+test.describe('startGrandmapocalypse', () => {
+    test('starts the grandmapocalypse', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.startGrandmapocalypse());
+        expect(await page.evaluate(() => Game.elderWrath)).toEqual(1);
+        await page.close();
+    });
+
+    test('changes nothing if the grandmapocalypse is already going', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame: {
+            // Minimal Communal Brainsweep configuration
+            "elderWrath": 2,
+            "buildings": {
+                "Grandma": {
+                    "amount": 6,
+                },
+            },
+            "ownedUpgrades": [
+                "One mind",
+                "Communal brainsweep",
+            ],
+            "unlockedUpgrades": [
+                "Arcane sugar",
+            ],
+            "achievements": [
+                "Elder",
+            ],
+        }});
+        await page.evaluate(() => CConnoisseur.startGrandmapocalypse());
+        expect(await page.evaluate(() => Game.elderWrath)).toEqual(2);
+        await page.close();
+    });
+
+    test('restarts the grandmapocalypse if under Elder Pledge', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame: {
+            "elderWrath": 0,
+            "pledgeT": 54000,
+            "buildings": {
+                "Grandma": {
+                    "amount": 6,
+                },
+            },
+            "ownedUpgrades": [
+                "One mind",
+                "Communal brainsweep",
+                "Elder Pact",
+                "Elder Pledge",
+            ],
+            "unlockedUpgrades": [
+                "Elder Covenant",
+            ],
+            "achievements": [
+                "Elder",
+            ],
+        }});
+        expect(await page.evaluate(() => Game.elderWrath)).toEqual(0);
+        await page.evaluate(() => CConnoisseur.startGrandmapocalypse());
+
+        /* there's a 0.1% chance that the Elder wrath increases each logic tick,
+         * so we cannot compare elderWrath with 1.
+         */
+        expect(await page.evaluate(() => Game.elderWrath)).toBeGreaterThan(0);
+        await page.close();
+    });
+
+    test('restarts the grandmapocalypse if under Elder Covenant', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame: {
+            "elderWrath": 0,
+            "buildings": {
+                "Grandma": {
+                    "amount": 6,
+                },
+            },
+            "ownedUpgrades": [
+                "One mind",
+                "Communal brainsweep",
+                "Elder Pact",
+                "Elder Covenant"
+            ],
+            "unlockedUpgrades": [
+                "Revoke Elder Covenant",
+            ],
+            "achievements": [
+                "Elder",
+            ],
+        }});
+        expect(await page.evaluate(() => Game.elderWrath)).toEqual(0);
+        await page.evaluate(() => CConnoisseur.startGrandmapocalypse());
+        expect(await page.evaluate(() => Game.elderWrath)).toBeGreaterThan(0);
+        await page.close();
+    });
+});

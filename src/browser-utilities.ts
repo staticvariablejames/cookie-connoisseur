@@ -114,6 +114,29 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         M.draw!();
     }
 
+    let startGrandmapocalypse = () => {
+        if(Game.elderWrath > 0) return;
+
+        if(Game.Objects['Grandma'].amount < 1) Game.Objects['Grandma'].getFree(1);
+
+        if(!Game.Has('One mind')) {
+            Game.Upgrades['One mind'].earn();
+        }
+        if(Game.Has('Elder Pledge')) {
+            Game.Upgrades['Elder Covenant'].earn();
+            // Fall-through!
+        }
+        if(Game.Has('Elder Covenant')) {
+            Game.Upgrades['Revoke Elder Covenant'].earn();
+
+            /* One Mind forces Game.elderWrath to be 1 upon purchase,
+             * but Pledge/Covenant don't (they wait for Game.UpdateGrandmapocalypse()).
+             * So we have to do it manually.
+             */
+            Game.elderWrath = 1;
+        }
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
@@ -123,5 +146,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         ascend,
         reincarnate,
         redrawMarketMinigame,
+        startGrandmapocalypse,
     };
 }

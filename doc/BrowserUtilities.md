@@ -115,3 +115,10 @@ only in the browser environment.
     this function increases `Game.drawT` a few times.
 
     Nothing happens if the minigame hasn't loaded.
+
+-   `startGrandmapocalypse: () => void`
+    Perform the necessary tasks to start the Grandmapocalypse.
+
+    If needed,
+    it will purchase a grandma, One Mind, and revoke the Elder Covenant.
+    Nothing happens if the Grandmapocalypse already started.

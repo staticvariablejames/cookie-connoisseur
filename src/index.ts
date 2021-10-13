@@ -11,5 +11,6 @@ declare global {
         ascend: () => void,
         reincarnate: () => void,
         redrawMarketMinigame: () => void,
+        startGrandmapocalypse: () => void,
     };
 }
