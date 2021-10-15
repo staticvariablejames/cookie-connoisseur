@@ -434,3 +434,96 @@ test.describe('Reindeer can be force-spawned', () => {
         await page.close();
     });
 });
+
+test.describe('Making wrinklers forcefully', () => {
+    test('pop works', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame: {
+            elderWrath: 1,
+            wrinklers: {
+                number: 2, // Two wrinklers
+                amount: 2, // One cookie inside each wrinkler
+            },
+            buildings: {
+                Grandma: {
+                    amount: 1,
+                },
+            },
+            ownedUpgrades: [
+                "One mind",
+            ],
+            unlockedUpgrades: [
+                "Exotic nuts",
+            ],
+        }});
+
+        expect(await page.evaluate(() => Game.wrinklers[0].phase)).toEqual(2);
+        expect(await page.evaluate(() => Game.wrinklers[1].phase)).toEqual(2);
+
+        expect(await page.evaluate(() => CConnoisseur.popWrinkler(0))).toBe(true);
+        expect(await page.evaluate(() => Game.wrinklers[0].phase)).toEqual(0);
+        expect(await page.evaluate(() => Game.wrinklersPopped)).toEqual(1);
+
+        expect(await page.evaluate(() => CConnoisseur.popWrinkler(1))).toBe(true);
+        expect(await page.evaluate(() => Game.wrinklers[1].phase)).toEqual(0);
+        expect(await page.evaluate(() => Game.wrinklersPopped)).toEqual(2);
+
+        expect(await page.evaluate(() => CConnoisseur.popWrinkler(2))).toBe(false);
+        expect(await page.evaluate(() => Game.wrinklersPopped)).toEqual(2);
+        await page.close();
+    });
+
+    test('pop fails if wrong wrinkler', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.startGrandmapocalypse());
+        expect(await page.evaluate(() => CConnoisseur.popWrinkler(0))).toBe(false);
+        expect(await page.evaluate(() => CConnoisseur.popWrinkler(-1))).toBe(false);
+        expect(await page.evaluate(() => CConnoisseur.popWrinkler(13))).toBe(false);
+        await page.close();
+    });
+
+    test('spawn works in the grandmapocalypse', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.startGrandmapocalypse());
+        let wrinklerId: number = await page.evaluate(() => CConnoisseur.spawnWrinkler());
+        expect(wrinklerId).not.toBe(-1);
+
+        expect(await page.evaluate(id => Game.wrinklers[id].phase, wrinklerId)).toEqual(2);
+        expect(await page.evaluate(id => CConnoisseur.popWrinkler(id), wrinklerId)).toBe(true);
+        expect(await page.evaluate(() => Game.wrinklersPopped)).toEqual(1);
+
+        wrinklerId = await page.evaluate(() => CConnoisseur.spawnWrinkler(5));
+        expect(wrinklerId).toBe(5);
+        await page.close();
+    });
+
+    test('spawn fails outside the grandmapocalypse', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        let wrinklerId: number = await page.evaluate(() => CConnoisseur.spawnWrinkler());
+        expect(wrinklerId).toBe(-1);
+        await page.close();
+    });
+
+    test('spawn fails if too many wrinklers exist', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {saveGame: {
+            elderWrath: 1,
+            wrinklers: {
+                number: 10,
+                amount: 10,
+            },
+            buildings: {
+                Grandma: {
+                    amount: 1,
+                },
+            },
+            ownedUpgrades: [
+                "One mind",
+            ],
+            unlockedUpgrades: [
+                "Exotic nuts",
+            ],
+        }});
+        let wrinklerId: number = await page.evaluate(() => CConnoisseur.spawnWrinkler());
+        expect(wrinklerId).toBe(-1);
+        await page.close();
+    });
+});

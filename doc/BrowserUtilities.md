@@ -130,3 +130,28 @@ only in the browser environment.
     the spawned reindeer is a spawn lead,
     which is accounted for the `Game.reindeerClicked` tally when popped.
     Explicitly pass `false` as the argument to disable this.
+
+-   `spawnWrinkler: (id?: number) => number`
+    Spawns a wrinkler.
+    If `id` is provided,
+    this is the wrinkler id that will be used
+    (the index in `Game.wrinklers`);
+    otherwise, a random one is chosen among the available ones.
+
+    The spawned wrinkler will be set to be already sucking cookies,
+    so popping it counts towards `Game.wrinklersPopped`.
+
+    On success, it returns the wrinkler id.
+    On failure
+    (outside the grandmapocalypse,
+    all wrinkler spots already taken,
+    or invalid id),
+    returns -1.
+
+-   `popWrinkler: (id: number) => boolean`
+    Pops the wrinkler with the given id,
+    returning true in case of success and false otherwise
+    (invalid id, or the given wrinkler is already dead).
+
+    This function automatically calls `Game.UpdateWrinklers()`,
+    to make sure the wrinkler dies and the wrinkler death events are processed.

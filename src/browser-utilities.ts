@@ -146,6 +146,33 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         return reindeer;
     }
 
+    let spawnWrinkler = (id?: number) => {
+        if(Game.elderWrath <= 0) return -1;
+
+        let wrinkler;
+        if(id) {
+            wrinkler = Game.SpawnWrinkler(Game.wrinklers[id]);
+        } else {
+            wrinkler = Game.SpawnWrinkler();
+        }
+        if(typeof wrinkler == 'boolean') {
+            return -1;
+        }
+        wrinkler.close = 0;
+        wrinkler.phase = 2;
+        return wrinkler.id;
+    }
+
+    let popWrinkler = (id: number) => {
+        if(!(id in Game.wrinklers)) return false;
+        let wrinkler = Game.wrinklers[id];
+        if(wrinkler.phase == 0) return false;
+
+        wrinkler.hp = -1;
+        Game.UpdateWrinklers();
+        return true;
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
@@ -157,5 +184,7 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         redrawMarketMinigame,
         startGrandmapocalypse,
         spawnReindeer,
+        spawnWrinkler,
+        popWrinkler,
     };
 }

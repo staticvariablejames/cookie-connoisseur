@@ -13,5 +13,7 @@ declare global {
         redrawMarketMinigame: () => void,
         startGrandmapocalypse: () => void,
         spawnReindeer: (spawnLead?: boolean) => Game.Shimmer,
+        spawnWrinkler: (id?: number) => number,
+        popWrinkler: (id: number) => boolean,
     };
 }
