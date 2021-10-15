@@ -387,3 +387,48 @@ test.describe('startGrandmapocalypse', () => {
         await page.close();
     });
 });
+
+test.describe('Reindeer can be force-spawned', () => {
+    /* TODO: remove the "null as any" arguments to Game.shimmers.prototype.pop
+     * once the typings are fixed in @types/cookieclicker
+     */
+    test('during Christmas', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {mockedDate: Date.UTC(2020, 11, 25)});
+        expect(await page.evaluate(() => Game.season)).toEqual('christmas');
+        await page.evaluate(() => CConnoisseur.spawnReindeer());
+        expect(await page.evaluate(() => Game.shimmers.length)).toEqual(1);
+        expect(await page.evaluate(() => Game.shimmers[0].type)).toEqual('reindeer');
+        await page.close();
+    });
+
+    test('outside Christmas', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        expect(await page.evaluate(() => Game.season)).not.toEqual('christmas');
+        await page.evaluate(() => CConnoisseur.spawnReindeer());
+        expect(await page.evaluate(() => Game.shimmers.length)).toEqual(1);
+        expect(await page.evaluate(() => Game.shimmers[0].type)).toEqual('reindeer');
+        await page.close();
+    });
+
+    test('and immediately popped afterwards', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.spawnReindeer().pop(null as any));
+        expect(await page.evaluate(() => Game.shimmers.length)).toEqual(0);
+        expect(await page.evaluate(() => Game.cookies)).toEqual(25);
+        await page.close();
+    });
+
+    test('being spawn leads by default', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+
+        await page.evaluate(() => CConnoisseur.spawnReindeer().pop(null as any));
+        expect(await page.evaluate(() => Game.reindeerClicked)).toEqual(1);
+
+        await page.evaluate(() => CConnoisseur.spawnReindeer(false).pop(null as any));
+        expect(await page.evaluate(() => Game.reindeerClicked)).toEqual(1);
+
+        await page.evaluate(() => CConnoisseur.spawnReindeer(true).pop(null as any));
+        expect(await page.evaluate(() => Game.reindeerClicked)).toEqual(2);
+        await page.close();
+    });
+});

@@ -12,5 +12,6 @@ declare global {
         reincarnate: () => void,
         redrawMarketMinigame: () => void,
         startGrandmapocalypse: () => void,
+        spawnReindeer: (spawnLead?: boolean) => Game.Shimmer,
     };
 }

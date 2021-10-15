@@ -122,3 +122,11 @@ only in the browser environment.
     If needed,
     it will purchase a grandma, One Mind, and revoke the Elder Covenant.
     Nothing happens if the Grandmapocalypse already started.
+
+-   `spawnReindeer: (spawnLead?: boolean) => Game.Shimmer`
+    Spawns a reindeer,
+    even if it is not Christmas.
+    By default,
+    the spawned reindeer is a spawn lead,
+    which is accounted for the `Game.reindeerClicked` tally when popped.
+    Explicitly pass `false` as the argument to disable this.
