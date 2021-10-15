@@ -247,6 +247,7 @@ test.describe('The market redraws', () => {
 
     test('the good panels', async ({ browser }) => {
         let page = await openCookieClickerPage(browser, {saveGame});
+        await page.waitForFunction(() => Game.isMinigameReady(Game.Objects['Bank']));
         let bankGoodPanel = await page.$('#bankGood-3');
 
         await page.evaluate(() => {
@@ -264,6 +265,7 @@ test.describe('The market redraws', () => {
 
     test('the office status', async ({ browser }) => {
         let page = await openCookieClickerPage(browser, {saveGame});
+        await page.waitForFunction(() => Game.isMinigameReady(Game.Objects['Bank']));
         let officeName = await page.locator('#bankOfficeName');
         let firstLoan = await page.locator('#bankLoan1');
 
