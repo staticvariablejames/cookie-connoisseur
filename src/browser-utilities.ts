@@ -173,6 +173,13 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         return true;
     }
 
+    let clickBigCookie = () => {
+        Game.lastClick = Date.now() - 4; // Will be reset to Date.now() by Game.ClickCookie()
+        if(Game.T < 3) Game.T = 3;
+        // TODO: remove the "as any" when @types/cookieclicker fixes the type of Game.ClickCookie
+        (Game as any).ClickCookie();
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
@@ -186,5 +193,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         spawnReindeer,
         spawnWrinkler,
         popWrinkler,
+        clickBigCookie,
     };
 }

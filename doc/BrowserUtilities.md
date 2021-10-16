@@ -155,3 +155,10 @@ only in the browser environment.
 
     This function automatically calls `Game.UpdateWrinklers()`,
     to make sure the wrinkler dies and the wrinkler death events are processed.
+
+-   `clickBigCookie: () => void`
+    Clicks the Big Cookie.
+
+    Cookie Clicker has some mechanisms to prevent the big cookie from being clicked too often,
+    so clicking twice in a script means only the first click is registered.
+    Calling this method bypasses those restrictions.

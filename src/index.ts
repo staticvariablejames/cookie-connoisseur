@@ -15,5 +15,6 @@ declare global {
         spawnReindeer: (spawnLead?: boolean) => Game.Shimmer,
         spawnWrinkler: (id?: number) => number,
         popWrinkler: (id: number) => boolean,
+        clickBigCookie: () => void,
     };
 }

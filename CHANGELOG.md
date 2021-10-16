@@ -6,6 +6,7 @@
 - Added: Browser utility `CConnoisseur.startGrandmapocalypse`.
 - Added: Browser utility `CConnoisseur.spawnReindeer`.
 - Added: Browser utilities `CConnoisseur.spawnWrinkler` and `CConnoisseur.popWrinkler`.
+- Added: Browser utility `CConnoisseur.clickBigCookie`.
 
 ## 0.2.0 - 2021-10-01
 - Added: Explicit support for Firefox.

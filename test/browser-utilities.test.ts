@@ -527,3 +527,32 @@ test.describe('Making wrinklers forcefully', () => {
         await page.close();
     });
 });
+
+test.describe('The big cookie is clicked', () => {
+    test('counting towards Game.cookieClicks', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => CConnoisseur.clickBigCookie());
+        expect(await page.evaluate(() => Game.cookieClicks)).toEqual(1);
+        await page.close();
+    });
+
+    test('even if we call twice in succession', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => {
+            CConnoisseur.clickBigCookie();
+            CConnoisseur.clickBigCookie();
+        });
+        expect(await page.evaluate(() => Game.cookieClicks)).toEqual(2);
+        await page.close();
+    });
+
+    test('even if we call many times in succession', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        await page.evaluate(() => {
+            for(let i = 0; i < 150; i++)
+                CConnoisseur.clickBigCookie();
+        });
+        expect(await page.evaluate(() => Game.cookieClicks)).toEqual(150);
+        await page.close();
+    });
+});
