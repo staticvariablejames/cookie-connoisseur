@@ -259,6 +259,7 @@ test.describe('The market redraws', () => {
             CConnoisseur.redrawMarketMinigame();
         });
 
+        await page.evaluate(() => Game.CloseNotes());
         expect(await bankGoodPanel!.screenshot()).toMatchSnapshot('redrawnBankPanel.png');
         await page.close();
     });
