@@ -2,7 +2,7 @@
 
 ## Unreleased
 - Added: Browser utilities `CConnoisseur.ascend` and `CConnoisseur.reincarnate`.
-- Added: Browser utility `CConnoisseur.redrawBankMinigame`.
+- Added: Browser utility `CConnoisseur.redrawMarketMinigame`.
 - Added: Browser utility `CConnoisseur.startGrandmapocalypse`.
 - Added: Browser utility `CConnoisseur.spawnReindeer`.
 - Added: Browser utilities `CConnoisseur.spawnWrinkler` and `CConnoisseur.popWrinkler`.
