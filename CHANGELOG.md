@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 0.2.1 - 2021-11-27
 - Added: Browser utilities `CConnoisseur.ascend` and `CConnoisseur.reincarnate`.
 - Added: Browser utility `CConnoisseur.redrawMarketMinigame`.
 - Added: Browser utility `CConnoisseur.startGrandmapocalypse`.
