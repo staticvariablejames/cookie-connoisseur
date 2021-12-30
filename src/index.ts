@@ -16,5 +16,6 @@ declare global {
         spawnWrinkler: (id?: number) => number,
         popWrinkler: (id: number) => boolean,
         clickBigCookie: () => void,
+        closeNotes: () => void,
     };
 }

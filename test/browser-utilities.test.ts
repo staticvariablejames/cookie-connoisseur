@@ -557,3 +557,14 @@ test.describe('The big cookie is clicked', () => {
         await page.close();
     });
 });
+
+test('Notes are closed and prevented from being created', async ({ browser }) => {
+    let page = await openCookieClickerPage(browser);
+    await page.evaluate(() => Game.Notify('Test', 'test'));
+    expect(await page.evaluate(() => Game.Notes.length)).toEqual(1);
+    await page.evaluate(() => CConnoisseur.closeNotes());
+    expect(await page.evaluate(() => Game.Notes.length)).toEqual(0);
+    await page.evaluate(() => Game.Notify('Test', 'test'));
+    expect(await page.evaluate(() => Game.Notes.length)).toEqual(0);
+    await page.close();
+});

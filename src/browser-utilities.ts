@@ -180,6 +180,11 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         (Game as any).ClickCookie();
     }
 
+    let closeNotes = () => {
+        Game.CloseNotes();
+        Game.Notify = () => {};
+    }
+
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
@@ -194,5 +199,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         spawnWrinkler,
         popWrinkler,
         clickBigCookie,
+        closeNotes,
     };
 }

@@ -162,3 +162,12 @@ only in the browser environment.
     Cookie Clicker has some mechanisms to prevent the big cookie from being clicked too often,
     so clicking twice in a script means only the first click is registered.
     Calling this method bypasses those restrictions.
+
+-   `closeNotes: () => void`
+    Close all notes (created with `Game.Notify`)
+    and replaces `Game.Notify` with an empty function.
+
+    This is intended for snapshot testing.
+    It prevents notifications
+    (from getting achievements, for example)
+    from randomly modifying the screenshot.
