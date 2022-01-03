@@ -4,6 +4,7 @@ CCSave
 **[Example](#example-script) |
 [API](#api) |
 [Attributes](#attributes) |
+[Mod data](#mod-data) |
 [Executables](#executables) |
 [Idiosyncrasies](#idiosyncrasies)**
 
@@ -210,6 +211,29 @@ but since storing a `JSON.stringify`ed object is common practice,
 the `modSaveData` attribute also accepts objects (like the output of `JSON.stringify`).
 
 
+Mod Data
+========
+
+Cookie Clicker allows mods to store data in the save file.
+This data is available in the `modSaveData` attribute both in the game and in the `CCSave` object.
+
+Because Cookie Clicker only allows other mods to save a single string,
+I expect most mods to `JSON.stringify` an object containing all the save data.
+For convenience,
+`CCSave.toNativeSave` accepts any object instead of a string,
+and `JSON.stringify`es it before converting.
+Similarly,
+`CCSave.fromNativeSave` attemtps to `JSON.parse` the save data,
+keeping them as strings in case of failure.
+
+Sometimes,
+when importing save strings,
+Cookie Clicker messes up when parsing the mod IDs
+and appends an extra "mod" with ID `""` or `"\u0000"`.
+This "mod" is then saved back to the save game.
+`CCSave.fromNativeSave` silently discards these "mods".
+
+
 Executables
 ===========
 
@@ -237,6 +261,10 @@ Idiosyncrasies
 To accomodate for some quirks of the game,
 some parts of `CCSave.fromNativeSave`, `CCSave.toNativeSave` and `CCSave.fromObject`
 behave idiosyncratically.
+
+-   As discussed [above](#mod-data),
+    CCSave lightly tinkers with mod data,
+    for convenience.
 
 -   Cookie Clicker has a bug in `minigamePantheon.js`, function `M.slotGod`.
     When slotting a spirit from the roster into an occuppied slot,
