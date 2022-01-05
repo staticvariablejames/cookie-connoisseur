@@ -23,7 +23,8 @@ a specific seed,
 with the option to display crates on the Stats menu,
 one Temple,
 the Pantheon minigame unlocked,
-and Rigidel slotted in the diamond slot.
+Rigidel slotted in the diamond slot,
+and 20 hours left of a 24-hour sugar blessing buff.
 
 ```javascript
 ...
@@ -34,6 +35,11 @@ and Rigidel slotted in the diamond slot.
     save.buildings['Temple'].amount = 1;
     save.buildings['Temple'].level = 1;
     save.buildings['Temple'].minigame.diamondSlot = 'order';
+    save.buffs.push({
+        name: 'sugar blessing',
+        maxTime: 24*3600*30, // 86400 seconds * fps
+        time: 20*3600*30,
+    });
 
     // Or, equivalently:
     save = CCSave.fromObject({
@@ -52,6 +58,13 @@ and Rigidel slotted in the diamond slot.
                 },
             },
         },
+        buffs: [
+            {
+                name: 'sugar blessing',
+                maxTime: 24*3600*30, // 86400 seconds * fps
+                time: 20*3600*30,
+            },
+        ],
     });
 
     let page = await openCookieClickerPage(browser, {
