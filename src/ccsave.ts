@@ -818,6 +818,11 @@ export class CCBuildingsData { // Aggregates all buildings
                 targetBuilding.highest = targetBuilding.amount;
             }
 
+            /* Code to make dealing with minigames a bit more convenient.
+             * The idea is to always have a default-constructed minigame object,
+             * which can be modified later,
+             * unless it was explicitly set to null.
+             */
             type minigameT<T> = {
                 fromObject: (obj: unknown, onError: ErrorHandler, subobjectName: string) => T | null;
                 new(): T;
@@ -828,16 +833,18 @@ export class CCBuildingsData { // Aggregates all buildings
             function handleMinigame(name: 'Wizard tower', minigameClass: minigameT<CCGrimoireMinigame>): void;
             function handleMinigame(name: string, minigameClass: any) {
                 if(buildingName === name) {
-                    if(sourceBuilding.level === 0) {
-                        (targetBuilding as any).minigame = null;
-                    } else if('minigame' in sourceBuilding) {
+                    if('minigame' in sourceBuilding) {
+                        // Propagate the minigame if explicitly set
                         (targetBuilding as any).minigame = minigameClass.fromObject(
                             sourceBuilding.minigame,
                             onError,
                             `${subobjectName}["${name}"].minigame`
                         );
+                    } else if(sourceBuilding.level === 0) {
+                        (targetBuilding as any).minigame = null;
+                        // Do not default-construct if level is explicitly set to zero
                     } else if((buildingsData as any)[name].level > 0) {
-                        // source.minigame has to be explicitly null to avoid this conditional
+                        // Default construct if level is explicitly set to something positive
                         (targetBuilding as any).minigame = new minigameClass();
                     }
                 }
