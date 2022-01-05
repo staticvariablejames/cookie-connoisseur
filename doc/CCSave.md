@@ -121,7 +121,7 @@ it simply throws a `new Error` with the message;
 the intention is to be loud about hardcoded partial saves.
 
 For usability purposes,
-the default constructor and the conversion functions handle minigame data a differently.
+the default constructor and the conversion functions handle minigame data differently.
 A default constructed `CCSave` will have all `minigame` attributes
 constructed with the minigame default constructors,
 even in situations in which this does not make sense
