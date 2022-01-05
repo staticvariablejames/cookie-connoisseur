@@ -3019,19 +3019,20 @@ test.describe('CCSave.fromObject', () => {
     });
 
     test.describe('handles .buffs', () => {
+        const fps = 30;
         test('with correct inputs', () => {
             let manualSave = new CCSave();
             let sugarBlessing = new CCBuffSugarBlessing();
-            sugarBlessing.maxTime = 24*3600*1000;
-            sugarBlessing.time = 20*3600*1000;
+            sugarBlessing.maxTime = 24*3600*fps;
+            sugarBlessing.time = 20*3600*fps;
             let buildingSpecial = new CCBuffBuildingSpecial();
-            buildingSpecial.maxTime = 60*1000;
-            buildingSpecial.time = 30*1000;
+            buildingSpecial.maxTime = 60*fps;
+            buildingSpecial.time = 30*fps;
             buildingSpecial.building = 6;
             buildingSpecial.multCpS = 60;
             let dragonflight = new CCBuffDragonflight();
-            dragonflight.maxTime = 20*1000;
-            dragonflight.time = 5*1000;
+            dragonflight.maxTime = 20*fps;
+            dragonflight.time = 5*fps;
             dragonflight.multClick = 1223;
             manualSave.buffs[0] = sugarBlessing;
             manualSave.buffs[1] = buildingSpecial;
@@ -3040,20 +3041,20 @@ test.describe('CCSave.fromObject', () => {
             let jsonSave = CCSave.fromObject({buffs: [
                 {
                     name: 'sugar blessing',
-                    maxTime: 24*3600*1000,
-                    time: 20*3600*1000,
+                    maxTime: 24*3600*fps,
+                    time: 20*3600*fps,
                 },
                 {
                     name: 'building buff',
-                    maxTime: 60*1000,
-                    time: 30*1000,
+                    maxTime: 60*fps,
+                    time: 30*fps,
                     building: 6,
                     multCpS: 60,
                 },
                 {
                     name: 'dragonflight',
-                    maxTime: 20*1000,
-                    time: 5*1000,
+                    maxTime: 20*fps,
+                    time: 5*fps,
                     multClick: 1223,
                 },
             ]});
@@ -3084,8 +3085,8 @@ test.describe('CCSave.fromObject', () => {
                 CCSave.fromObject({buffs: [
                     {
                         name: 'building buff',
-                        maxTime: 60*1000,
-                        time: 30*1000,
+                        maxTime: 60*fps,
+                        time: 30*fps,
                         building: 6,
                         multCpS: 60,
                     },
