@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added: Browser utility `CConnoisseur.closeNotes`.
+- Added: Cookie Connoisseur now waits for minigames to load by default.
 
 ## 0.2.1 - 2021-11-27
 - Added: Browser utilities `CConnoisseur.ascend` and `CConnoisseur.reincarnate`.

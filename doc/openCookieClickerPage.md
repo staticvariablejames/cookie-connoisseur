@@ -62,6 +62,19 @@ Available options:
     Initial value of CConnoisseur.mockedDate; see [here](./BrowserUtilities.md) for details.
     Defaults to 1.6e12.
 
+-   `waitForMinigames: boolean`
+    Whether to wait or not to wait for minigames to load before returing the page.
+    Defaults to true.
+
+    Minigames load whenever the corresponding building's level is at least 1
+    (even if the building wasn't purchased yet).
+    Cookie Connoisseur only waits for minigames to load if the level of the corresponding building
+    is at least one.
+    Note that setting this to `false` is _not_ an effective way of guaranteeing that
+    the minigame will not be loaded;
+    you have to set the corresponding building level to zero,
+    and level it up inside your script.
+
 The first three options
 (`heralds`, `grandmaNames` and `updatesResponse`)
 are updated by the game every 60 minutes,

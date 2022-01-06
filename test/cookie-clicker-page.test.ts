@@ -91,3 +91,54 @@ test('Updates check can be changed dynamically', async ({browser}) => {
 
     await page.close();
 });
+
+test.describe('Waiting for minigames', () => {
+    test('by default', async ({browser}) => {
+        let page = await openCookieClickerPage(browser, {saveGame: {
+            buildings: {
+                'Farm': {
+                    amount: 1,
+                    level: 1,
+                },
+                'Bank': {
+                    amount: 1,
+                    level: 1,
+                },
+                'Temple': {
+                    amount: 0, // Cookie Clicker loads minigames even without the purchasing,
+                    level: 1, // as long as the level is >= 1.
+                },
+                'Wizard tower': {
+                    amount: 0,
+                    level: 1,
+                },
+            },
+        }});
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Farm']))).toBeTruthy();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Bank']))).toBeTruthy();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Temple']))).toBeTruthy();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Wizard tower']))).toBeTruthy();
+    });
+
+    test('unless there are no minigames', async ({browser}) => {
+        let page = await openCookieClickerPage(browser, {
+            waitForMinigames: true,
+            saveGame: {
+                buildings: {
+                    'Grandma': { // Buildings without minigame should still load normally
+                        amount: 1,
+                        level: 1,
+                    },
+                    'Portal': {
+                        amount: 0,
+                        level: 1,
+                    },
+                },
+            }
+        });
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Farm']))).toBeFalsy();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Bank']))).toBeFalsy();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Temple']))).toBeFalsy();
+        expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Wizard tower']))).toBeFalsy();
+    });
+});

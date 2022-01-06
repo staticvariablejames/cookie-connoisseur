@@ -4,7 +4,7 @@ import { cacheURLs } from './url-list';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
-import { CCSave } from './ccsave';
+import { CCSave, CCBuildingsData } from './ccsave';
 
 /* See the documentation of openCookieClickerPage below for a description of these options.
  * For convenience,
@@ -17,6 +17,7 @@ export type CCPageOptions = {
     cookieConsent?: boolean,
     saveGame?: string | object,
     mockedDate?: number,
+    waitForMinigames?: boolean,
 };
 
 /* The first three options may be requested multiple times,
@@ -88,6 +89,15 @@ function getMockedDate(options: CCPageOptions) {
         return 1.6e12; // 2020-09-13 12:26:40 UTC
     }
 }
+
+function getWaitForMinigames(options: CCPageOptions) {
+    if(typeof options.waitForMinigames == 'boolean') {
+        return options.waitForMinigames;
+    } else {
+        return true;
+    }
+}
+
 /* Helper function.
  * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
  * this function fulfills the request with the format that the game expects
@@ -324,5 +334,16 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
 
     await page.goto('https://orteil.dashnet.org/cookieclicker/index.html');
     await page.waitForFunction(() => Game != undefined && 'ready' in Game && Game.ready);
+
+    if(getWaitForMinigames(options)) {
+        let save = new CCSave();
+        if(utilOptions.saveGame) save = CCSave.fromNativeSave(utilOptions.saveGame);
+        let buildingName: keyof CCBuildingsData;
+        for(buildingName in save.buildings) {
+            if('minigame' in save.buildings[buildingName] && save.buildings[buildingName].level > 0) {
+                await page.waitForFunction(building => Game.isMinigameReady(Game.Objects[building]), buildingName);
+            }
+        }
+    }
     return page;
 }
