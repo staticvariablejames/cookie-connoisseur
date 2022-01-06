@@ -8,7 +8,7 @@ import { PlaywrightTestConfig } from '@playwright/test';
  * However we still define `browserName` for those tests
  * because Cookie Clicker is used to manufacture edge cases for some of them.
  */
-let nonBrowserTests = ['test/ccsave.test.ts'];
+let nonBrowserTests = ['test/ccsave.test.ts', 'test/util.test.ts'];
 
 const config: PlaywrightTestConfig = {
     projects: [
