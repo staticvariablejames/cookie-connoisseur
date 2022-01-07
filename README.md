@@ -180,21 +180,25 @@ Configuration File
 
 The configuration file is `cookie-connoisseur.config.json`,
 located in the root folder.
-The following example is from [Choose Your Own Lump](
-https://github.com/staticvariablejames/ChooseYourOwnLump/blob/master/cookie-connoisseur.config.json
+The following example is from [Insugar Trading](
+https://github.com/staticvariablejames/InsugarTrading/blob/master/cookie-connoisseur.config.json
 ).
 
 ```json
 {
     "customURLs": [
         {"url": "https://klattmose.github.io/CookieClicker/CCSE.js"},
-        {"url": "https://staticvariablejames.github.io/SpicedCookies/Spice.js"}
+        {"url": "https://klattmose.github.io/CookieClicker/img/CCSEicon.png"}
     ],
     "localFiles": [
-        {"url": "https://staticvariablejames.github.io/ChooseYourOwnLump/ChooseYourOwnLump.js",
-         "path": "ChooseYourOwnLump.js"},
-        {"url": "https://staticvariablejames.github.io/ChooseYourOwnLump/dist/main.js",
-         "path": "dist/main.js"}
+        {"url": "https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js",
+         "path": "./InsugarTrading.js"},
+        {"url": "https://staticvariablejames.github.io/InsugarTrading/dist/main.js",
+         "path": "./dist/main.js"}
+    ],
+    "localDirectories": [
+        {"url": "https://staticvariablejames.github.io/InsugarTrading/data/",
+         "path": "./data/"}
     ]
 }
 ```
