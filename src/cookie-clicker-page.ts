@@ -105,7 +105,7 @@ function getWaitForMinigames(options: CCPageOptions) {
  * and returns true.
  * It returns false otherwise.
  */
-async function handlePatreonGrabs(route: Route, options: CCPageOptions) {
+async function handlePatreonGrabs(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
     if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
         return false;
 
@@ -119,7 +119,7 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions) {
         contentType: 'text/html',
         body: response,
     }).catch(reason => {
-        if(process.env.DEBUG)
+        if(config.verbose >= 2)
             console.log(`Couldn't deliver Herald count and Grandma names: ${reason}`);
     });
 
@@ -131,7 +131,7 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions) {
  * this function fulfills the request with options.updatesResponse and returns true.
  * It returns false otherwise.
  */
-async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
+async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
     let url = route.request().url();
     if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
         return false;
@@ -141,7 +141,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
         contentType: 'text/html',
         body: getUpdatesResponse(options),
     }).catch(reason => {
-        if(process.env.DEBUG)
+        if(config.verbose >= 2)
             console.log(`Couldn't deliver answer to updates query: ${reason}`);
     });
     return true;
@@ -155,7 +155,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions) {
  *
  * It returns false if the URL is not cached by Cookie Connoisseur.
  */
-async function handleCacheFile(route: Route) {
+async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
     let url = normalizeURL(route.request().url());
     if(!(url in cacheURLs))
         return false;
@@ -168,11 +168,13 @@ async function handleCacheFile(route: Route) {
             options.contentType = cacheURLs[url].contentType;
         }
         await route.fulfill(options).catch(reason => {
-            if(process.env.DEBUG)
+            if(config.verbose >= 2)
                 console.log(`Couldn't deliver cached page ${url}: ${reason}`);
         });
     } else {
-        console.log(`Downloading file ${path}...`);
+        if(config.verbose >= 1) {
+            console.log(`Downloading file ${path}...`);
+        }
         route.request().frame().page().on('response', makeDownloadingListener(url));
         await route.continue();
     }
@@ -190,11 +192,13 @@ async function handleCustomURL(route: Route, config: CookieConnoisseurConfig) {
     let path = localPathOfURL(url);
     if(existsSync(path)) {
         await route.fulfill({path}).catch(reason => {
-            if(process.env.DEBUG)
+            if(config.verbose >= 2)
                 console.log(`Couldn't deliver custom URL ${url}: ${reason}`);
         });
     } else {
-        console.log(`Downloading file ${path}...`);
+        if(config.verbose >= 1) {
+            console.log(`Downloading file ${path}...`);
+        }
         route.request().frame().page().on('response', makeDownloadingListener(url));
         await route.continue();
     }
@@ -215,11 +219,13 @@ async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
 
     if(existsSync(options.path)) {
         await route.fulfill(options).catch(reason => {
-            if(process.env.DEBUG)
+            if(config.verbose >= 2)
                 console.log(`Couldn't deliver local page ${url}: ${reason}`);
         });
     } else {
-        console.log(`File ${options.path} not found`);
+        if(config.verbose >= 1) {
+            console.log(`File ${options.path} not found`);
+        }
         await route.continue();
     }
 
@@ -237,11 +243,13 @@ async function handleLocalDirectory(route: Route, config: CookieConnoisseurConfi
             let filePath = directoryPath + "/" + url.substr(urlPrefix.length);
             if(existsSync(filePath)) {
                 await route.fulfill({path: filePath}).catch(reason => {
-                    if(process.env.DEBUG)
+                    if(config.verbose >= 2)
                         console.log(`Couldn't deliver local page ${url}: ${reason}`);
                 });
             } else {
-                console.log(`File ${filePath} not found in directory ${directoryPath}`);
+                if(config.verbose >= 1) {
+                    console.log(`File ${filePath} not found in directory ${directoryPath}`);
+                }
                 await route.continue();
             }
             return true;
@@ -314,11 +322,11 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
     await page.addInitScript(initBrowserUtilities, utilOptions);
 
     await page.route('**/*', async route => {
-        if(await handlePatreonGrabs(route, options))
+        if(await handlePatreonGrabs(route, options, config))
             return;
-        if(await handleUpdatesQuery(route, options))
+        if(await handleUpdatesQuery(route, options, config))
             return;
-        if(await handleCacheFile(route))
+        if(await handleCacheFile(route, config))
             return;
         if(await handleCustomURL(route, config))
             return;

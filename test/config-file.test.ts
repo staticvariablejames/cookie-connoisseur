@@ -17,6 +17,7 @@ test('Configuration file is properly read', async () => {
         localDirectories: {
              "https://example.org/subdomain/": {path: "./"},
         },
+        verbose: 1,
     });
 });
 

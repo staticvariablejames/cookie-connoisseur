@@ -17,12 +17,19 @@ export type CookieConnoisseurConfig = {
             path: string;
         };
     },
+    verbose: number,
 }
 
 export const configPath = 'cookie-connoisseur.config.json';
 
 export async function parseConfigFile(): Promise<CookieConnoisseurConfig> {
-    let config: CookieConnoisseurConfig = {customURLs: {}, localFiles: {}, localDirectories: {}};
+    let config: CookieConnoisseurConfig = {
+        customURLs: {},
+        localFiles: {},
+        localDirectories: {},
+        verbose: 1,
+    };
+
     if(!existsSync(configPath)) {
         return config;
     }
@@ -55,6 +62,10 @@ export async function parseConfigFile(): Promise<CookieConnoisseurConfig> {
                     config.localDirectories[obj.url] = {path: obj.path};
             }
         }
+    }
+
+    if('verbose' in content) {
+        config.verbose = Number(content.verbose);
     }
 
     return config;

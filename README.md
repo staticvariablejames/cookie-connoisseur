@@ -223,6 +223,14 @@ Available options:
     Whenever a URL starting with `url` is requested,
     that prefix is replaced with `path`, and the resulting path is provided instead.
 
+-   `verbose`: `number`
+    The verbosity level for `openCookieClickerPage`.
+    Defaults to 1.
+    Set to 2 to add some additional debug messages,
+    and to 0 to disable all warning messages.
+
+    Note that this does not disable messages from the command line interface.
+
 It is advised to re-run `npx cookie-connoisseur fetch`
 whenever the `customURLs` list is changed.
 
