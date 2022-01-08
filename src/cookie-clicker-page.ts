@@ -1,5 +1,5 @@
+import * as fsPromises from 'fs/promises';
 import { Browser, BrowserContext, Page, Route } from 'playwright';
-import { existsSync } from 'fs';
 import { cacheURLs } from './url-list';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './browser-utilities';
@@ -161,9 +161,15 @@ async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
         return false;
 
     let path = localPathOfURL(url);
-    if(existsSync(path)) {
+    try {
+        /* This operation may reject the promise if the file wasn't downloaded yet.
+         * Node.js actually recommends doing this way,
+         * instead of using exists or existsSync:
+         * <https://nodejs.org/api/fs.html#fsexistspath-callback>
+         */
+        let file = await fsPromises.readFile(path);
         let options: Parameters<Route["fulfill"]>[0] = {};
-        options = {path};
+        options = {body: file};
         if('contentType' in cacheURLs[url]) {
             options.contentType = cacheURLs[url].contentType;
         }
@@ -171,7 +177,12 @@ async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
             if(config.verbose >= 2)
                 console.log(`Couldn't deliver cached page ${url}: ${reason}`);
         });
-    } else {
+    }
+    catch (e) {
+        if(!(e instanceof Error && 'code' in e && e['code'] === 'ENOENT')) {
+            // Some filesystem error which is not a simple "file not found"
+            throw e;
+        }
         if(config.verbose >= 1) {
             console.log(`Downloading file ${path}...`);
         }
@@ -190,12 +201,16 @@ async function handleCustomURL(route: Route, config: CookieConnoisseurConfig) {
         return false;
 
     let path = localPathOfURL(url);
-    if(existsSync(path)) {
-        await route.fulfill({path}).catch(reason => {
+    try {
+        let file = await fsPromises.readFile(path);
+        await route.fulfill({body: file}).catch(reason => {
             if(config.verbose >= 2)
                 console.log(`Couldn't deliver custom URL ${url}: ${reason}`);
         });
-    } else {
+    } catch (e) {
+        if(!(e instanceof Error && 'code' in e && e['code'] === 'ENOENT')) {
+            throw e;
+        }
         if(config.verbose >= 1) {
             console.log(`Downloading file ${path}...`);
         }
@@ -215,16 +230,19 @@ async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
     if(!(url in config.localFiles))
         return false;
 
-    let options = {path: config.localFiles[url].path};
-
-    if(existsSync(options.path)) {
-        await route.fulfill(options).catch(reason => {
+    let path = config.localFiles[url].path;
+    try {
+        let file = await fsPromises.readFile(path);
+        await route.fulfill({body: file}).catch(reason => {
             if(config.verbose >= 2)
                 console.log(`Couldn't deliver local page ${url}: ${reason}`);
         });
-    } else {
+    } catch (e) {
+        if(!(e instanceof Error && 'code' in e && e['code'] === 'ENOENT')) {
+            throw e;
+        }
         if(config.verbose >= 1) {
-            console.log(`File ${options.path} not found`);
+            console.log(`File ${path} not found`);
         }
         await route.continue();
     }
@@ -241,12 +259,16 @@ async function handleLocalDirectory(route: Route, config: CookieConnoisseurConfi
         if(url.startsWith(urlPrefix)) { // Found matching prefix!
             let directoryPath = config.localDirectories[urlPrefix].path;
             let filePath = directoryPath + "/" + url.substr(urlPrefix.length);
-            if(existsSync(filePath)) {
-                await route.fulfill({path: filePath}).catch(reason => {
+            try {
+                let file = await fsPromises.readFile(filePath);
+                await route.fulfill({body: file}).catch(reason => {
                     if(config.verbose >= 2)
                         console.log(`Couldn't deliver local page ${url}: ${reason}`);
                 });
-            } else {
+            } catch (e) {
+                if(!(e instanceof Error && 'code' in e && e['code'] === 'ENOENT')) {
+                    throw e;
+                }
                 if(config.verbose >= 1) {
                     console.log(`File ${filePath} not found in directory ${directoryPath}`);
                 }
