@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { invertMap, pseudoObjectAssign, throwOnError } from '../src/util';
+import { invertMap, pseudoObjectAssign, throwOnError, sha1sumFromBuffer } from '../src/util';
 
 test('invertMap inverts maps', () => {
     let map = ['zero', 'one', 'two'];
@@ -131,4 +131,10 @@ test.describe('pseudoObjectAssign', () => {
         pseudoObjectAssign(false, {a: 1}, mock.onError, '.prefs');
         expect(mock.msg).toContain('target.prefs is not an object');
     });
+});
+
+test('sha1sumFromBuffer', () => {
+    let str = 'abcde';
+    let buffer = Buffer.from(str, 'utf8');
+    expect(sha1sumFromBuffer(buffer)).toEqual('03de6c570bfe24bfc328ccd7ca46b76eadaf4334');
 });

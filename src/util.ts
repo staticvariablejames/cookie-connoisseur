@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+
 /* Given a list of strings,
  * return a string->number object inverseMap such that
  *  inverseMap[map[i]] == i
@@ -101,4 +103,13 @@ export function pseudoObjectAssign<T>(
     }
 
     return _target;
+}
+
+/* Returns the sha1sum from the given buffer,
+ * in hex form.
+ */
+export function sha1sumFromBuffer(buffer: Buffer) {
+    let hash = createHash('sha1');
+    hash.update(buffer);
+    return hash.digest('hex');
 }
