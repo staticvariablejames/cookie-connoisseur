@@ -2,11 +2,10 @@
  */
 
 import { promises as fsPromises, existsSync } from 'fs';
+import { URLDirectory } from './url-list';
 
 export type CookieConnoisseurConfig = {
-    customURLs: {
-        [url: string]: {};
-    },
+    customURLs: URLDirectory,
     localFiles: {
         [url: string]: {
             path: string;

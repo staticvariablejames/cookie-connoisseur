@@ -3,7 +3,7 @@
 import { existsSync } from 'fs';
 import { localPathOfURL, makeDownloadingListener } from './local-cc-instance';
 import { chromium } from 'playwright';
-import { cacheURLs } from './url-list';
+import { liveURLs as builtinURLs } from './url-list-live';
 import { parseConfigFile } from './parse-config';
 
 const helpString =
@@ -64,7 +64,7 @@ function parseCommandLineArgs(args: string[]) {
 async function urlsToDownload(options: FetchOptions) {
     let config = await parseConfigFile();
     let urlList: string[] = [];
-    for(let url in cacheURLs) {
+    for(let url in builtinURLs) {
         if(!url.endsWith('/favicon.ico')) {
             /* Playwright does not emit events if the URL ends in '/favicon.ico'.
              * I'm not sure why;

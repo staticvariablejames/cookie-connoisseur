@@ -1,6 +1,6 @@
 import * as fsPromises from 'fs/promises';
 import { Browser, BrowserContext, Page, Route } from 'playwright';
-import { cacheURLs } from './url-list';
+import { liveURLs as builtinURLs, liveEntryURL as entryURL } from './url-list-live';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities } from './browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
@@ -157,7 +157,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: 
  */
 async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
     let url = normalizeURL(route.request().url());
-    if(!(url in cacheURLs))
+    if(!(url in builtinURLs))
         return false;
 
     let path = localPathOfURL(url);
@@ -170,8 +170,8 @@ async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
         let file = await fsPromises.readFile(path);
         let options: Parameters<Route["fulfill"]>[0] = {};
         options = {body: file};
-        if('contentType' in cacheURLs[url]) {
-            options.contentType = cacheURLs[url].contentType;
+        if('contentType' in builtinURLs[url]) {
+            options.contentType = builtinURLs[url].contentType;
         }
         await route.fulfill(options).catch(reason => {
             if(config.verbose >= 2)
@@ -362,7 +362,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
         await route.continue();
     });
 
-    await page.goto('https://orteil.dashnet.org/cookieclicker/index.html');
+    await page.goto(entryURL);
     await page.waitForFunction(() => Game != undefined && 'ready' in Game && Game.ready);
 
     if(getWaitForMinigames(options)) {

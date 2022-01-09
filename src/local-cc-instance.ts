@@ -1,5 +1,5 @@
 /* This package manages a local copy of Cookie Clicker.
- * The files listed in url-list.ts are downloaded by cli-fetch.ts.
+ * The files listed in url-list-live.ts are downloaded by cli-fetch.ts.
  * The playwright Page constructed by cookie-clicker-page.ts uses those files
  * instead of querying the Internet.
  *
@@ -8,7 +8,7 @@
 import { Response } from 'playwright';
 import { promises as fsPromises } from 'fs';
 import { dirname } from 'path';
-import { urlsToDrop } from './url-list';
+import { liveURLsToDrop as urlsToDrop } from './url-list-live';
 
 export function localPathOfURL(url: string) {
     return '.cookie-connoisseur/' + url.replace(/https?:\/\//, '');
