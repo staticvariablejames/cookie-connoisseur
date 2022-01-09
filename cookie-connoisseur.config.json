@@ -1,5 +1,10 @@
 {
     "comment": "This file exists only for testing.",
+    "customURLs": [
+        {"url": "https://example.org/fileWithSha1Sum.js",
+         "sha1sum": "test"},
+        {"url": "https://example.org/fileWithoutSha1Sum.js"}
+    ],
     "localFiles": [
         {"url": "https://example.com/test.js",
          "path": "test/test-file.js"}

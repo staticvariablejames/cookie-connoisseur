@@ -10,7 +10,10 @@ const testSubdomainURL = 'https://example.org/subdomain/';
 
 test('Configuration file is properly read', async () => {
     expect(await parseConfigFile()).toEqual({
-        customURLs: {},
+        customURLs: {
+            'https://example.org/fileWithSha1Sum.js': {sha1sum: 'test'},
+            'https://example.org/fileWithoutSha1Sum.js': {},
+        },
         localFiles: {
             [testURL]: {path: "test/test-file.js"},
         },

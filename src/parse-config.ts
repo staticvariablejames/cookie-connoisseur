@@ -41,6 +41,9 @@ export async function parseConfigFile(): Promise<CookieConnoisseurConfig> {
         for(let obj of content.customURLs) {
             if('url' in obj && typeof obj.url == 'string') {
                 config.customURLs[obj.url] = {};
+                if('sha1sum' in obj && typeof obj.sha1sum == 'string') {
+                    config.customURLs[obj.url].sha1sum = obj.sha1sum;
+                }
             }
         }
     }
