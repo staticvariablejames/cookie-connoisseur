@@ -68,7 +68,7 @@ async function verifyChecksums(urls: URLDirectory) {
         let path = localPathOfURL(url);
         try {
             let file = await readFile(path);
-            if('sha1sum' in urls[url]) {
+            if(urls[url].sha1sum) {
                 let sha1sum = sha1sumFromBuffer(file);
                 if(sha1sum !== urls[url].sha1sum) {
                     console.log(`sha1sum(${path}) = ${sha1sum}` +

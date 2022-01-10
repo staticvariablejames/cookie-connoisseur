@@ -56,6 +56,7 @@ type DownloadingListenerOptions = {
     verbose?: number,
     callback?: () => Promise<void>,
 };
+
 export function makeDownloadingListener(url: string, options: DownloadingListenerOptions = {}) {
     if(!('prefix' in options)) {
         options.prefix = './';
@@ -66,6 +67,7 @@ export function makeDownloadingListener(url: string, options: DownloadingListene
     if(!('verbose' in options)) {
         options.verbose = 1;
     }
+
     url = normalizeURL(url);
     let path = options.prefix + '/' + localPathOfURL(url);
     let handler = async (response: Response) => {
@@ -82,13 +84,14 @@ export function makeDownloadingListener(url: string, options: DownloadingListene
                 }
                 return; // Nothing we can do here
             }
+
             await fsPromises.mkdir(dirname(path), {recursive: true});
             await fsPromises.writeFile(path, responseBody);
             await response.frame().page().removeListener('response', handler);
-            if(options.verbose! >= 2 && !('sha1sum' in options)) {
-                console.log(`Missing expected sha1sum for ${url}`);
+            if(options.verbose! >= 2 && !options.sha1sum) {
+                console.log(`Missing sha1sum for ${url}`);
             }
-            if(options.verbose! >= 1 && 'sha1sum' in options) {
+            if(options.verbose! >= 1 && options.sha1sum) {
                 let sha1sum = sha1sumFromBuffer(responseBody);
                 if(sha1sum !== options.sha1sum) {
                     console.log(`sha1sum(${path}) = ${sha1sum}` +
