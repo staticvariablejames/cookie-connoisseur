@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.2 - 2022-01-10
+
 - Added: Browser utility `CConnoisseur.closeNotes`.
 - Added: Cookie Connoisseur now waits for minigames to load by default.
 - Added: `verbose` setting in `cookie-connoisseur.config.json`.
