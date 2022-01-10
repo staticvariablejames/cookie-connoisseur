@@ -301,7 +301,8 @@ behave idiosyncratically.
     will be saved as `0,2310,2310,7,0,0` if loaded and saved again.
     `CCSave.toNativeSave` never writes the spurious `,0,0`.
 
--   `Game.vault` is a list of the vaulted upgrades.
+-   `Game.vault` is the list of the vaulted upgrades
+    (for the _Inspired checklist_ heavenly upgrade).
     This list is constructed as the player vaults upgrades.
     and therefore may be out of order.
     (This has no gameplay effect.)
