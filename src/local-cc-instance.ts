@@ -70,14 +70,26 @@ export function makeDownloadingListener(url: string, options: DownloadingListene
     let path = options.prefix + '/' + localPathOfURL(url);
     let handler = async (response: Response) => {
         if(response.ok() && normalizeURL(response.url()) == url) { // Success
+            let responseBody;
+            try {
+                /* Playwright might close before the handler runs,
+                 * so we must surround this with try-catch
+                 */
+                responseBody = await response.body();
+            } catch (e) {
+                if(options.verbose! >= 2) {
+                    console.log(`Couldn't get response body for ${url}: ${e}`);
+                }
+                return; // Nothing we can do here
+            }
             await fsPromises.mkdir(dirname(path), {recursive: true});
-            await fsPromises.writeFile(path, await response.body());
+            await fsPromises.writeFile(path, responseBody);
             await response.frame().page().removeListener('response', handler);
             if(options.verbose! >= 2 && !('sha1sum' in options)) {
                 console.log(`Missing expected sha1sum for ${url}`);
             }
             if(options.verbose! >= 1 && 'sha1sum' in options) {
-                let sha1sum = sha1sumFromBuffer(await response.body());
+                let sha1sum = sha1sumFromBuffer(responseBody);
                 if(sha1sum !== options.sha1sum) {
                     console.log(`sha1sum(${path}) = ${sha1sum}` +
                                 ` differs from expected ${options.sha1sum}`);
