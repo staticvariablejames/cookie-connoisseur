@@ -205,13 +205,26 @@ https://github.com/staticvariablejames/InsugarTrading/blob/master/cookie-connois
 
 Available options:
 
--   `customURLs`: `{url: string}[]`
+-   `customURLs`: `{url: string, sha1sum: string}[]`
     List of URLs that are handled in the same way as Cookie Clicker files.
     If they are missing, these files are downloaded to `.cookie-connoisseur`
     in the first time they are needed,
     and the local copy is used used afterwards whenever that URL is requested.
     Alternatively,
     you can download all these files at once by running `npx cookie-connoisseur fetch`.
+
+    When downloading,
+    `cookie-connoisseur fetch` will verify the sha1sum if available.
+    The intention is to better document mod compatibilities;
+    the checksum indirectly specifies which version of the third-party mod we're compatible with,
+    and we can record in the repo's history
+    that the updated version of a third-party mod is compatible with ours without changes.
+    Effectively,
+    this implements a rudimentar analogue to `package-lock.json`.
+
+    The sha1sum of Cookie Clicker files is also checked,
+    to make sure the version of Cookie Connoisseur
+    is compatible with the cached version of Cookie Clicker.
 
 -   `localFiles`: `{url: string, path: string}[]`
     List of URLs that are redirected to local files.

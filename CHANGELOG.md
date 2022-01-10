@@ -5,6 +5,13 @@
 - Added: Browser utility `CConnoisseur.closeNotes`.
 - Added: Cookie Connoisseur now waits for minigames to load by default.
 - Added: `verbose` setting in `cookie-connoisseur.config.json`.
+- Added: Field `sha1sum` for custom URLs in `cookie-connoisseur.config.json`,
+    which is checked by `cookie-connoisseur fetch` when downloading the files.
+- Added: Option `--checksum` in `cookie-connoisseur fetch`,
+    which only verifies checksums.
+- Changed: `cookie-connoisseur fetch` always re-download every file.
+- Removed: Option `--force` no longer exists in `cookie-connoisseur fetch`,
+    as this behavior is always on. (**breaking**)
 
 ## 0.2.1 - 2021-11-27
 - Added: Browser utilities `CConnoisseur.ascend` and `CConnoisseur.reincarnate`.
