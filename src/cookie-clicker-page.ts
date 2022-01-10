@@ -186,7 +186,13 @@ async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
         if(config.verbose >= 1) {
             console.log(`Downloading file ${path}...`);
         }
-        route.request().frame().page().on('response', makeDownloadingListener(url));
+        route.request().frame().page().on('response', makeDownloadingListener(
+            url,
+            {
+                verbose: config.verbose,
+                sha1sum: builtinURLs[url].sha1sum,
+            },
+        ));
         await route.continue();
     }
     return true;
@@ -214,7 +220,13 @@ async function handleCustomURL(route: Route, config: CookieConnoisseurConfig) {
         if(config.verbose >= 1) {
             console.log(`Downloading file ${path}...`);
         }
-        route.request().frame().page().on('response', makeDownloadingListener(url));
+        route.request().frame().page().on('response', makeDownloadingListener(
+            url,
+            {
+                verbose: config.verbose,
+                sha1sum: config.customURLs[url].sha1sum,
+            },
+        ));
         await route.continue();
     }
 

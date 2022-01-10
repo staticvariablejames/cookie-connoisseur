@@ -9,6 +9,7 @@ import { Response } from 'playwright';
 import { promises as fsPromises } from 'fs';
 import { dirname } from 'path';
 import { liveURLsToDrop as urlsToDrop } from './url-list-live';
+import { sha1sumFromBuffer } from './util';
 
 export function localPathOfURL(url: string) {
     return '.cookie-connoisseur/' + url.replace(/https?:\/\//, '');
@@ -41,14 +42,30 @@ export function normalizeURL(url: string) {
  * Options:
  *  - prefix: where the '.cookie-connoisseur' directory is located.
  *      Defaults to './'.
+ *  - sha1sum: the checksum that this file will be compared against.
+ *  - verbose: verbosity level.
+ *      If at least 1, will warn about a mismatched sha1sum.
+ *      If at least 2, will warn if sha1sum is not provided.
+ *      Defaults to 1.
  *  - callback: Function that is called after the file path is written.
- *      Defaults to () => {}.
+ *      Defaults to async () => {}.
  */
-export function makeDownloadingListener(url: string, options = {
-    prefix: './',
-    callback: async () => {},
-})
-{
+type DownloadingListenerOptions = {
+    prefix?: string,
+    sha1sum?: string,
+    verbose?: number,
+    callback?: () => Promise<void>,
+};
+export function makeDownloadingListener(url: string, options: DownloadingListenerOptions = {}) {
+    if(!('prefix' in options)) {
+        options.prefix = './';
+    }
+    if(!('callback' in options)) {
+        options.callback = async () => {};
+    }
+    if(!('verbose' in options)) {
+        options.verbose = 1;
+    }
     url = normalizeURL(url);
     let path = options.prefix + '/' + localPathOfURL(url);
     let handler = async (response: Response) => {
@@ -56,7 +73,17 @@ export function makeDownloadingListener(url: string, options = {
             await fsPromises.mkdir(dirname(path), {recursive: true});
             await fsPromises.writeFile(path, await response.body());
             await response.frame().page().removeListener('response', handler);
-            await options.callback();
+            if(options.verbose! >= 2 && !('sha1sum' in options)) {
+                console.log(`Missing expected sha1sum for ${url}`);
+            }
+            if(options.verbose! >= 1 && 'sha1sum' in options) {
+                let sha1sum = sha1sumFromBuffer(await response.body());
+                if(sha1sum !== options.sha1sum) {
+                    console.log(`sha1sum(${path}) = ${sha1sum}` +
+                                ` differs from expected ${options.sha1sum}`);
+                }
+            }
+            await options.callback!();
         }
     };
     return handler;
