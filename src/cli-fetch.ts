@@ -4,7 +4,7 @@ import { readFile } from 'fs/promises';
 import { localPathOfURL, makeDownloadingListener } from './local-cc-instance';
 import { chromium } from 'playwright';
 import { URLDirectory } from './url-list';
-import { liveURLs as builtinURLs } from './url-list-live';
+import { betaURLs as builtinURLs } from './url-list-beta';
 import { CookieConnoisseurConfig, parseConfigFile } from './parse-config';
 import { sha1sumFromBuffer } from './util';
 
