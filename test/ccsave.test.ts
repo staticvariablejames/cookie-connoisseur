@@ -271,6 +271,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
                     'CKI': {val: 128.39, mode: 'slow fall', d: -0.53, dur: 651, stock: 0, hidden: false, last: 0},
                     'RCP': {val: 163.58, mode: 'slow rise', d:  0.07, dur: 489, stock: 0, hidden: false, last: 0},
                     'SBD': {val: 148.23, mode:   'chaotic', d: -0.22, dur: 495, stock: 0, hidden: false, last: 0},
+                    'PBL': {val:      1, mode:    'stable', d:     0, dur:   0, stock: 0, hidden: false, last: 0},
                 },
             },
         },
@@ -289,6 +290,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
         'Fractal engine':       {amount: 600, bought: 2052, totalCookies:  2.793821458824039e+56, level: 10, muted:  true, highest: 600},
         'Javascript console':   {amount: 583, bought: 1962, totalCookies:  7.376629221584014e+55, level: 10, muted:  true, highest: 583},
         'Idleverse':            {amount: 545, bought: 2428, totalCookies: 4.6363535311180915e+56, level: 10, muted:  true, highest: 550},
+        'Cortex baker':         {amount: 0,   bought: 0,    totalCookies:                      0, level:  0, muted: false, highest: 0},
     },
 
     ownedUpgrades: [
@@ -1769,6 +1771,7 @@ const saveAsObject2_04 = {
                     CKI: {val:145.83, mode:"slow rise", d:0.18,  dur:574, stock:0,   hidden:false, last:0},
                     RCP: {val:127.36, mode:"slow fall", d:-0.51, dur:359, stock:0,   hidden:false, last:0},
                     SBD: {val:77.5,   mode:"fast fall", d:-2.19, dur:280, stock:70,  hidden:false, last:2},
+                    PBL: {val:1,      mode:'stable',    d:0,     dur:0,   stock:0,   hidden:false, last:0},
                 }
             }
         },
@@ -1786,6 +1789,7 @@ const saveAsObject2_04 = {
         'Fractal engine':       { amount: 100, bought: 200, totalCookies: 4.323731765209361e+25,  level: 0, muted: true,  highest: 100},
         'Javascript console':   { amount: 100, bought: 100, totalCookies: 1.740298586732432e+26,  level: 0, muted: true,  highest: 100},
         'Idleverse':            { amount: 80,  bought: 82,  totalCookies: 7.952103393221773e+26,  level: 0, muted: true,  highest: 80},
+        'Cortex baker':         { amount: 0,   bought: 0 ,  totalCookies: 0,                      level: 0, muted: false, highest: 0},
     },
 
     ownedUpgrades: [

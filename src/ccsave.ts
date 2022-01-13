@@ -474,6 +474,7 @@ export class CCMarketStockList {
     CKI: CCMarketStock = new CCMarketStock(); // Cookies
     RCP: CCMarketStock = new CCMarketStock(); // Recipes
     SBD: CCMarketStock = new CCMarketStock(); // Subsidiaries
+    PBL: CCMarketStock = new CCMarketStock(); // Publicists
 
     static fromNativeSave(str: string) {
         let l = new CCMarketStockList();
@@ -495,13 +496,17 @@ export class CCMarketStockList {
         l.CKI = CCMarketStock.fromNativeSave(data[13]);
         l.RCP = CCMarketStock.fromNativeSave(data[14]);
         l.SBD = CCMarketStock.fromNativeSave(data[15]);
+        l.PBL = CCMarketStock.fromNativeSave(data[16]);
         return l;
     }
 
     static toNativeSave(l: CCMarketStockList, version: number) {
         let str = '';
-        for(let [_key, value] of Object.entries(l)) {
-            str += CCMarketStock.toNativeSave(value, version) + '!';
+        let goods = Object.entries(l);
+        let numberOfStocks = goods.length;
+        if(version <= 2.043) numberOfStocks = 16;
+        for(let i = 0; i < numberOfStocks; i++) {
+            str += CCMarketStock.toNativeSave(goods[i][1], version) + '!';
         }
         return str;
     }
@@ -737,6 +742,7 @@ export class CCBuildingsData { // Aggregates all buildings
     'Fractal engine': CCPlainBuilding = new CCPlainBuilding();
     'Javascript console': CCPlainBuilding = new CCPlainBuilding();
     'Idleverse': CCPlainBuilding = new CCPlainBuilding();
+    'Cortex baker': CCPlainBuilding = new CCPlainBuilding();
 
     static fromNativeSave(str: string) {
         let buildings = new CCBuildingsData();
@@ -758,8 +764,12 @@ export class CCBuildingsData { // Aggregates all buildings
         buildings['Chancemaker'] = CCPlainBuilding.fromNativeSave(data[14]);
         buildings['Fractal engine'] = CCPlainBuilding.fromNativeSave(data[15]);
         buildings['Javascript console'] = CCPlainBuilding.fromNativeSave(data[16]);
-        if(data[17] != '') // Idleverses were introduced in 2.03
+        if(data[17]) { // Idleverses were introduced in 2.03
             buildings['Idleverse'] = CCPlainBuilding.fromNativeSave(data[17]);
+        }
+        if(data[18]) { // Cortex bakers were introduced in 2.044
+            buildings['Cortex baker'] = CCPlainBuilding.fromNativeSave(data[18]);
+        }
         return buildings;
     }
 
@@ -791,6 +801,8 @@ export class CCBuildingsData { // Aggregates all buildings
         str += CCPlainBuilding.toNativeSave(buildings['Fractal engine'], version) + ';';
         str += CCPlainBuilding.toNativeSave(buildings['Javascript console'], version) + ';';
         str += CCPlainBuilding.toNativeSave(buildings['Idleverse'], version) + ';';
+        if(version >= 2.044)
+            str += CCPlainBuilding.toNativeSave(buildings['Cortex baker'], version) + ';';
         return str;
     }
 
@@ -1596,9 +1608,70 @@ export const UpgradesById = [
     "Pokey",
     "Cashew cookies",
     "Milk chocolate cookies",
+
+    // Introduced in 2.044
+    "Brainy grandmas",
+    "Principled neural shackles",
+    "Obey",
+    "A sprinkle of irrationality",
+    "Front and back hemispheres",
+    "Neural networking",
+    "Cosmic brainstorms",
+    "Megatherapy",
+    "Synaptic lubricant",
+    "Psychokinesis",
+    "Spines",
+    "Neuraforming",
+    "Epistemological trickery",
+    "Every possible idea",
+    "Kitchen cabinets",
+    "Cookie mulch",
+    "Delicious mineralogy",
+    "N-dimensional assembly lines",
+    "Cookie Points",
+    "Negatheism",
+    "Magical realism",
+    "Cosmic foreground radiation",
+    "Arcanized glassware",
+    "Portal guns",
+    "Timeproof upholstery",
+    "Employee minification",
+    "Hyperblack paint",
+    "Silver lining maximization",
+    "Multiscale profiling",
+    "PHP containment vats",
+    "Opposite universe",
+    "The land of dreams",
+    "Thoughts & prayers",
+    "Fertile minds",
+    "Fortune #019",
+    "Decillion fingers",
+    "Aetherice mouse",
+    "Kitten admins",
+    "Everybutter biscuit",
 ];
 
 export const UpgradesByName = invertMap(UpgradesById);
+
+export function upgradeListToNativeSave(
+    ownedUpgrades: string[],
+    unlockedUpgrades: string[],
+    version: number
+) {
+    let upgrades = '00'.repeat(UpgradesById.length).split('');
+    for(let upgrade of ownedUpgrades) {
+        let i = UpgradesByName[upgrade];
+        upgrades[2*i] = upgrades[2*i+1] = '1';
+    }
+    for(let upgrade of unlockedUpgrades) {
+        let i = UpgradesByName[upgrade];
+        upgrades[2*i] = '1';
+    }
+
+    let numberOfUpgrades = UpgradesById.length;
+    if(version <= 2.043) numberOfUpgrades = 729;
+    return upgrades.slice(0, 2*numberOfUpgrades).join('');
+}
 
 /* List of all achievements in the game, sorted by id.
  * This lis follow their in-game names,
@@ -2147,9 +2220,66 @@ export const AchievementsById = [
     "Hypersize me",
     "Max capacity",
     "Liquid assets",
+
+    // Introduced in 2.044
+    "Stifling the press",
+    "It's big brain time",
+    "Just my imagination",
+    "Now there's an idea",
+    "The organ that named itself",
+    "Gyrification",
+    "A trademarked portmanteau of \"imagination\" and \"engineering\"",
+    "Mindfulness",
+    "The 10% myth",
+    "Don't think about it too hard",
+    "Though fools seldom differ",
+    "Looking kind of dumb",
+    "A beautiful mind",
+    "Cardinal synapses",
+    "Positive thinking",
+    "The thought that counts",
+    "Unthinkable",
+    "Gifted",
+    "They moistly come at night",
+    "It's grown on you",
+    "Don't let the walls cave in on you",
+    "Replaced by robots",
+    "Financial prodigy",
+    "And I will pray to a big god",
+    "Shosple Colupis",
+    "False vacuum",
+    "Metallic taste",
+    "Swiss cheese",
+    "But the future refused to change",
+    "What's the dark matter with you",
+    "Enlightenment",
+    "Never tell me the odds",
+    "Blowing an Apollonian gasket",
+    "Get with the program",
+    "Lost your cosmic marbles",
+    "By will alone I set my mind in motion",
+    "Ain't that a click in the head",
+    "Sexcentennial and a half",
+    "I am speed",
+    "And on and on",
+    "Fake it till you bake it",
+    "History in the baking",
+    "Baby it's old outside",
 ]
 
 export const AchievementsByName = invertMap(AchievementsById);
+
+export function achievementListToNativeSave(achievementList: string[], version: number) {
+    let achievements = '0'.repeat(AchievementsById.length).split('');
+    for(let achievement of achievementList) {
+        let i = AchievementsByName[achievement];
+        achievements[i] = '1';
+    }
+
+    let numberOfAchievements = AchievementsById.length;
+    if(version <= 2.043) numberOfAchievements = 538;
+    return achievements.slice(0, numberOfAchievements).join('');
+}
 
 /* Cookie Clicker buffs.
  * `name` here is the "technical name" used in the code;
@@ -2606,7 +2736,7 @@ export class CCModSaveData {
 
 export class CCSave {
     // Attribute names have the same name in game
-    version: number = 2.031;
+    version: number = 2.044;
     startDate: TimePoint = 1.6e12; // Run start date
     fullDate: TimePoint = 1.6e12; // Legacy start date; NaN for very old save files
     lastDate: TimePoint = 1.6e12; // when the save was made; used to compute offline production
@@ -2672,7 +2802,7 @@ export class CCSave {
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
 
-    static maxVersion = 2.042;
+    static maxVersion = 2.044;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
 
     static toNativeSave(save: CCSave): string {
@@ -2750,24 +2880,10 @@ export class CCSave {
         saveString += CCBuildingsData.toNativeSave(save.buildings, save.version);
 
         saveString += '|';
-        let upgrades = '00'.repeat(UpgradesById.length).split('');
-        for(let upgrade of save.ownedUpgrades) {
-            let i = UpgradesByName[upgrade];
-            upgrades[2*i] = upgrades[2*i+1] = '1';
-        }
-        for(let upgrade of save.unlockedUpgrades) {
-            let i = UpgradesByName[upgrade];
-            upgrades[2*i] = '1';
-        }
-        saveString += upgrades.join('');
+        saveString += upgradeListToNativeSave(save.ownedUpgrades, save.unlockedUpgrades, save.version);
 
         saveString += '|';
-        let achievements = '0'.repeat(AchievementsById.length).split('');
-        for(let achievement of save.achievements) {
-            let i = AchievementsByName[achievement];
-            achievements[i] = '1';
-        }
-        saveString += achievements.join('');
+        saveString += achievementListToNativeSave(save.achievements, save.version);
 
         saveString += '|';
         saveString += save.buffs.map(writeBuffToString).join('');
