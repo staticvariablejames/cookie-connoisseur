@@ -1,8 +1,8 @@
 import * as fsPromises from 'fs/promises';
 import { Browser, BrowserContext, Page, Route } from 'playwright';
-import { liveURLs as builtinURLs, liveEntryURL as entryURL } from './url-list-live';
+import { betaURLs as builtinURLs, betaEntryURL as entryURL } from './url-list-beta';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
-import { BrowserUtilitiesOptions, initBrowserUtilities } from './browser-utilities';
+import { BrowserUtilitiesOptions, initBrowserUtilities, CookieClickerLanguage } from './browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 import { CCSave, CCBuildingsData } from './ccsave';
 
@@ -18,6 +18,7 @@ export type CCPageOptions = {
     saveGame?: string | object,
     mockedDate?: number,
     waitForMinigames?: boolean,
+    language?: CookieClickerLanguage | null,
 };
 
 /* The first three options may be requested multiple times,
@@ -98,6 +99,16 @@ function getWaitForMinigames(options: CCPageOptions) {
     }
 }
 
+function getLanguage(options: CCPageOptions): CookieClickerLanguage | null {
+    if(typeof options.language == 'string') {
+        return options.language;
+    } else if(typeof options.language == 'object') {
+        return null;
+    } else {
+        return 'EN';
+    }
+}
+
 /* Helper function.
  * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
  * this function fulfills the request with the format that the game expects
@@ -133,7 +144,7 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions, config: 
  */
 async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
     let url = route.request().url();
-    if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
+    if(!url.includes('https://orteil.dashnet.org/cookieclicker/beta/server.php?q=checkupdate'))
         return false;
 
     await route.fulfill({
@@ -352,6 +363,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
     let utilOptions: BrowserUtilitiesOptions = {
         mockedDate: getMockedDate(options),
         saveGame: getSaveGame(options),
+        language: getLanguage(options),
     };
     await page.addInitScript(initBrowserUtilities, utilOptions);
 

@@ -12,14 +12,35 @@ declare global {
     }
 }
 
+// Available languages
+export type CookieClickerLanguage =
+    'CS' |
+    'DE' |
+    'EN' |
+    'ES' |
+    'FR' |
+    'IT' |
+    'JA' |
+    'KO' |
+    'NL' |
+    'PL' |
+    'PT-BR' |
+    'RU' |
+    'ZH-CN';
+
+
 export type BrowserUtilitiesOptions = {
     mockedDate: number;
+    language: CookieClickerLanguage | null;
     saveGame: string;
 }
 
 export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     if(options.saveGame != '') {
-        window.localStorage.setItem('CookieClickerGame', options.saveGame);
+        window.localStorage.setItem('CookieClickerGameBeta', options.saveGame);
+    }
+    if(options.language) {
+        window.localStorage.setItem('CookieClickerLang', options.language);
     }
 
     let mockedDate = options.mockedDate;
@@ -174,7 +195,7 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     }
 
     let clickBigCookie = () => {
-        Game.lastClick = Date.now() - 4; // Will be reset to Date.now() by Game.ClickCookie()
+        Game.lastClick = Date.now() - 20; // Will be reset to Date.now() by Game.ClickCookie()
         if(Game.T < 3) Game.T = 3;
         // TODO: remove the "as any" when @types/cookieclicker fixes the type of Game.ClickCookie
         (Game as any).ClickCookie();
