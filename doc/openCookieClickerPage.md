@@ -75,6 +75,25 @@ Available options:
     you have to set the corresponding building level to zero,
     and level it up inside your script.
 
+    As a safeguard,
+    if the `language` option is explicitly set to `null`,
+    this option is treated as `false` regardless of its value.
+
+-   `language: string | null`
+    Chooses which localization file to use.
+    Defaults to `'EN'`.
+
+    The value of this option must be one of the available languages
+    (`'CS'`, `'DE', `'EN'`, `'ES'`, `'FR'`, `'IT'`, `'JA'`, `'KO'`,
+    `'NL'`, `'PL'`, `'PT-BR'`, `'RU'`, `'ZH-CN'),
+    or `null`.
+
+    If explicitly set to `null`,
+    no language option is chosen,
+    and the returned `Page` will be in the language selection menu.
+    In this case,
+    the `waitForMinigames` option is ignored.
+
 The first three options
 (`heralds`, `grandmaNames` and `updatesResponse`)
 are updated by the game every 60 minutes,
