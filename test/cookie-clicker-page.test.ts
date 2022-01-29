@@ -142,3 +142,21 @@ test.describe('Waiting for minigames', () => {
         expect(await page.evaluate(() => Game.isMinigameReady(Game.Objects['Wizard tower']))).toBeFalsy();
     });
 });
+
+test.describe('Language selection', () => {
+    test('defaults to English', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        let statsButton = await page.locator('#statsButton');
+        let lang = await page.evaluate(() => window.localStorage.getItem('CookieClickerLang'));
+        expect(await statsButton.innerText()).toEqual('Stats');
+        expect(lang).toEqual('EN');
+    });
+
+    test('can be set to French', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {language: 'FR'});
+        let statsButton = await page.locator('#statsButton');
+        let lang = await page.evaluate(() => window.localStorage.getItem('CookieClickerLang'));
+        expect(await statsButton.innerText()).toEqual('Statistiques');
+        expect(lang).toEqual('FR');
+    });
+});
