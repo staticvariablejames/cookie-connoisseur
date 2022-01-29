@@ -92,7 +92,9 @@ function getMockedDate(options: CCPageOptions) {
 }
 
 function getWaitForMinigames(options: CCPageOptions) {
-    if(typeof options.waitForMinigames == 'boolean') {
+    if(options.language === null) {
+        return false;
+    } else if(typeof options.waitForMinigames == 'boolean') {
         return options.waitForMinigames;
     } else {
         return true;
@@ -387,7 +389,10 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
     });
 
     await page.goto(entryURL);
-    await page.waitForFunction(() => Game != undefined && 'ready' in Game && Game.ready);
+    await page.waitForFunction(() => typeof Game != 'undefined');
+    if(options.language !== null) {
+        await page.waitForFunction(() => 'ready' in Game && Game.ready);
+    }
 
     if(getWaitForMinigames(options)) {
         let save = new CCSave();

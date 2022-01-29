@@ -159,4 +159,34 @@ test.describe('Language selection', () => {
         expect(await statsButton.innerText()).toEqual('Statistiques');
         expect(lang).toEqual('FR');
     });
+
+    test('can be explicitly null', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {language: null});
+        await page.click('text=Deutsch');
+        await page.waitForFunction(() => 'ready' in Game && Game.ready);
+        let statsButton = await page.locator('#statsButton');
+        let lang = await page.evaluate(() => window.localStorage.getItem('CookieClickerLang'));
+        expect(await statsButton.innerText()).toEqual('Statistiken');
+        expect(lang).toEqual('DE');
+    });
+
+    test('forces waitForMinigames to be ignored', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {
+            language: null,
+            saveGame: {
+                buildings: {
+                    'Bank': {
+                        amount: 1,
+                        level: 1,
+                    },
+                },
+            },
+        });
+        await page.click('text=Polski');
+        await page.waitForFunction(() => 'ready' in Game && Game.ready);
+        let statsButton = await page.locator('#statsButton');
+        let lang = await page.evaluate(() => window.localStorage.getItem('CookieClickerLang'));
+        expect(await statsButton.innerText()).toEqual('Statystyki');
+        expect(lang).toEqual('PL');
+    });
 });
