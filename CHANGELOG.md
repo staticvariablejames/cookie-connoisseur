@@ -5,8 +5,8 @@
 ## 0.3.0 - 2022-01-29
 
 - Added: `language` option for `openCookieClickerPage`.
-- Changed: Cookie Connoisseur now downloads and uses the game files from the beta version 2.044.
-    (**breaking**)
+- Changed: Cookie Connoisseur now downloads and uses the game files from the beta version 2.044
+    (**breaking**).
 
 ## 0.2.2 - 2022-01-10
 
