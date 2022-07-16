@@ -10,28 +10,28 @@ export const betaURLs: URLDirectory = {
     },
     'https://orteil.dashnet.org/cookieclicker/beta/index.html': {
         contentType: 'text/html; charset=UTF-8', // see encoding.test.ts
-        sha1sum: '1d126fb48baf4e23a67ca3aef9d665a9ffe38550',
+        sha1sum: 'edad550de5df315c2f3e528b0d1b05de837c6127',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/main.js': {
-        sha1sum: '496a57a566f3baa05c8a50d5ef22cf584a91285e',
+        sha1sum: '19a78a4ac549988e286e2679f9395d44cfd362fc',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/minigameGarden.js': {
-        sha1sum: '55e35632a4aa944668ddfabfedab000a6c87685a',
+        sha1sum: '1cdd030aac75c584a4381cfbff2b46b504eba7f0',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/minigameGrimoire.js': {
-        sha1sum: '833884a6a1bf0b9b71ef3b599c24206246e3ba8a',
+        sha1sum: 'd4b70b7215b052eaaf7cd9fdcd69a8e7a1c9327b',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/minigameMarket.js': {
-        sha1sum: '2a8899994d8804c3c2e5cf609b4f2f814ba3bcff',
+        sha1sum: 'fdaf30c59cf2ab89bf0b54243f7208bb6e0b03df',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/minigamePantheon.js': {
-        sha1sum: 'e779590be81a4d8fc16d89ede1c4415fbeeb39c4',
+        sha1sum: '4d1a3950b078b1a7895087867012d9c4b33b221b',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/showads.js': {
         sha1sum: 'b1375e41dfe177c4e35048eb5779ab684f424127',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/style.css': {
-        sha1sum: 'cfb885a32869fb41ca140255a5373211bc122787',
+        sha1sum: '00084a12e2c2bdd370bcf7dfea5a3a25864503d1',
     },
 
     'https://orteil.dashnet.org/cookieclicker/beta/img/alchemylabBackground.png': {
@@ -77,19 +77,40 @@ export const betaURLs: URLDirectory = {
         sha1sum: '83c29fd4f7908a06905e50008db844261b8c38da',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/bgBlack.jpg': {
-        sha1sum: '97231fb60f6666cbb047642efddd3a5cd38ec4ed',
+        sha1sum: 'ab4df909a0e6f0b57cae748659813c6af7fccf52',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/bgBlue.jpg': {
-        sha1sum: 'b971e72a739b96c859b4a0853f9f0bbcd941e8dd',
+        sha1sum: '305de9aca0575aa8ee963ef843f390014b24550b',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgBW.jpg': {
+        sha1sum: 'da509ddac895eacd43ef45a3f901b8bd8eb4f960',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgCandy.jpg': {
+        sha1sum: '0ab7caffe0a75e469c25b37a2d1f7ea4a1672028',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgChoco.jpg': {
+        sha1sum: '9408e27332c82c343080c07a2f1131aa3170488b',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgChocoDark.jpg': {
+        sha1sum: 'f220ef89599bcc151fbab5115de0eafa49744a21',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgCoarse.jpg': {
+        sha1sum: '6056cbff19e70dbe2b4f57ce686f64166be75657',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgFoil.jpg': {
+        sha1sum: '7c901a2c778da579f0ff6dc6f4e543f458fdf5ba',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/BGgarden.jpg': {
         sha1sum: 'd811b679145ce3f617a797280faf25b33fc5c2f1',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/bgGold.jpg': {
-        sha1sum: '2b25e5281d948d52708ebc7f2cd3a7d83b54edb4',
+        sha1sum: '2c67dadb5a8ffec6232e7ab04533354bdb0e774d',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/BGgrimoire.jpg': {
         sha1sum: '837c2c41be7ef924f67edf34befebe508877c7d8',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgMint.jpg': {
+        sha1sum: '3c97c1a4451c6844b701b0f666389cbab9bb4db9',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/BGmarket.jpg': {
         sha1sum: 'cb1b35013e4d232952f9eb3ccaa7df594d118adc',
@@ -97,14 +118,41 @@ export const betaURLs: URLDirectory = {
     'https://orteil.dashnet.org/cookieclicker/beta/img/bgMoney.jpg': {
         sha1sum: '8ce2ee0f4c0c5ba1115a6ba118ddf54330cacddf',
     },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgPaint.jpg': {
+        sha1sum: 'bcd1e12fd8d8d2a6d6233639885bb4c09e6a7d8c',
+    },
     'https://orteil.dashnet.org/cookieclicker/beta/img/BGpantheon.jpg': {
         sha1sum: '38dd14f996d69e57808502176c9fd1a7cfaab42d',
     },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgPink.jpg': {
+        sha1sum: '8f1a88b56e73af1a3d07ee455795f0e23810090c',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgPurple.jpg': {
+        sha1sum: '32cf96d6946290b5f2c62a4f2290d0264e71aba6',
+    },
     'https://orteil.dashnet.org/cookieclicker/beta/img/bgRed.jpg': {
-        sha1sum: '2eea4e8ea984fe18ff8779dc2aa4dcb89be92ede',
+        sha1sum: 'ee704a5f3f00bdaa7648b7a1f65d6d2b1f980a02',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgSilver.jpg': {
+        sha1sum: '3d4885048519720af4f0ec9fcf04ac4f8fc4765a',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgSky.jpg': {
+        sha1sum: 'ad9aa65d3db30e53a60d1ff01c1b3d2750a50bf3',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgSnowy.jpg': {
+        sha1sum: '1355114c67f91d84d84fd3d74288830d86748faf',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgSpectrum.jpg': {
+        sha1sum: '07e59d78539b6b2d248ea4a3094ca2f305e5377f',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgStars.jpg': {
+        sha1sum: '91c58e63dc00091115972ce10641d4b1612ab34e',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/bgWhite.jpg': {
-        sha1sum: 'cb9d345f3ca84291141ebb336d691bbe38b936d0',
+        sha1sum: '5aef7cb66e01dc893e0ff30841a5456b459c58f3',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/bgYellowBlue.jpg': {
+        sha1sum: '004bfae39cbd7896e063f77ad88cf50d6008d891',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/blackGradient.png': {
         sha1sum: '90580358baf717939a0515aa3552e47e2f00ed8c',
@@ -286,7 +334,7 @@ export const betaURLs: URLDirectory = {
         sha1sum: '19e7bbba3956590912a66c4b2c536543f75e541e',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/icons.png': {
-        sha1sum: '9f7fbf54fa40b314b23d6353d1a1133c552a0ce3',
+        sha1sum: '1bbf49652cac775fe74406d7fe4ec3f3ca72c7bd',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/idleverseBackground.png': {
         sha1sum: 'aadc7e56984f805c0769bd94f44572bcd7385f64',
@@ -470,6 +518,9 @@ export const betaURLs: URLDirectory = {
     'https://orteil.dashnet.org/cookieclicker/beta/img/pieFill.png': {
         sha1sum: 'cb35b02bbf4ce3d7e6ae97a8809ad65737eb0c51',
     },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/pointGlow.gif': {
+        sha1sum: '8f3e6891a637f6b2ed36aab0009deb15654496e2',
+    },
     'https://orteil.dashnet.org/cookieclicker/beta/img/pointyLad.png': {
         sha1sum: '7dea1eaae2d1b95d5a209c02054e65aef2ead171',
     },
@@ -502,6 +553,9 @@ export const betaURLs: URLDirectory = {
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/scriptGrandma.png': {
         sha1sum: 'cf5b8a055e4c0ceeae83d1ec4fea7c15cdd9fdaf',
+    },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/selectTarget.png': {
+        sha1sum: '230585d5e83017be7bbb9ce96473d63fb15c74c5',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/img/shadedBordersGold.png': {
         sha1sum: '1896f81107cb2d5be52b98f5706f0d42c9dc7570',
@@ -599,6 +653,9 @@ export const betaURLs: URLDirectory = {
     'https://orteil.dashnet.org/cookieclicker/beta/img/tinyEyeOn.png': {
         sha1sum: '54b53e1476702d2e35ff901b87e6bda37a7265ea',
     },
+    'https://orteil.dashnet.org/cookieclicker/beta/img/tinyglobe.gif': {
+        sha1sum: 'd5de284b89ec246fe7311493bc181bc248f8353a',
+    },
     'https://orteil.dashnet.org/cookieclicker/beta/img/transmutedGrandma.png': {
         sha1sum: '3c5651d242735fd123e11841e1074151355ed697',
     },
@@ -658,43 +715,43 @@ export const betaURLs: URLDirectory = {
     },
 
     'https://orteil.dashnet.org/cookieclicker/beta/loc/CS.js': {
-        sha1sum: 'a6a7f1e477feab31046142ebc7ee4b41cddf25ac',
+        sha1sum: 'eac09a92481f70f91f2989fa261066354f516168',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/DE.js': {
-        sha1sum: '8d3a3de432ffcbb9fa4e34f140aa6c87c59e64f4',
+        sha1sum: 'bffe1a555cb426b225a7968c5f8a5dec6e6e56f3',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/EN.js': {
-        sha1sum: '36c40c64f8d88716452c18bbb29d86965a39c643',
+        sha1sum: '6ef4f568c0d207803b7a50a2396c9caac2f32485',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/ES.js': {
-        sha1sum: '3be3fb455222e5b424f2f808e2ce63cceb4bfda4',
+        sha1sum: 'd20d6a7d4e102691c920c2878d3cc56111301022',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/FR.js': {
-        sha1sum: '609bde532bf79bea7b23a7754b421049ba88fef9',
+        sha1sum: 'd958c5dda676a57633b51f50677bad878184307c',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/IT.js': {
-        sha1sum: '4fce6c051971ca18e5e4118c564aeaf446576ea8',
+        sha1sum: '33be34e6569177ae6f68e64298206c95502308d8',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/JA.js': {
-        sha1sum: '847ed8fc2836593fdb89926c92fb02035d007cd6',
+        sha1sum: '7669945d7bebdc4dfee3369f5ec9d66b1a466980',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/KO.js': {
-        sha1sum: '5e916e64c1f730d45a41ce8a0652fe26a5528eca',
+        sha1sum: '03c3265228be87b023717261f61b2e96aea09821',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/NL.js': {
-        sha1sum: '386d681116a3e19017b3de8d427ac5415c6a39a1',
+        sha1sum: '1556a1e0a984929f39939e28c1ba17f1f8da40a6',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/PL.js': {
-        sha1sum: 'd9fcb24fdb45c38c29975a9357af3fa56a3686ef',
+        sha1sum: '11ef4bf41e533032b0d1524b23032313d5baff41',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/PT-BR.js': {
-        sha1sum: 'b271fab248aa1f728d023f8824e6919cf47c458b',
+        sha1sum: '3d1702799eefa2f2306825c90500216f4ce67a66',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/RU.js': {
-        sha1sum: '3168e3887654eb358387e1ca7aee210dc658fc63',
+        sha1sum: '81f51ff6411bd363732023d251c2bb61d4ac585f',
     },
     'https://orteil.dashnet.org/cookieclicker/beta/loc/ZH-CN.js': {
-        sha1sum: 'e7ed9d711c52d91b87b8cd12eb10c62f62a61027',
+        sha1sum: '620062bdb62b11dc1579dbd4b8226bc7f32c120d',
     },
 
     'https://orteil.dashnet.org/cookieclicker/beta/snd/buy1.mp3': {
@@ -901,7 +958,7 @@ export const betaURLs: URLDirectory = {
     },
     'https://fonts.googleapis.com/css?family=Merriweather:900&subset=latin,latin-ext': {
         contentType: 'text/css',
-        sha1sum: '8a58228f79ab43ed64d9bda99a78ce8545a63c2c',
+        sha1sum: '6b3f25fcfc268258698f614589daaa18140d49b5',
     },
 };
 
