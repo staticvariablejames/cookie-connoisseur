@@ -1,6 +1,6 @@
 import * as fsPromises from 'fs/promises';
 import { Browser, BrowserContext, Page, Route } from 'playwright';
-import { betaURLs as builtinURLs, betaEntryURL as entryURL } from './url-list-beta';
+import { liveURLs as builtinURLs, liveEntryURL as entryURL } from './url-list-live';
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities, CookieClickerLanguage } from './browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
@@ -60,7 +60,7 @@ function getUpdatesResponse(options: CCPageOptions) {
     } else if (typeof options.updatesResponse == 'function') {
         return options.updatesResponse();
     } else {
-        return '2.029|new stock market minigame!';
+        return '2.048|new building and a whole lot of other things!';
     }
 }
 
@@ -146,7 +146,7 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions, config: 
  */
 async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
     let url = route.request().url();
-    if(!url.includes('https://orteil.dashnet.org/cookieclicker/beta/server.php?q=checkupdate'))
+    if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
         return false;
 
     await route.fulfill({

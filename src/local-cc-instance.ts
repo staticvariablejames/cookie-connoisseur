@@ -8,7 +8,7 @@
 import { Response } from 'playwright';
 import { promises as fsPromises } from 'fs';
 import { dirname } from 'path';
-import { betaURLsToDrop as urlsToDrop } from './url-list-beta';
+import { liveURLsToDrop as urlsToDrop } from './url-list-live';
 import { sha1sumFromBuffer } from './util';
 
 export function localPathOfURL(url: string) {
