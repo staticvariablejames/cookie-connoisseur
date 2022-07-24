@@ -198,7 +198,7 @@ test.describe('Ascend, reincarnate:', () => {
     test('Autoascending while manually ascending does nothing', async ({ browser }) => {
         let page = await openCookieClickerPage(browser);
         await page.click('text=Legacy');
-        await page.click('text=Yes!');
+        await page.click('a:has-text("Ascend")');
         await page.evaluate(() => CConnoisseur.ascend());
         expect(await page.evaluate(() => Game.AscendTimer)).toBeGreaterThan(0);
         expect(await page.evaluate(() => Game.OnAscend)).toBeFalsy();

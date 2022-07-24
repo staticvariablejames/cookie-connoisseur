@@ -122,6 +122,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
         notScary:  false,
         fullscreen: false,
         screenreader: false,
+        discordPresence: true,
     },
 
     cookies: 2.8669364395786304e+64,
@@ -1551,7 +1552,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
     },
 };
 
-const saveAsString2_04 = // 2.031 save game
+const saveAsString2_04 = // 2.04 save game
    'Mi4wNHx8MTYzMDg2ODgzNDMzMDsxNjMwNTM3NzIwODM3OzE2MzA5ODE4MzUxMzY7U3RhdGljO2Jy'+
    'b3R4fDExMTExMTAxMTAwMTExMTAwMTAxMDEwMDB8MS4zOTczMjYyMzExODE0MTE1ZSsyODsyLjQ1'+
    'OTEyMTUxNTAwMjYyODZlKzI4OzIxMTU7MTMyNDsyLjA5MTQ0MDIwMzEyMjkzMzRlKzI4Ozc3MDsw'+
@@ -1655,6 +1656,7 @@ const saveAsObject2_04 = {
         notScary: false,
         fullscreen: false,
         screenreader: false,
+        discordPresence: true,
     },
 
     cookies: 1.3973262311814115e+28,

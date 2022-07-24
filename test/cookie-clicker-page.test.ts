@@ -163,7 +163,11 @@ test.describe('Language selection', () => {
     test('can be explicitly null', async ({ browser }) => {
         let page = await openCookieClickerPage(browser, {language: null});
         await page.click('text=Deutsch');
-        await page.waitForFunction(() => 'ready' in Game && Game.ready);
+        // This reloads the page, so wait till it says "Statistiken"
+        await page.waitForSelector('text=Statistiken');
+        await page.waitForFunction(() => {
+            return typeof Game != 'undefined' && 'ready' in Game && Game.ready
+        });
         let statsButton = await page.locator('#statsButton');
         let lang = await page.evaluate(() => window.localStorage.getItem('CookieClickerLang'));
         expect(await statsButton.innerText()).toEqual('Statistiken');
@@ -183,7 +187,11 @@ test.describe('Language selection', () => {
             },
         });
         await page.click('text=Polski');
-        await page.waitForFunction(() => 'ready' in Game && Game.ready);
+        // This reloads the page, so wait till it says "Statystyki"
+        await page.waitForSelector('text=Statystyki');
+        await page.waitForFunction(() => {
+            return typeof Game != 'undefined' && 'ready' in Game && Game.ready
+        });
         let statsButton = await page.locator('#statsButton');
         let lang = await page.evaluate(() => window.localStorage.getItem('CookieClickerLang'));
         expect(await statsButton.innerText()).toEqual('Statystyki');
