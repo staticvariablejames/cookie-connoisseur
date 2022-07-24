@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Changed: Cookie Connoisseur now downloads and uses the game files from the live version 2.048
+    (**breaking**).
+
 ## 0.3.0 - 2022-01-29
 
 - Added: `language` option for `openCookieClickerPage`.
