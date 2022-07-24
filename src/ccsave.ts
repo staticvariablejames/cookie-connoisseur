@@ -80,10 +80,14 @@ export class CCPreferences {
     // Introduced in 2.042
     screenreader: boolean = false; // Add some DOM attributes to help screenreaders
 
+    // Introduced in 2.046 (or was it 2.047?); active only on Steam
+    discordPresence: boolean = true; // Whether to activate Discord Rich Presence or not
+
     static attributeCount(version: number) {
         if(version <= 2.031) return 21;
         if(version <= 2.040) return 25;
-        return 26; // version 2.042
+        if(version <= 2.042) return 26;
+        return 27; // version 2.042
     }
 
     static toNativeSave(prefs: CCPreferences, version: number) {
@@ -742,6 +746,8 @@ export class CCBuildingsData { // Aggregates all buildings
     'Fractal engine': CCPlainBuilding = new CCPlainBuilding();
     'Javascript console': CCPlainBuilding = new CCPlainBuilding();
     'Idleverse': CCPlainBuilding = new CCPlainBuilding();
+
+    // Introduced in 2.044
     'Cortex baker': CCPlainBuilding = new CCPlainBuilding();
 
     static fromNativeSave(str: string) {
@@ -1649,6 +1655,59 @@ export const UpgradesById = [
     "Aetherice mouse",
     "Kitten admins",
     "Everybutter biscuit",
+
+    // Introduced in 2.045
+    "Unshackled cursors",
+    "Unshackled grandmas",
+    "Unshackled farms",
+    "Unshackled mines",
+    "Unshackled factories",
+    "Unshackled banks",
+    "Unshackled temples",
+    "Unshackled wizard towers",
+    "Unshackled shipments",
+    "Unshackled alchemy labs",
+    "Unshackled portals",
+    "Unshackled time machines",
+    "Unshackled antimatter condensers",
+    "Unshackled prisms",
+    "Unshackled chancemakers",
+    "Unshackled fractal engines",
+    "Unshackled javascript consoles",
+    "Unshackled idleverses",
+    "Unshackled cortex bakers",
+    "Unshackled flavor",
+    "Unshackled berrylium",
+    "Unshackled blueberrylium",
+    "Unshackled chalcedhoney",
+    "Unshackled buttergold",
+    "Unshackled sugarmuck",
+    "Unshackled jetmint",
+    "Unshackled cherrysilver",
+    "Unshackled hazelrald",
+    "Unshackled mooncandy",
+    "Unshackled astrofudge",
+    "Unshackled alabascream",
+    "Unshackled iridyum",
+    "Unshackled glucosmium",
+    "Delicate touch",
+    "Steadfast murmur",
+    "Glittering edge",
+    "Distinguished wallpaper assortment",
+    "Sound test",
+    "Jukebox",
+    "Dalgona cookies",
+    "Spicy cookies",
+    "Smile cookies",
+    "Kolachy cookies",
+    "Gomma cookies",
+    "Vegan cookies",
+    "Coyotas",
+    "Frosted sugar cookies",
+    "Marshmallow sandwich cookies",
+    "Web cookies",
+    "Steamed cookies",
+    "Deep-fried cookie dough",
 ];
 
 export const UpgradesByName = invertMap(UpgradesById);
@@ -1668,8 +1727,12 @@ export function upgradeListToNativeSave(
         upgrades[2*i] = '1';
     }
 
-    let numberOfUpgrades = UpgradesById.length;
-    if(version <= 2.043) numberOfUpgrades = 729;
+    let numberOfUpgrades: number;
+    if     (version <= 2.043) numberOfUpgrades = 729;
+    else if(version <= 2.044) numberOfUpgrades = 768;
+    else if(version <= 2.045) numberOfUpgrades = 819;
+    else numberOfUpgrades = UpgradesById.length; // fallback
+
     return upgrades.slice(0, 2*numberOfUpgrades).join('');
 }
 
@@ -2265,6 +2328,18 @@ export const AchievementsById = [
     "Fake it till you bake it",
     "History in the baking",
     "Baby it's old outside",
+
+    // Introduced in 2.045
+    "Myriad",
+    "Kaizen",
+    "Beyond quality",
+
+    // Introduced in 2.046 (or was it 2.047?)
+    "Everything happens so much",
+    "I'll rest when I'm dead",
+    "What do you get for the baker who has everything",
+    "Bottomless pit",
+    "All the stars in heaven",
 ]
 
 export const AchievementsByName = invertMap(AchievementsById);
@@ -2276,8 +2351,13 @@ export function achievementListToNativeSave(achievementList: string[], version: 
         achievements[i] = '1';
     }
 
-    let numberOfAchievements = AchievementsById.length;
-    if(version <= 2.043) numberOfAchievements = 538;
+    let numberOfAchievements: number;
+    if     (version <= 2.043) numberOfAchievements = 538;
+    else if(version <= 2.044) numberOfAchievements = 581;
+    else if(version <= 2.045) numberOfAchievements = 584;
+    else if(version <= 2.046) numberOfAchievements = 589;
+    else numberOfAchievements = AchievementsById.length;
+
     return achievements.slice(0, numberOfAchievements).join('');
 }
 
@@ -2802,7 +2882,7 @@ export class CCSave {
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
 
-    static maxVersion = 2.044;
+    static maxVersion = 2.048;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
 
     static toNativeSave(save: CCSave): string {
