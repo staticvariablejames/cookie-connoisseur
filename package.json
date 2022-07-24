@@ -1,6 +1,6 @@
 {
   "name": "cookie-connoisseur",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Package for testing Cookie Clicker mods",
   "repository": "github:staticvariablejames/cookie-connoisseur",
   "main": "lib/index.js",

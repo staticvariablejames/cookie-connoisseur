@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.1 - 2022-07-23
+
 - Changed: Cookie Connoisseur now downloads and uses the game files from the live version 2.048
     (**breaking**).
 
