@@ -159,8 +159,7 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     }
 
     let spawnReindeer = (spawnLead?: boolean) => {
-        // TODO: remove the "any" as soon as the typo in @types/cookieclicker is fixed
-        let reindeer = new (Game as any).shimmer('reindeer') as Game.Shimmer;
+        let reindeer = new Game.shimmer('reindeer');
         if(typeof spawnLead != 'boolean' || spawnLead) {
             reindeer.spawnLead = 1;
         }

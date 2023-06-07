@@ -12,7 +12,7 @@ declare global {
         reincarnate: () => void,
         redrawMarketMinigame: () => void,
         startGrandmapocalypse: () => void,
-        spawnReindeer: (spawnLead?: boolean) => Game.Shimmer,
+        spawnReindeer: (spawnLead?: boolean) => Game.shimmer,
         spawnWrinkler: (id?: number) => number,
         popWrinkler: (id: number) => boolean,
         clickBigCookie: () => void,
