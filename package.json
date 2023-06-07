@@ -20,11 +20,11 @@
   "author": "Static Variable James",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "playwright": "^1.23.3"
+    "playwright": "^1.34.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.23.3",
-    "@types/cookieclicker": "^2.31.5",
-    "typescript": "^4.7.4"
+    "@playwright/test": "^1.34.3",
+    "@types/cookieclicker": "^2.52.0",
+    "typescript": "^4.9.5"
   }
 }
