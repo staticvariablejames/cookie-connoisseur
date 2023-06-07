@@ -84,8 +84,8 @@ Available options:
     Defaults to `'EN'`.
 
     The value of this option must be one of the available languages
-    (`'CS'`, `'DE', `'EN'`, `'ES'`, `'FR'`, `'IT'`, `'JA'`, `'KO'`,
-    `'NL'`, `'PL'`, `'PT-BR'`, `'RU'`, `'ZH-CN'),
+    (`'CS'`, `'DE'`, `'EN'`, `'ES'`, `'FR'`, `'IT'`, `'JA'`, `'KO'`,
+    `'NL'`, `'PL'`, `'PT-BR'`, `'RU'`, `'ZH-CN'`),
     or `null`.
 
     If explicitly set to `null`,
