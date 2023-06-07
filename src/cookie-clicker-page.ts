@@ -20,6 +20,7 @@ export type CCPageOptions = {
     mockedDate?: number,
     waitForMinigames?: boolean,
     language?: CookieClickerLanguage | null,
+    routingFallback?: (route: Route) => Promise<void>,
 };
 
 /* The first three options may be requested multiple times,
@@ -109,6 +110,14 @@ function getLanguage(options: CCPageOptions): CookieClickerLanguage | null {
         return null;
     } else {
         return 'EN';
+    }
+}
+
+function getRoutingFallback(options: CCPageOptions): (route: Route) => Promise<void> {
+    if(typeof options.routingFallback == 'function') {
+        return options.routingFallback;
+    } else {
+        return route => route.continue();
     }
 }
 
@@ -351,6 +360,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
     await page.addInitScript(initBrowserUtilities, utilOptions);
 
     await page.route('**/*', async route => {
+        console.log(`Requesting ${route.request().url()}`);
         if(await handlePatreonGrabs(route, options, config))
             return;
         if(await handleUpdatesQuery(route, options, config))
@@ -365,8 +375,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
             return;
         if(await handleForbiddenURLs(route))
             return;
-
-        await route.continue();
+        await getRoutingFallback(options)(route);
     });
 
     await page.goto(entryURL);

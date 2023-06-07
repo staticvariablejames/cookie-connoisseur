@@ -62,7 +62,12 @@ function launchCookieClickerInstance(args: string[]) {
 
     setTimeout(async () => {
         let browser = await firefox.launch( {headless: false} );
-        let page = await openCookieClickerPage(browser);
+        let page = await openCookieClickerPage(browser, {
+            routingFallback: route => {
+                console.log(`Internet request fallback for ${route.request().url()}`);
+                return route.continue();
+            },
+        });
         await new Promise(resolve => {
             page.on('close', () => {
                 resolve(true);

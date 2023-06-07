@@ -94,6 +94,35 @@ Available options:
     In this case,
     the `waitForMinigames` option is ignored.
 
+-   `routingFallback?: (route: Route) => Promise<void>`
+    Fallback for handling routes which are not accounted for by Cookie Connoisseur.
+    Defaults to `route => route.continue();`,
+    which simply forwards the route to the Internet.
+
+    Cookie Connoisseur will intercept several requests,
+    like using a file downloaded by `npx cookie-connoisseur fetch`
+    instead of letting the browser get it from the Internet.
+    However,
+    if Cookie Connoisseur does not know how to handle some request
+    (say, some mod queries a page which is not declared in the
+    [config file](../README.md#configuration-file)),
+    it will call this function instead.
+
+    For example,
+    for logging purposes,
+    `npx cookie-connoisseur launch` uses the following function:
+
+        routingFallback: route => {
+            console.log(`Internet request fallback for ${route.request().url()}`);
+            return route.continue();
+        },
+
+    Routing is done via [page.route](https://playwright.dev/docs/api/class-page#page-route).
+    If you register conflicting routes,
+    [the later routes take precedence](https://github.com/microsoft/playwright/issues/7394),
+    so you may override any route established by Cookie Connoisseur
+    by just registering a new route.
+
 The first three options
 (`heralds`, `grandmaNames` and `updatesResponse`)
 are updated by the game every 60 minutes,
@@ -101,9 +130,3 @@ querying an appropriate page.
 If you provide a function for these options,
 the function will be called every time it is needed,
 so you can use that to change those options dynamically.
-
-Routing is done via [page.route](https://playwright.dev/docs/api/class-page#page-route).
-If you register conflicting routes,
-[the later routes take precedence](https://github.com/microsoft/playwright/issues/7394),
-so you may override any route established by Cookie Connoisseur
-by just registering a new route.
