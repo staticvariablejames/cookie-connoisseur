@@ -6,7 +6,8 @@ import { BrowserUtilitiesOptions, initBrowserUtilities, CookieClickerLanguage } 
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 import { CCSave, CCBuildingsData } from './ccsave';
 
-/* See the documentation of openCookieClickerPage below for a description of these options.
+/* These options are documented in `doc/openCookieClickerPage.md`.
+ *
  * For convenience,
  * functions in this file pass around the entire `options` object to each other.
  */
@@ -320,27 +321,7 @@ async function handleForbiddenURLs(route: Route) {
 
 /* Creates a new page using the given browser or browserContext,
  * and navigates to https://orteil.dashnet.org/cookieclicker/index.html.
- * Routes that query orteil.dashnet.org will be redirected to use the local cache instead.
- *
- * The second argument is an object with the optional arguments.
- * Some options can be changed dynamically; to do so,
- * provide a function returning the option instead of providing the option directly.
- *
- * Possible attributes of options:
- *  heralds <number>: Heralds and Patreon-submitted grandma names are obtained by querying
- *      https://orteil.dashnet.org/patreon/grab.php. Cookie Connoisseur intercepts this query;
- *      options.heralds is the number used in the response.
- *  grandmaNames <string[]>: list of names that some grandmas get if "Custom grandmas" is "ON".
- *      Names must not contain the pipe (|) character.
- *  updatesResponse <string>: Every 30 minutes Cookie Clicker checks for updates;
- *      this is the string fed to Game.CheckUpdatesResponse.
- *      The default value is '2.029|new stock market minigame!'.
- *  cookieConsent <boolean>: Unless set to 'false',
- *      the page includes the browser cookie `cookieconsent_dismissed=yes`,
- *      which dismisses the cookie consent dialog.
- *  saveGame <string | object>: String to be used as the stored save game.
- *      If it is an object, it is parsed by CCSave beforehand.
- *  mockedDate <number>: Initial value of CConnoisseur.mockedDate; see browser-utilities.d.ts.
+ * See `doc/openCookieClickerPage.md` for a complete documentation of the arguments.
  */
 export async function openCookieClickerPage(browser: Browser, options?: CCPageOptions): Promise<Page>;
 export async function openCookieClickerPage(context: BrowserContext, options?: CCPageOptions): Promise<Page>;
