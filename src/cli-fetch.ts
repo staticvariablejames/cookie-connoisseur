@@ -1,18 +1,15 @@
 /* This file contains the implementation of the 'cookie-connoisseur fetch' subcommand.
  */
-import { readFile } from 'fs/promises';
-import { localPathOfURL, makeDownloadingListener } from './local-cc-instance';
+import { makeDownloadingListener } from './local-cc-instance';
 import { chromium } from 'playwright';
 import { URLDirectory } from './url-list';
 import { liveURLs as builtinURLs } from './url-list-live';
 import { CookieConnoisseurConfig, parseConfigFile } from './parse-config';
-import { sha1sumFromBuffer } from './util';
 
 const helpString =
     "usage: npx cookie-connoisseur fetch [options]\n" +
     "Downloads a local copy of Cookie Clicker.\n" +
     "Options:\n" +
-    "   --checksum  Does not download anything, only checks file sha1sums\n" +
     "   --help      Show this help\n" +
     "   --save-prefix <path>\n" +
     "               Creates the .cookie-connoisseur directory under the given path\n"
@@ -20,7 +17,6 @@ const helpString =
     "";
 
 class FetchOptions {
-    checksumOnly: boolean = false;
     dir: string = './';
 };
 
@@ -35,9 +31,6 @@ function parseCommandLineArgs(args: string[]) {
             case '--help':
                 console.log(helpString);
                 return null;
-                break;
-            case '--checksum':
-                options.checksumOnly = true;
                 break;
             case '--save-prefix':
                 if(args[1] === undefined) {
@@ -56,33 +49,6 @@ function parseCommandLineArgs(args: string[]) {
     }
 
     return options;
-}
-
-async function verifyChecksums(urls: URLDirectory) {
-    for(let url in urls) {
-        if(url.endsWith('/favicon.ico')) {
-            // We ignore favicons
-            continue;
-        }
-
-        let path = localPathOfURL(url);
-        try {
-            let file = await readFile(path);
-            if(urls[url].sha1sum) {
-                let sha1sum = sha1sumFromBuffer(file);
-                if(sha1sum !== urls[url].sha1sum) {
-                    console.log(`sha1sum(${path}) = ${sha1sum}` +
-                                ` differs from expected ${urls[url].sha1sum}`);
-                }
-            } else {
-                console.log(`Missing sha1sum for ${path}`);
-            }
-        } catch (e) {
-            if(e instanceof Error && 'code' in e && e['code'] === 'ENOENT') {
-                console.log(`Missing file ${path}`);
-            }
-        }
-    }
 }
 
 /* This is the function that actually does the fetching.
@@ -142,10 +108,6 @@ export function fetchFiles(args: string[]) {
     setTimeout(async () => {
         let config = await parseConfigFile();
         let urls = {...builtinURLs, ...config.customURLs};
-        if(options!.checksumOnly) {
-            await verifyChecksums(urls);
-        } else {
-            await downloadFiles(urls, options!, config);
-        }
+        await downloadFiles(urls, options!, config);
     });
 }

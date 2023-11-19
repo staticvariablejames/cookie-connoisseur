@@ -2,6 +2,7 @@
  */
 const package_json = require('../package.json');
 import { fetchFiles } from './cli-fetch';
+import { checksumFiles } from './cli-checksum';
 import { firefox } from 'playwright';
 import { openCookieClickerPage } from './cookie-clicker-page';
 import { CCSave } from './ccsave';
@@ -12,6 +13,7 @@ process.stdin.setEncoding('utf8');
 let helpString =
     "usage: npx cookie-connoisseur <command>\n" +
     "where <command> is one of\n" +
+    "   checksum - Verifies the files of the local copy of Cookie Clicker\n" +
     "   fetch - Downloads a local copy of Cookie Clicker\n" +
     "           and of the files specified in cookie-connoisseur.config.json\n" +
     "   launch - Launches a Cookie Clicker instance\n" +
@@ -80,6 +82,9 @@ function launchCookieClickerInstance(args: string[]) {
 switch(args[0]) {
     case 'fetch':
         fetchFiles(args.splice(1));
+        break;
+    case 'checksum':
+        checksumFiles(args.splice(1));
         break;
     case 'launch':
         launchCookieClickerInstance(args.splice(1));

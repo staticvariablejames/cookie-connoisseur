@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Added: `routingFallback` option for `openCookieClickerPage`.
+- Changed: The `--checksum` option for `npx cookie-connoisseur fetch`
+    was moved to its own command (`npx cookie-connoisseur checksum`).
 
 ## 0.3.1 - 2022-07-23
 

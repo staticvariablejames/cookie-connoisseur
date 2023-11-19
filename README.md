@@ -118,6 +118,11 @@ Executables
 
 Cookie Connoiseur has a command-line interface with a few commands.
 
+    npx cookie-connoisseur checksum
+
+Tests the local Cookie Clicker instance downloaded by `npx cookie-connoisseur fetch`
+against a list of known "good" checksums to make sure that you have the correct files.
+
     npx cookie-connoisseur fetch
 
 This downloads the files needed to run a Cookie Clicker instance
