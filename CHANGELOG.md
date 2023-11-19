@@ -5,6 +5,9 @@
 - Added: `routingFallback` option for `openCookieClickerPage`.
 - Changed: The `--checksum` option for `npx cookie-connoisseur fetch`
     was moved to its own command (`npx cookie-connoisseur checksum`).
+- Added: Option `--update-database` for `npx cookie-connoisseur checksum`,
+    which updates `sha1sum`s
+    in files like `src/url-list-live.ts` and `cookie-connoisseur.config.json`.
 
 ## 0.3.1 - 2022-07-23
 

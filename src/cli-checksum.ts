@@ -1,6 +1,6 @@
 /* This file contains the implementation of the 'cookie-connoisseur checksum' subcommand.
  */
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { localPathOfURL } from './local-cc-instance';
 import { URLDirectory } from './url-list';
 import { liveURLs as builtinURLs } from './url-list-live';
@@ -54,7 +54,7 @@ function parseCommandLineArgs(args: string[]) {
     return options;
 }
 
-/* List of pairs [file path, checksum].
+/* List of pairs [url, checksum].
  */
 type ChecksumList = [string,string][];
 
@@ -78,7 +78,7 @@ async function verifyChecksums(urls: URLDirectory): Promise<ChecksumList> {
                 if(sha1sum !== urls[url].sha1sum) {
                     console.log(`sha1sum(${path}) = ${sha1sum}` +
                                 ` differs from expected ${urls[url].sha1sum}`);
-                    mismatches.push([path, sha1sum]);
+                    mismatches.push([url, sha1sum]);
                 }
             } else {
                 console.log(`Missing sha1sum for ${path}`);
@@ -92,8 +92,27 @@ async function verifyChecksums(urls: URLDirectory): Promise<ChecksumList> {
     return mismatches;
 }
 
-async function updateDatabase(_databasePath: string, _mismatchedChecksums: ChecksumList) {
-    console.log('TODO: implement updateDatabase');
+async function updateDatabase(databasePath: string, mismatchedChecksums: ChecksumList) {
+    let database = (await readFile(databasePath)).toString(); // TODO: error checking
+    for(let [url, sha1sum] of mismatchedChecksums) {
+        let urlIndex = database.indexOf(url);
+        let sha1sumIndex = database.indexOf('sha1sum', urlIndex+1);
+        let leftQuoteIndex = database.indexOf("'", sha1sumIndex+1);
+        let rightQuoteIndex = database.indexOf("'", leftQuoteIndex+1);
+        if(
+            urlIndex === -1 ||
+            sha1sumIndex === -1 ||
+            leftQuoteIndex === -1 ||
+            rightQuoteIndex === -1
+        ) {
+            // url not found in the database
+            continue;
+        }
+
+        database = database.substring(0, leftQuoteIndex+1) + sha1sum + database.substring(rightQuoteIndex, database.length);
+    }
+
+    await writeFile(databasePath, database);
 }
 
 /* args should essentially be process.argv.splice(3);
