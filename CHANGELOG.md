@@ -8,6 +8,9 @@
 - Added: Option `--update-database` for `npx cookie-connoisseur checksum`,
     which updates `sha1sum`s
     in files like `src/url-list-live.ts` and `cookie-connoisseur.config.json`.
+- Changed: Console logging was tweaked;
+    it should be less spammy now,
+    unless explicitly requested in `cookie-connoisseur.config.json`.
 - Fixed: Cookie Connoisseur now also handles resources requested from <cdn.orteil.org>
     as if they were from its corresponding <orteil.dashnet.org> URL.
 - Removed: `--checksum` option for `npx cookie-connoisseur fetch`;

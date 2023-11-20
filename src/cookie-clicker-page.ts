@@ -142,7 +142,7 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions, config: 
         contentType: 'text/html',
         body: response,
     }).catch(reason => {
-        if(config.verbose >= 2)
+        if(config.verbose >= 1)
             console.log(`Couldn't deliver Herald count and Grandma names: ${reason}`);
     });
 
@@ -164,7 +164,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: 
         contentType: 'text/html',
         body: getUpdatesResponse(options),
     }).catch(reason => {
-        if(config.verbose >= 2)
+        if(config.verbose >= 1)
             console.log(`Couldn't deliver answer to updates query: ${reason}`);
     });
     return true;
@@ -197,7 +197,7 @@ async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
             options.contentType = builtinURLs[url].contentType;
         }
         await route.fulfill(options).catch(reason => {
-            if(config.verbose >= 2)
+            if(config.verbose >= 1)
                 console.log(`Couldn't deliver cached page ${url}: ${reason}`);
         });
     }
@@ -269,7 +269,7 @@ async function handleLocalFile(route: Route, config: CookieConnoisseurConfig) {
     try {
         let file = await fsPromises.readFile(path);
         await route.fulfill({body: file}).catch(reason => {
-            if(config.verbose >= 2)
+            if(config.verbose >= 1)
                 console.log(`Couldn't deliver local page ${url}: ${reason}`);
         });
     } catch (e) {
@@ -297,14 +297,14 @@ async function handleLocalDirectory(route: Route, config: CookieConnoisseurConfi
             try {
                 let file = await fsPromises.readFile(filePath);
                 await route.fulfill({body: file}).catch(reason => {
-                    if(config.verbose >= 2)
+                    if(config.verbose >= 1)
                         console.log(`Couldn't deliver local page ${url}: ${reason}`);
                 });
             } catch (e) {
                 if(!(e instanceof Error && 'code' in e && e['code'] === 'ENOENT')) {
                     throw e;
                 }
-                if(config.verbose >= 1) {
+                if(config.verbose >= 0) {
                     console.log(`File ${filePath} not found in directory ${directoryPath}`);
                 }
                 await route.continue();
@@ -360,7 +360,9 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
     await page.addInitScript(initBrowserUtilities, utilOptions);
 
     await page.route('**/*', async route => {
-        console.log(`Requesting ${route.request().url()}`);
+        if(config.verbose >= 2) {
+            console.log(`Requesting ${route.request().url()}`);
+        }
         if(await handlePatreonGrabs(route, options, config))
             return;
         if(await handleUpdatesQuery(route, options, config))
