@@ -24,14 +24,23 @@ export function isForbiddenURL(url: string) {
     return false;
 }
 
-/* For some reason, some URLs have a version attached at the end
+/* Removes version numbers and redirects CDN URLs to "regular" URLs.
+ *
+ * For some reason, some URLs have a version attached at the end
  * (like 'main.js?v=2.089' instead of just 'main.js'),
  * even though accessing 'https://orteil.dashnet.org/cookieclicker/main.js'
  * yields the same page as 'main.js?v=2.089' and 'main.js?v=2.058'.
  * This function strips that version number if present.
+ *
+ * Most (but not all) image resources are downloaded from cdn.dashnet.org,
+ * rather than orteil.dashnet.org;
+ * this function also redirects the former to the latter.
  */
 export function normalizeURL(url: string) {
-    return url.replace(/\?v=.*/, '').replace(/\?r=.*/, '');
+    return url
+        .replace(/\?v=.*/, '')
+        .replace(/\?r=.*/, '')
+        .replace('cdn.dashnet.org','orteil.dashnet.org');
 }
 
 /* Constructs an event listener for the page.on('response') event.
