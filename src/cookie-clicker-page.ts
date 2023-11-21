@@ -170,6 +170,29 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: 
     return true;
 }
 
+/* Helper function to helper function;
+ * it does an additional layer of normalization beyond what normalizeURL does.
+ *
+ * Cookie Clicker changed to use a CDN in 2.052;
+ * resources are loaded like `Game.resPath+'img/goldCookie.png'`,
+ * where `Game.resPath` is the base URL for the resources.
+ * However,
+ * the code that computes `Game.resPath` only works in <https://orteil.dashnet.org/cookieclicker/>,
+ * failing in <https://orteil.dashnet.org/cookieclicker/index.html>
+ * (note the "index.html" at the end).
+ * Hence we have to navigate to <https://orteil.dashnet.org/cookieclicker/>,
+ * but load the file <https://orteil.dashnet.org/cookieclicker/index.html> instead.
+ * This function replaces the former URL with the latter,
+ * allowing Cookie Connoisseur to fetch the proper file.
+ *
+ * This function exists primarily to document this issue.
+ */
+function index_html_workaround(url: string) {
+    if(url === entryURL)
+        return entryURL + 'index.html';
+    return url;
+}
+
 /* Helper function.
  * If the route queries a URL that is cached by Cookie Connoisseur by default,
  * this function fulfills the request with the appropriate file and returns true.
@@ -179,7 +202,7 @@ async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: 
  * It returns false if the URL is not cached by Cookie Connoisseur.
  */
 async function handleCacheFile(route: Route, config: CookieConnoisseurConfig) {
-    let url = normalizeURL(route.request().url());
+    let url = index_html_workaround(normalizeURL(route.request().url()));
     if(!(url in builtinURLs))
         return false;
 
