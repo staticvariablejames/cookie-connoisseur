@@ -273,6 +273,14 @@ In particular,
 clicks that trigger sounds (like clicking the big cookie)
 crash the WebKit browser on Linux.
 
+For some reason,
+Firefox's font rendering in Cookie Connoisseur
+(using the browser binaries provided by Playwright)
+differ from the font rendering of "live" Firefox
+(outside of Playwright, using Mozilla-provided binaries).
+Hence screenshots may differ from Cookie Connoisseur to live,
+but it should still be internally consistent.
+
 Checksums of PNG files are flaky.
 For some reason,
 some PNG files have distinct versions,
