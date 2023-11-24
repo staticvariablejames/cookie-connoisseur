@@ -94,6 +94,15 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
     lastDate: 1606617852540,
     bakeryName: 'Static',
     seed: 'ujxnq',
+    YouCustomizer: {
+        hair: 0,
+        hairCol: 1,
+        skinCol: 0,
+        head: 0,
+        face: 0,
+        acc1: 0,
+        acc2: 0,
+    },
 
     prefs: {
         particles: true,
@@ -183,6 +192,8 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
     fortuneCPS: true,
     cookiesPsRawHighest: 8.704799674705293e+50,
     volumeMusic: 50,
+    cookiesSent: 0,
+    cookiesReceived: 0,
 
     buildings: {
         'Cursor':               {amount: 731, bought: 2932, totalCookies:  4.543140626515491e+54, level: 20, muted: false, highest: 782},
@@ -273,6 +284,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
                     'RCP': {val: 163.58, mode: 'slow rise', d:  0.07, dur: 489, stock: 0, hidden: false, last: 0},
                     'SBD': {val: 148.23, mode:   'chaotic', d: -0.22, dur: 495, stock: 0, hidden: false, last: 0},
                     'PBL': {val:      1, mode:    'stable', d:     0, dur:   0, stock: 0, hidden: false, last: 0},
+                    'YOU': {val:      1, mode:    'stable', d:     0, dur:   0, stock: 0, hidden: false, last: 0},
                 },
             },
         },
@@ -292,6 +304,7 @@ const saveAsObject2_031: CCSave = { // Same save as above, but as an object
         'Javascript console':   {amount: 583, bought: 1962, totalCookies:  7.376629221584014e+55, level: 10, muted:  true, highest: 583},
         'Idleverse':            {amount: 545, bought: 2428, totalCookies: 4.6363535311180915e+56, level: 10, muted:  true, highest: 550},
         'Cortex baker':         {amount: 0,   bought: 0,    totalCookies:                      0, level:  0, muted: false, highest: 0},
+        'You':         {amount: 0,   bought: 0,    totalCookies:                      0, level:  0, muted: false, highest: 0},
     },
 
     ownedUpgrades: [
@@ -1628,6 +1641,15 @@ const saveAsObject2_04 = {
     lastDate: 1630981835136,
     bakeryName: "Static",
     seed: "brotx",
+    YouCustomizer: {
+        hair: 0,
+        hairCol: 1,
+        skinCol: 0,
+        head: 0,
+        face: 0,
+        acc1: 0,
+        acc2: 0,
+    },
 
     prefs: {
         particles: true,
@@ -1715,6 +1737,8 @@ const saveAsObject2_04 = {
     fortuneCPS: false,
     cookiesPsRawHighest: 2.860126534046133e+22,
     volumeMusic: 20,
+    cookiesSent: 0,
+    cookiesReceived: 0,
 
     buildings: {
         'Cursor':  {amount: 300, bought: 5719, totalCookies: 3.109262153738578e+22,  level: 0, muted: false, highest: 310},
@@ -1774,6 +1798,7 @@ const saveAsObject2_04 = {
                     RCP: {val:127.36, mode:"slow fall", d:-0.51, dur:359, stock:0,   hidden:false, last:0},
                     SBD: {val:77.5,   mode:"fast fall", d:-2.19, dur:280, stock:70,  hidden:false, last:2},
                     PBL: {val:1,      mode:'stable',    d:0,     dur:0,   stock:0,   hidden:false, last:0},
+                    YOU: {val:1,      mode:'stable',    d:0,     dur:0,   stock:0,   hidden:false, last:0},
                 }
             }
         },
@@ -1792,6 +1817,7 @@ const saveAsObject2_04 = {
         'Javascript console':   { amount: 100, bought: 100, totalCookies: 1.740298586732432e+26,  level: 0, muted: true,  highest: 100},
         'Idleverse':            { amount: 80,  bought: 82,  totalCookies: 7.952103393221773e+26,  level: 0, muted: true,  highest: 80},
         'Cortex baker':         { amount: 0,   bought: 0 ,  totalCookies: 0,                      level: 0, muted: false, highest: 0},
+        'You':                  { amount: 0,   bought: 0 ,  totalCookies: 0,                      level: 0, muted: false, highest: 0},
     },
 
     ownedUpgrades: [

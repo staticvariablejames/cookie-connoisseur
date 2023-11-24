@@ -48,6 +48,34 @@ import { invertMap, ErrorHandler, throwOnError, pseudoObjectAssign } from './uti
  */
 type TimePoint = number;
 
+export class YouCustomizerGenes {
+    hair: number = 0; // Index of the hair style
+    hairCol: number = 1; // Index of the hair color
+    skinCol: number = 0; // Index of the skin color
+    head: number = 0; // Index of the head shape
+    face: number = 0; // Index of the face type
+    acc1: number = 0; // Index of the first accessory
+    acc2: number = 0; // Index of the second accessory
+
+    static toNativeSave(currentGenes: YouCustomizerGenes, _version: number) {
+        return Object.values(currentGenes).join(',');
+    }
+
+    static fromNativeSave(str: string) {
+        let genes = str.split(',');
+        let currentGenes = new YouCustomizerGenes();
+        let keys = Object.keys(currentGenes) as Array<keyof YouCustomizerGenes>;
+        for(let i = 0; i < Math.min(keys.length, str.length); i++) {
+            currentGenes[keys[i]] = Number(genes[i]);
+        }
+        return currentGenes;
+    }
+
+    static fromObject(obj: unknown, onError: ErrorHandler, subobjectName: string) {
+        return pseudoObjectAssign(new YouCustomizerGenes(), obj, onError, subobjectName);
+    }
+}
+
 export class CCPreferences {
     particles: boolean = true; // e.g. cookies falling down
     numbers: boolean = true; // Numbers that pop up when clicking the big cookie
@@ -479,6 +507,7 @@ export class CCMarketStockList {
     RCP: CCMarketStock = new CCMarketStock(); // Recipes
     SBD: CCMarketStock = new CCMarketStock(); // Subsidiaries
     PBL: CCMarketStock = new CCMarketStock(); // Publicists
+    YOU: CCMarketStock = new CCMarketStock(); // You
 
     static fromNativeSave(str: string) {
         let l = new CCMarketStockList();
@@ -501,14 +530,18 @@ export class CCMarketStockList {
         l.RCP = CCMarketStock.fromNativeSave(data[14]);
         l.SBD = CCMarketStock.fromNativeSave(data[15]);
         l.PBL = CCMarketStock.fromNativeSave(data[16]);
+        l.YOU = CCMarketStock.fromNativeSave(data[17]);
         return l;
     }
 
     static toNativeSave(l: CCMarketStockList, version: number) {
         let str = '';
         let goods = Object.entries(l);
-        let numberOfStocks = goods.length;
+        let numberOfStocks = 15;
         if(version <= 2.043) numberOfStocks = 16;
+        else if(version <= 2.048) numberOfStocks = 17;
+        else if(version <= 2.052) numberOfStocks = 18;
+        else numberOfStocks = goods.length; // Fallback
         for(let i = 0; i < numberOfStocks; i++) {
             str += CCMarketStock.toNativeSave(goods[i][1], version) + '!';
         }
@@ -750,6 +783,9 @@ export class CCBuildingsData { // Aggregates all buildings
     // Introduced in 2.044
     'Cortex baker': CCPlainBuilding = new CCPlainBuilding();
 
+    // Introduced in 2.052
+    'You': CCPlainBuilding = new CCPlainBuilding();
+
     static fromNativeSave(str: string) {
         let buildings = new CCBuildingsData();
         let data = str.split(';');
@@ -775,6 +811,9 @@ export class CCBuildingsData { // Aggregates all buildings
         }
         if(data[18]) { // Cortex bakers were introduced in 2.044
             buildings['Cortex baker'] = CCPlainBuilding.fromNativeSave(data[18]);
+        }
+        if(data[19]) { // You were introduced in 2.052
+            buildings['You'] = CCPlainBuilding.fromNativeSave(data[19]);
         }
         return buildings;
     }
@@ -809,6 +848,8 @@ export class CCBuildingsData { // Aggregates all buildings
         str += CCPlainBuilding.toNativeSave(buildings['Idleverse'], version) + ';';
         if(version >= 2.044)
             str += CCPlainBuilding.toNativeSave(buildings['Cortex baker'], version) + ';';
+        if(version >= 2.052)
+            str += CCPlainBuilding.toNativeSave(buildings['You'], version) + ';';
         return str;
     }
 
@@ -1708,6 +1749,64 @@ export const UpgradesById = [
     "Web cookies",
     "Steamed cookies",
     "Deep-fried cookie dough",
+
+    // Introduced between 2.049 and 2.052
+    "Wrapping paper",
+    "Havreflarn",
+    "Alfajores",
+    "Gaufrettes",
+    "Cookie bars",
+    "Nines",
+    "Clone grandmas",
+    "Cloning vats",
+    "Energized nutrients",
+    "Stunt doubles",
+    "Clone recycling plant",
+    "Free-range clones",
+    "Genetic tailoring",
+    "Power in diversity",
+    "Self-betterment",
+    "Source control",
+    "United workforce",
+    "Safety patrols",
+    "Clone rights",
+    "One big family",
+    "Fine-tuned body plans",
+    "Foam-tipped canes",
+    "Self-driving tractors",
+    "Mineshaft supports",
+    "Universal automation",
+    "The big shortcake",
+    "Temple traps",
+    "Polymorphism",
+    "At your doorstep in 30 minutes or your money back",
+    "The dose makes the poison",
+    "A way home",
+    "Rectifying a mistake",
+    "Candied atoms",
+    "Lab goggles but like cool shades",
+    "Gambler's fallacy fallacy",
+    "The more they stay the same",
+    "Simulation failsafes",
+    "The other routes to Rome",
+    "Intellectual property theft",
+    "Reading your clones bedtime stories",
+    "Accelerated development",
+    "Peer review",
+    "Fortune #020",
+    "Personal biscuit",
+    "Unshackled glimmeringue",
+    "Unshackled You",
+    "Kitten strategists",
+    "Baklavas",
+    "Snowball cookies",
+    "Sequilhos",
+    "Hazelnut swirlies",
+    "Spritz cookies",
+    "Mbatata cookies",
+    "Springerles",
+    "Undecillion fingers",
+    "Omniplast mouse",
 ];
 
 export const UpgradesByName = invertMap(UpgradesById);
@@ -1731,13 +1830,15 @@ export function upgradeListToNativeSave(
     if     (version <= 2.043) numberOfUpgrades = 729;
     else if(version <= 2.044) numberOfUpgrades = 768;
     else if(version <= 2.045) numberOfUpgrades = 819;
+    else if(version <= 2.048) numberOfUpgrades = 819; // No new upgrades between 2.045 and 2.048
+    else if(version <= 2.052) numberOfUpgrades = 875;
     else numberOfUpgrades = UpgradesById.length; // fallback
 
     return upgrades.slice(0, 2*numberOfUpgrades).join('');
 }
 
 /* List of all achievements in the game, sorted by id.
- * This lis follow their in-game names,
+ * This list follow their in-game names,
  * with the following exceptions:
  *  230 - Named "Brought to you by the letter 🍪" here,
  *          "Brought to you by the letter <div style="display:inline-block;background:url(img/money.png);width:16px;height:16px;"></div>" in-game
@@ -2340,6 +2441,62 @@ export const AchievementsById = [
     "What do you get for the baker who has everything",
     "Bottomless pit",
     "All the stars in heaven",
+
+    // Introduced between 2.049 and 2.052
+    "No time like the present",
+    "Can we get much higher",
+    "Speed's the name of the game (no it's not it's called Cookie Clicker)",
+    "Rainy day fund",
+    "And a little extra",
+    "Grandmapocalypse",
+    "Wrath cookie",
+    "No more room in hell",
+    "In her likeness",
+    "Wrinkler poker",
+    "Septcentennial",
+    "My own clone",
+    "Multiplicity",
+    "Born for this job",
+    "Episode II",
+    "Copy that",
+    "Life finds a way",
+    "Overcrowding",
+    "Strength in numbers",
+    "Army of me",
+    "Know thyself",
+    "Didn't make sense not to live",
+    "Genetic bottleneck",
+    "Despite everything, it's still you",
+    "Everyone everywhere all at once",
+    "Self-made",
+    "Reproducible results",
+    "That's all you",
+    "Self-improvement",
+    "And now you're even older",
+    "Au naturel",
+    "Dirt-rich",
+    "Bots build bots",
+    "Getting that bag",
+    "The leader is good, the leader is great",
+    "You don't think they could've used... it couldn't have been ma-",
+    "Signed, sealed, delivered",
+    "Sugar, spice, and everything nice",
+    "Not even remotely close to Kansas anymore",
+    "I only meant to stay a while",
+    "Not 20 years away forever",
+    "Bright side of the Moon",
+    "Riding the Mersenne twister",
+    "Divide and conquer",
+    "Pebcakes",
+    "Greener on the other sides",
+    "Where is my mind",
+    "Introspection",
+    "Debt evasion",
+    "Oft we mar what's well",
+    "Cookie Clicker",
+    "What's not clicking",
+    "All on deck",
+    "A round of applause",
 ]
 
 export const AchievementsByName = invertMap(AchievementsById);
@@ -2356,6 +2513,8 @@ export function achievementListToNativeSave(achievementList: string[], version: 
     else if(version <= 2.044) numberOfAchievements = 581;
     else if(version <= 2.045) numberOfAchievements = 584;
     else if(version <= 2.046) numberOfAchievements = 589;
+    else if(version <= 2.048) numberOfAchievements = 589; // None added between 2.047 and 2.048
+    else if(version <= 2.052) numberOfAchievements = 643;
     else numberOfAchievements = AchievementsById.length;
 
     return achievements.slice(0, numberOfAchievements).join('');
@@ -2552,6 +2711,13 @@ export class CCBuffRetirementLoanRepayment {
     multCpS: number = 0.8; // 0.8x CpS multiplier
 }
 
+export class CCBuffGiftedOut {
+    name: 'gifted out' = 'gifted out';
+    maxTime: number = 0;
+    time: number = 0;
+    power: number = 1; // Unused
+}
+
 export class CCUnknownBuff {
     // This buff does not exist in the game code; it is here only to keep TypeScript happy
     name: 'unknown' = 'unknown';
@@ -2590,6 +2756,7 @@ export const BuffNamesById = [
     'loan 2 (interest)',
     'loan 3',
     'loan 3 (interest)',
+    'gifted out',
     'unknown',
 ];
 
@@ -2603,7 +2770,8 @@ export type CCBuff = CCBuffFrenzy | CCBuffElderFrenzy | CCBuffClot |
     CCBuffNastyGoblins | CCBuffMagicAdept | CCBuffMagicInept |
     CCBuffDevastation | CCBuffSugarFrenzy | CCBuffModestLoan |
     CCBuffModestLoanRepayment | CCBuffPawnshopLoan | CCBuffPawnshopLoanRepayment |
-    CCBuffRetirementLoan | CCBuffRetirementLoanRepayment | CCUnknownBuff;
+    CCBuffRetirementLoan | CCBuffRetirementLoanRepayment | CCBuffGiftedOut |
+    CCUnknownBuff;
 
 // List of all buff classes
 export const BuffClasses = [
@@ -2615,7 +2783,8 @@ export const BuffClasses = [
     CCBuffNastyGoblins, CCBuffMagicAdept, CCBuffMagicInept,
     CCBuffDevastation, CCBuffSugarFrenzy, CCBuffModestLoan,
     CCBuffModestLoanRepayment, CCBuffPawnshopLoan, CCBuffPawnshopLoanRepayment,
-    CCBuffRetirementLoan, CCBuffRetirementLoanRepayment, CCUnknownBuff,
+    CCBuffRetirementLoan, CCBuffRetirementLoanRepayment, CCBuffGiftedOut,
+    CCUnknownBuff,
 ];
 
 // The 'T extends T' part forces the generic type to distribute over union
@@ -2815,13 +2984,19 @@ export class CCModSaveData {
 }
 
 export class CCSave {
+    static maxVersion = 2.052;
+    static minVersion = 2.022; // Versions earlier than this may not be properly parseable
+
     // Attribute names have the same name in game
-    version: number = 2.044;
+    version: number = CCSave.maxVersion;
     startDate: TimePoint = 1.6e12; // Run start date
     fullDate: TimePoint = 1.6e12; // Legacy start date; NaN for very old save files
     lastDate: TimePoint = 1.6e12; // when the save was made; used to compute offline production
     bakeryName: string = "Test"; // Matches [A-Za-z0-9_ ]{1,28}
     seed: string = "aaaaa"; // Matches [a-z]{5}
+
+    // Introduced in 2.052
+    YouCustomizer: YouCustomizerGenes = new YouCustomizerGenes();
 
     prefs: CCPreferences = new CCPreferences();
 
@@ -2870,8 +3045,12 @@ export class CCSave {
     fortuneCPS: boolean = false; // Whether the hour-of-CpS fortune appeared or not
     cookiesPsRawHighest: number = 0; // Highest raw CpS in this ascension (used in the stock market)
 
-    // 2.04-specific
+    // Introduced in 2.04
     volumeMusic: number = 50; // Background music volume
+
+    // Introduced in 2.052
+    cookiesSent: number = 0; // Number of cookies sent as gifts ("Wrapping paper" heavenly upgrade)
+    cookiesReceived: number = 0; // Number of cookies redeemed from gifts
 
     // The following attributes have no direct counterpart in the `Game` namespace.
 
@@ -2881,9 +3060,6 @@ export class CCSave {
     achievements: string[] = []; // Achievements won
     buffs: CCBuff[] = [];
     modSaveData = new CCModSaveData();
-
-    static maxVersion = 2.048;
-    static minVersion = 2.022; // Versions earlier than this may not be properly parseable
 
     static toNativeSave(save: CCSave): string {
         let saveString = '';
@@ -2898,6 +3074,11 @@ export class CCSave {
             save.lastDate + ';' +
             save.bakeryName + ';' +
             save.seed;
+
+        if(save.version >= 2.052) {
+            saveString += ';';
+            saveString += YouCustomizerGenes.toNativeSave(save.YouCustomizer, save.version);
+        }
 
         saveString += '|';
         saveString += CCPreferences.toNativeSave(save.prefs, save.version)
@@ -2956,6 +3137,10 @@ export class CCSave {
             saveString += save.volumeMusic + ';';
         }
 
+        if(save.version >= 2.052) {
+            saveString += save.cookiesSent + ';' + save.cookiesReceived + ';';
+        }
+
         saveString += '|';
         saveString += CCBuildingsData.toNativeSave(save.buildings, save.version);
 
@@ -2997,6 +3182,11 @@ export class CCSave {
         saveObject.lastDate = Number(saveMetadata[2]);
         saveObject.bakeryName = saveMetadata[3] ?? 'Test';
         saveObject.seed = saveMetadata[4];
+
+        // Introduced in 2.052
+        if(saveMetadata[5]) {
+            saveObject.YouCustomizer = YouCustomizerGenes.fromNativeSave(saveMetadata[5]);
+        }
 
         saveObject.prefs = CCPreferences.fromNativeSave(data[3]);
 
@@ -3061,6 +3251,10 @@ export class CCSave {
         // Introduced in 2.04
         if(generalData[52]) saveObject.volumeMusic = Number(generalData[52]);
 
+        // Introduced in 2.052
+        if(generalData[53]) saveObject.cookiesSent = Number(generalData[53]);
+        if(generalData[54]) saveObject.cookiesReceived = Number(generalData[54]);
+
         saveObject.buildings = CCBuildingsData.fromNativeSave(data[5]);
 
         for(let i = 0; i < UpgradesById.length; i++) {
@@ -3113,6 +3307,10 @@ export class CCSave {
         }
 
         pseudoObjectAssign(save, _obj, onError);
+
+        if('YouCustomizer' in _obj) {
+            save.YouCustomizer = YouCustomizerGenes.fromObject(_obj.YouCustomizer, onError, '.YouCustomizer');
+        }
 
         if('prefs' in _obj) {
             save.prefs = CCPreferences.fromObject(_obj.prefs, onError, '.prefs');
