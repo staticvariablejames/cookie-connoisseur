@@ -11,7 +11,7 @@ import { prettyPrintCCSave } from './pretty-print-ccsave';
 process.stdin.setEncoding('utf8');
 
 let helpString =
-    "usage: npx cookie-connoisseur <command>\n" +
+    "usage: npx cookie-connoisseur <command> [options]\n" +
     "where <command> is one of\n" +
     "   checksum - Verifies the files of the local copy of Cookie Clicker\n" +
     "   fetch - Downloads a local copy of Cookie Clicker\n" +
@@ -20,14 +20,20 @@ let helpString =
     "   native-to-json - Parses stdin, which must be a save file\n" +
     "           in Cookie Clicker's native save format, to a JSON format\n" +
     "   json-to-native - Converts the JSON in stdin back to a save file\n" +
+    "All commands accept at least the --help option.\n" +
     "";
 
 let args = process.argv.slice(2);
 
 function writeJsonSaveFormat(args: string[]) {
     if(args.length != 0) {
-        console.error('usage: npx cookie-connoisseur native-to-json');
-        process.exit(1);
+        if(args[0] == '--help') {
+            console.log('usage: npx cookie-connoisseur native-to-json');
+            process.exit(0);
+        } else {
+            console.error('usage: npx cookie-connoisseur native-to-json');
+            process.exit(1);
+        }
     }
 
     process.stdin.on('readable', () => {
@@ -41,8 +47,13 @@ function writeJsonSaveFormat(args: string[]) {
 
 function writeNativeSaveFormat(args: string[]) {
     if(args.length != 0) {
-        console.error('usage: npx cookie-connoisseur json-to-native');
-        process.exit(1);
+        if(args[0] == '--help') {
+            console.log('usage: npx cookie-connoisseur json-to-native');
+            process.exit(0);
+        } else {
+            console.error('usage: npx cookie-connoisseur json-to-native');
+            process.exit(1);
+        }
     }
 
     process.stdin.on('readable', () => {
@@ -58,8 +69,13 @@ function writeNativeSaveFormat(args: string[]) {
 
 function launchCookieClickerInstance(args: string[]) {
     if(args.length != 0) {
-        console.error('usage: npx cookie-connoisseur launch');
-        process.exit(1);
+        if(args[0] == '--help') {
+            console.log('usage: npx cookie-connoisseur launch');
+            process.exit(0);
+        } else {
+            console.error('usage: npx cookie-connoisseur launch');
+            process.exit(1);
+        }
     }
 
     setTimeout(async () => {
