@@ -1,6 +1,7 @@
 /* This file contains the implementation of the 'cookie-connoisseur fetch' subcommand.
  */
-import { makeDownloadingListener } from './local-cc-instance';
+import { access as fsAccess } from 'fs/promises';
+import { localPathOfURL, makeDownloadingListener } from './local-cc-instance';
 import { chromium } from 'playwright';
 import { URLDirectory } from './url-list';
 import { liveURLs as builtinURLs } from './url-list-live';
@@ -14,10 +15,13 @@ const helpString =
     "   --save-prefix <path>\n" +
     "               Creates the .cookie-connoisseur directory under the given path\n"
     "               Default: './'\n" +
+    "   --skip-existing\n" +
+    "               Do not redownload files that already exist inside .cookie-cliker.\n" +
     "";
 
 class FetchOptions {
     dir: string = './';
+    skipExisting: boolean = false;
 };
 
 /* Parses the command line, returning a FetchOptions.
@@ -40,6 +44,9 @@ function parseCommandLineArgs(args: string[]) {
                 options.dir = args[1];
                 args.shift();
                 break;
+            case '--skip-existing':
+                options.skipExisting = true;
+                break;
             default:
                 console.error(helpString);
                 process.exit(1);
@@ -49,6 +56,15 @@ function parseCommandLineArgs(args: string[]) {
     }
 
     return options;
+}
+
+async function fileExists(path: string) {
+    try {
+        await fsAccess(path);
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 /* This is the function that actually does the fetching.
@@ -67,8 +83,17 @@ async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: 
             continue;
         }
 
-        if(config.verbose >= 1) {
-            console.log(`Downloading ${url}...`);
+        if(options.skipExisting) {
+            if(await fileExists(localPathOfURL(url))) {
+                if(config.verbose >= 1) {
+                    console.log(`Skipping ${url}`);
+                }
+                continue;
+            } else {
+                if(config.verbose >= 1) {
+                    console.log(`Downloading ${url}...`);
+                }
+            }
         }
 
         // Step 1: register the downloader
