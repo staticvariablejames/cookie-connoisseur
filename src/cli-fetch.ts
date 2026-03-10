@@ -2,7 +2,7 @@
  */
 import { access as fsAccess } from 'fs/promises';
 import { localPathOfURL, makeDownloadingListener } from './local-cc-instance';
-import { chromium } from 'playwright';
+import { firefox } from 'playwright';
 import { URLDirectory } from './url-list';
 import { liveURLs as builtinURLs } from './url-list-live';
 import { CookieConnoisseurConfig, parseConfigFile } from './parse-config';
@@ -70,7 +70,7 @@ async function fileExists(path: string) {
 /* This is the function that actually does the fetching.
  */
 async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: CookieConnoisseurConfig) {
-    let browser = await chromium.launch();
+    let browser = await firefox.launch();
     let page = await browser.newPage();
 
     for(let url in urls) {
