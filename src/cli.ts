@@ -3,8 +3,7 @@
 const package_json = require('../package.json');
 import { fetchFiles } from './cli-fetch';
 import { checksumFiles } from './cli-checksum';
-import { firefox } from 'playwright';
-import { openCookieClickerPage } from './cookie-clicker-page';
+import { launchCookieClickerInstance } from './cli-launch-instance';
 import { CCSave } from './ccsave';
 import { prettyPrintCCSave } from './pretty-print-ccsave';
 
@@ -66,34 +65,6 @@ function writeNativeSaveFormat(args: string[]) {
         console.log(CCSave.toNativeSave(save));
     });
 };
-
-function launchCookieClickerInstance(args: string[]) {
-    if(args.length != 0) {
-        if(args[0] == '--help') {
-            console.log('usage: npx cookie-connoisseur launch');
-            process.exit(0);
-        } else {
-            console.error('usage: npx cookie-connoisseur launch');
-            process.exit(1);
-        }
-    }
-
-    setTimeout(async () => {
-        let browser = await firefox.launch( {headless: false} );
-        let page = await openCookieClickerPage(browser, {
-            routingFallback: route => {
-                console.log(`Internet request fallback for ${route.request().url()}`);
-                return route.continue();
-            },
-        });
-        await new Promise(resolve => {
-            page.on('close', () => {
-                resolve(true);
-            });
-        });
-        await browser.close();
-    });
-}
 
 switch(args[0]) {
     case 'fetch':
