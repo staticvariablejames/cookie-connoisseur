@@ -15,6 +15,7 @@ declare global {
 // Available languages
 export type CookieClickerLanguage =
     'CS' |
+    'DA' |
     'DE' |
     'EN' |
     'ES' |
@@ -23,9 +24,11 @@ export type CookieClickerLanguage =
     'JA' |
     'KO' |
     'NL' |
+    'NO' |
     'PL' |
     'PT-BR' |
     'RU' |
+    'SV' |
     'ZH-CN';
 
 

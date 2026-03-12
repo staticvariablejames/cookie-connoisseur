@@ -288,4 +288,3 @@ some PNG files have distinct versions,
 and which version is downloaded depends on the IP that <orteil.dashnet.org> resolves to.
 The differences seem to be only in terms of metadata and have no impact on gameplay,
 but it makes Cookie Connoisseur throw some false positives when downloading files.
-(For now I'm using the sha1sums of the Steam version as the "ground truth".)
