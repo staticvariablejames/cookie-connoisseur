@@ -36,10 +36,10 @@ export type BrowserUtilitiesOptions = {
 }
 
 export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
-    if(options.saveGame != '') {
+    if(options.saveGame != '' && !window.localStorage.getItem('CookieClickerGame')) {
         window.localStorage.setItem('CookieClickerGame', options.saveGame);
     }
-    if(options.language) {
+    if(options.language && !window.localStorage.getItem('CookieClickerLang')) {
         window.localStorage.setItem('CookieClickerLang', options.language);
     }
 
