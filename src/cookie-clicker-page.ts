@@ -17,7 +17,7 @@ export type CCPageOptions = {
     updatesResponse?: string | (() => string),
     cookieConsent?: boolean,
     saveGame?: string | object,
-    mockedDate?: number,
+    mockedDate?: number | null,
     waitForMinigames?: boolean,
     language?: CookieClickerLanguage | null,
     routingFallback?: (route: Route) => Promise<void>,
@@ -86,7 +86,9 @@ function getSaveGame(options: CCPageOptions) {
 }
 
 function getMockedDate(options: CCPageOptions) {
-    if(typeof options.mockedDate == 'number') {
+    if(options.mockedDate === null) {
+        return null;
+    } else if(typeof options.mockedDate == 'number') {
         return options.mockedDate;
     } else {
         return 1.6e12; // 2020-09-13 12:26:40 UTC

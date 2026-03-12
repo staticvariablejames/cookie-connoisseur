@@ -17,7 +17,7 @@ only in the browser environment.
 
 `CConnoisseur` attributes:
 
--   `mockedDate: number`
+-   `mockedDate: number | null`
     The Cookie Connoisseur implementation of a `Date.now()` mock.
     There are several game mechanics that rely on `Date.now()` advancing normally,
     so it is not viable to simply set `Date.now() = () => 1.6e12`.
@@ -32,6 +32,8 @@ only in the browser environment.
     await page.evaluate( () => { window.CConnoisseur.mockedDate = 1.7e12 } );
     ```
     is equivalent to advancing the system clock by one hour.
+
+    Explicitly setting this option to `null` disables date mocking and prevents overwriting `Date.now()`.
 
 -   `clearNewsTickerText: () => void`
     This function simply modifies the DOM to make the news ticker text empty.
@@ -87,6 +89,8 @@ only in the browser environment.
 
     Note that this function does _not_ add cookies, tick minigames etc.,
     just `Game.T` and `Date.now()` are forwarded in time.
+
+    Cannot be used if `mockedDate` was set to `null`.
 
     Caution regarding save games:
     if Cookie Clicker fails to load a save game at the very beginning,

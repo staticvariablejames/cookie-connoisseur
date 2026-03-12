@@ -58,12 +58,12 @@ Available options:
     [`CCSave.fromObject` and `CCSave.toNativeSave`](doc/CCSave.md#API).
     Defaults to empty.
 
--   `mockedDate: number`
+-   `mockedDate: number | null`
     Initial value of CConnoisseur.mockedDate; see [here](./BrowserUtilities.md) for details.
     Defaults to 1.6e12.
 
 -   `waitForMinigames: boolean`
-    Whether to wait or not to wait for minigames to load before returing the page.
+    Whether to wait or not to wait for minigames to load before returning the page.
     Defaults to true.
 
     Minigames load whenever the corresponding building's level is at least 1

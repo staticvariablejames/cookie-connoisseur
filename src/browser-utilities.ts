@@ -30,7 +30,7 @@ export type CookieClickerLanguage =
 
 
 export type BrowserUtilitiesOptions = {
-    mockedDate: number;
+    mockedDate: number | null;
     language: CookieClickerLanguage | null;
     saveGame: string;
 }
@@ -43,31 +43,33 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         window.localStorage.setItem('CookieClickerLang', options.language);
     }
 
-    let mockedDate = options.mockedDate;
-    let currentDate = Date.now();
-    let realDate = Date;
+    let mockedDate = options.mockedDate; // assigned to window.CConnoisseur.mockedDate at the end of this function
+    if(mockedDate != null) {
+        let currentDate = Date.now();
+        let realDate = Date;
 
-    let newDate = Object.assign(
-        function(this: Date, ...args : any[]) {
-            if(args.length == 0) {
-                if(this) {
-                    return new realDate(newDate.now());
+        let newDate = Object.assign(
+            function(this: Date, ...args : any[]) {
+                if(args.length == 0) {
+                    if(this) {
+                        return new realDate(newDate.now());
+                    }
+                    else
+                        return (new realDate(newDate.now())).toString();
+                } else {
+                    // @ts-ignore
+                    return new realDate(...args);
                 }
-                else
-                    return (new realDate(newDate.now())).toString();
-            } else {
-                // @ts-ignore
-                return new realDate(...args);
+            },
+            {
+                now: () => realDate.now() - currentDate + window.CConnoisseur.mockedDate!,
+                parse: realDate.parse,
+                UTC: realDate.UTC,
             }
-        },
-        {
-            now: () => realDate.now() - currentDate + window.CConnoisseur.mockedDate,
-            parse: realDate.parse,
-            UTC: realDate.UTC,
-        }
-    );
-    // @ts-ignore (I couldn't figure out how to convince Typescript that this works)
-    Date = newDate;
+        );
+        // @ts-ignore (I couldn't figure out how to convince Typescript that this works)
+        Date = newDate;
+    }
 
     let clearNewsTickerText = () => {
         Game.tickerL.innerHTML = '';
@@ -93,6 +95,9 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     }
 
     let warpTimeToFrame = (frame: number) => {
+        if(CConnoisseur.mockedDate == null) {
+            throw 'CConnoisseur.warpTimeToFrame: cannot warp because date mocking is disabled';
+        }
         let deltaFrames = frame - Game.T;
         if(deltaFrames <= 0) {
             // Nothing to skip

@@ -3,7 +3,7 @@ export * from './ccsave';
 
 declare global {
     export const CConnoisseur: {
-        mockedDate: number,
+        mockedDate: number | null,
         clearNewsTickerText: () => void,
         setSliderValue: (e: Element, value: number) => number,
         gainLumps: (lumpsToGain: number) => void,
