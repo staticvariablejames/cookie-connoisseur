@@ -11,7 +11,7 @@
 export type URLDirectory = { // Better name needed
     [url: string]: {
         contentType?: string, // MIME type; deduced from extension if absent
-        sha1sum?: string,
+        sha1sum?: string | null, // Set to `null` to disable sha1sum checking
     }
 };
 

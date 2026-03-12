@@ -52,6 +52,7 @@ export function normalizeURL(url: string) {
  *  - prefix: where the '.cookie-connoisseur' directory is located.
  *      Defaults to './'.
  *  - sha1sum: the checksum that this file will be compared against.
+ *      Set to `null` to disable checking.
  *  - verbose: verbosity level.
  *      If at least 1, will warn about a mismatched sha1sum.
  *      If at least 2, will warn if sha1sum is not provided.
@@ -61,23 +62,28 @@ export function normalizeURL(url: string) {
  */
 type DownloadingListenerOptions = {
     prefix?: string,
-    sha1sum?: string,
+    sha1sum?: string | null,
     verbose?: number,
     callback?: () => Promise<void>,
 };
 
 export function makeDownloadingListener(url: string, options: DownloadingListenerOptions = {}) {
-    if(!('prefix' in options)) {
+    if(options.prefix === undefined) {
         options.prefix = './';
     }
-    if(!('callback' in options)) {
+    if(options.callback === undefined) {
         options.callback = async () => {};
     }
-    if(!('verbose' in options)) {
+    if(options.verbose === undefined) {
         options.verbose = 1;
     }
 
     url = normalizeURL(url);
+
+    if(options.verbose >= 2) {
+        console.log(`Preparing to download ${url}`);
+    }
+
     let path = options.prefix + '/' + localPathOfURL(url);
     let handler = async (response: Response) => {
         if(response.ok() && normalizeURL(response.url()) == url) { // Success
@@ -91,16 +97,16 @@ export function makeDownloadingListener(url: string, options: DownloadingListene
                 if(options.verbose! >= 2) {
                     console.log(`Couldn't get response body for ${url}: ${e}`);
                 }
-                return; // Nothing we can do here
+                await options.callback!(); return; // Nothing we can do here
             }
 
             await fsPromises.mkdir(dirname(path), {recursive: true});
             await fsPromises.writeFile(path, responseBody);
             await response.frame().page().removeListener('response', handler);
-            if(options.verbose! >= 2 && !options.sha1sum) {
+            if(options.verbose! >= 2 && options.sha1sum === undefined) {
                 console.log(`Missing sha1sum for ${url}`);
             }
-            if(options.verbose! >= 1 && options.sha1sum) {
+            if(options.verbose! >= 1 && typeof options.sha1sum == 'string') {
                 let sha1sum = sha1sumFromBuffer(responseBody);
                 if(sha1sum !== options.sha1sum) {
                     console.log(`sha1sum(${path}) = ${sha1sum}` +

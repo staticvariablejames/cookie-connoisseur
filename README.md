@@ -210,7 +210,7 @@ https://github.com/staticvariablejames/InsugarTrading/blob/master/cookie-connois
 
 Available options:
 
--   `customURLs`: `{url: string, sha1sum: string}[]`
+-   `customURLs`: `{url: string, sha1sum: string | null}[]`
     List of URLs that are handled in the same way as Cookie Clicker files.
     If they are missing, these files are downloaded to `.cookie-connoisseur`
     in the first time they are needed,
@@ -230,6 +230,7 @@ Available options:
     The sha1sum of Cookie Clicker files is also checked,
     to make sure the version of Cookie Connoisseur
     is compatible with the cached version of Cookie Clicker.
+    Explicitly set it to `null` to disable sha1sum checking.
 
 -   `localFiles`: `{url: string, path: string}[]`
     List of URLs that are redirected to local files.
