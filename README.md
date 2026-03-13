@@ -31,23 +31,22 @@ See the section [API](#api) below for a full list of features.
 Installation
 ============
 
-    npm --foreground-scripts install --save-dev --save-exact cookie-connoisseur
+**Note: [due to an issue](https://github.com/microsoft/playwright/issues/39593),
+currently, Cookie Connoisseur only works properly with Playwright 1.57.**
+
+    npm install --save-dev cookie-connoisseur
+    npx cookie-connoisseur fetch
 
 This istalls the library,
 the `cookie-connoisseur` binary,
 and downloads a copy of <https://orteil.dashnet.org/cookieclicker>.
 (The files will be stored to `.cookie-connoisseur`.)
 
-By default,
-NPM [gobbles the output](https://docs.npmjs.com/cli/v7/using-npm/config#foreground-scripts)
-from install scripts.
-**If you forget the `--foregound-scripts` flag**,
-`npm install` will look like it is frozen for a minute.
-The download will still happen, though.
+If you forget to run `npx cookie-connoisseur fetch`,
+the copy of Cookie Clicker will be downloaded during testing,
+which might cause timing errors in your tests.
 
 The library comes with TypeScript typings.
-
-As the API is still unstable, `--save-exact` is recommended to minimize breakage.
 
 
 Example Script
@@ -256,6 +255,9 @@ whenever the `customURLs` list is changed.
 
 Known Issues
 ============
+
+[Due to an issue](https://github.com/microsoft/playwright/issues/39593),
+currently, Cookie Connoisseur only works properly with Playwright 1.57.
 
 The core functionality is still somewhat unstable,
 so some tests might fail due to crashes inside Cookie Connoisseur.
