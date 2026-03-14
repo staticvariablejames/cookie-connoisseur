@@ -12,13 +12,16 @@ const helpString =
     "               Chooses the browser. Default: firefox\n" +
     "   --ccsave <save string>\n" +
     "               Uses the given string as the saved game.\n" +
+    "   --date-mock, --mock-date <number>\n" +
+    "               Mocks to the given date.\n" +
+    "               <number> is the number of milliseconds since epoch.\n" +
     "   --no-date-mock, --no-mock-date\n" +
     "               Disable date mocking.\n" +
     "";
 
 class LaunchOptions {
     browser: BrowserType = firefox;
-    doMockDate: boolean = true;
+    mockedDate?: number | null;
     saveGame: string | null = null;
 };
 
@@ -49,9 +52,18 @@ function parseCommandLineArgs(args: string[]) {
                 options.saveGame = args[1];
                 args.shift();
                 break;
+            case '--date-mock':
+            case '--mock-date':
+                if(args[1] === undefined) {
+                    console.error(helpString);
+                    process.exit(1);
+                }
+                options.mockedDate = Number(args[1]);
+                args.shift();
+                break;
             case '--no-mock-date':
             case '--no-date-mock':
-                options.doMockDate = false;
+                options.mockedDate = null;
                 break;
             default:
                 console.error(helpString);
@@ -69,9 +81,7 @@ export function launchCookieClickerInstance(args: string[]) {
     if(options == null) return;
 
     let pageOptions: CCPageOptions = {};
-    if(!options.doMockDate) {
-        pageOptions.mockedDate = null;
-    }
+    pageOptions.mockedDate = options.mockedDate;
     if(options.saveGame) {
         pageOptions.saveGame = options.saveGame;
     }
