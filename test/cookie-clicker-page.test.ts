@@ -16,33 +16,43 @@ test('Page loads and game works', async ({browser}) => {
 
 test('Heralds and grandma names have defaults', async ({browser}) => {
     let page = await openCookieClickerPage(browser);
-    expect(await page.evaluate(() => Game.heralds)).toEqual(42);
+    expect(await page.evaluate(() => Game.heralds)).toEqual(17.29);
     expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Custom grandma names");
     await page.close();
 });
 
-test.describe('Heralds and grandma names can be set', () => {
-    test('directly', async ({browser}) => {
-        let page = await openCookieClickerPage(browser, {heralds: 72, grandmaNames: ["Test1", "Test3"]});
-        expect(await page.evaluate(() => Game.heralds)).toEqual(72);
-        expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Test1");
-        expect(await page.evaluate(() => Game.customGrandmaNames[1])).toEqual("Test3");
-        await page.close();
+test('Heralds and grandma names can be set', async ({browser}) => {
+    let page = await openCookieClickerPage(browser, {querySteamPlayers: 7200, queryGrandmaNames: ["Test1", "Test3"]});
+    expect(await page.evaluate(() => Game.heralds)).toEqual(72);
+    expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Test1");
+    expect(await page.evaluate(() => Game.customGrandmaNames[1])).toEqual("Test3");
+    await page.close();
+});
+
+test.describe('Info query is properly set', () => {
+    // TODO: also test the extraCss property
+    test('to the default value', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser);
+        expect(await page.locator('id=topLink-4')).toBeVisible();
+        expect(await page.evaluate(() => document.querySelector('#topbarOtherVersions .hoverable').childElementCount)).toBe(5);
     });
 
-    test('with functions', async ({browser}) => {
-        let page = await openCookieClickerPage(browser, {
-            heralds: () => 72,
-            grandmaNames: () => ["Test1", "Test3"]
-        });
-        expect(await page.evaluate(() => Game.heralds)).toEqual(72);
-        expect(await page.evaluate(() => Game.customGrandmaNames[0])).toEqual("Test1");
-        expect(await page.evaluate(() => Game.customGrandmaNames[1])).toEqual("Test3");
-        await page.close();
+    test('to a custom empty value', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {queryInfo: {}});
+        expect(await page.locator('id=topbarSteamCC')).toBeVisible();
+        expect(await page.locator('id=topLink-0').count()).toBe(0);
+        expect(await page.evaluate(() => document.querySelector('#topbarOtherVersions .hoverable').childElementCount)).toBe(4);
+    });
+
+    test('to a custom value with empty lists', async ({ browser }) => {
+        let page = await openCookieClickerPage(browser, {queryInfo: {links: [], versions: []}});
+        expect(await page.locator('id=topbarSteamCC')).toBeVisible();
+        expect(await page.locator('id=topLink-0').count()).toBe(0);
+        expect(await page.evaluate(() => document.querySelector('#topbarOtherVersions .hoverable').childElementCount)).toBe(0);
     });
 });
 
-test.describe('Updates check is properly intercepted', () => {
+test.describe('Version update check is properly intercepted', () => {
     test('if there is nothing to show', async ({browser}) => {
         let page = await openCookieClickerPage(browser);
         await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
@@ -51,17 +61,14 @@ test.describe('Updates check is properly intercepted', () => {
         await page.close();
     });
 
-    test('displaying an alert', async ({browser}) => {
-        let page = await openCookieClickerPage(browser, {updatesResponse: 'alert|Hello!'});
-        await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
-        await page.waitForFunction(() => Game.T > Game.fps * 60 * 60);
-        expect(await page.evaluate(() => document.getElementById("alert")?.innerHTML)).toEqual("Hello!");
-        expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("block");
-        await page.close();
-    });
+    test('if there is a new version', async ({browser}) => {
+        let page = await openCookieClickerPage(browser, {
+            queryVersion: {
+                "Cookie Clicker": {v: 2.71828, updateNotes: "Logarithms!"},
+                "Cookie Clicker beta": {v: 2.71828, updateNotes: "Logarithms!"},
+            },
+        });
 
-    test('informing new version', async ({browser}) => {
-        let page = await openCookieClickerPage(browser, {updatesResponse: '2.71828|Logarithms!'});
         await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
         await page.waitForFunction(() => Game.T > Game.fps * 60 * 60);
         expect(await page.evaluate(() => document.getElementById("alert")?.innerText)).toEqual(
@@ -73,14 +80,20 @@ test.describe('Updates check is properly intercepted', () => {
 });
 
 test('Updates check can be changed dynamically', async ({browser}) => {
-    let updatesResponse = '2.027|Old version';
-    let page = await openCookieClickerPage(browser, {updatesResponse: () => updatesResponse});
+    let versionResponse = {
+        "Cookie Clicker": {v: 2.027, updateNotes: "Old version"},
+        "Cookie Clicker beta": {v: 2.027, updateNotes: "Old version"},
+    };
+    let page = await openCookieClickerPage(browser, {queryVersion: () => versionResponse});
     await page.evaluate(() => CConnoisseur.warpTimeToFrame(Game.fps * 60 * 60 - 1));
     await page.waitForFunction(() => Game.T > Game.fps * 60 * 60 + 1);
     // Nothing changes because it is an old version
     expect(await page.evaluate(() => document.getElementById("alert")?.style?.display)).toEqual("");
 
-    updatesResponse = '3.141592|Circles!';
+    versionResponse = {
+        "Cookie Clicker": {v: 3.141592, updateNotes: "Circles!"},
+        "Cookie Clicker beta": {v: 3.141592, updateNotes: "Circles!"},
+    };
     await page.evaluate(() => CConnoisseur.warpTimeToFrame(2 * Game.fps * 60 * 60 - 1));
     await page.waitForFunction(() => Game.T > 2 * Game.fps * 60 * 60 + 1);
     // Now things change because it is a new version

@@ -29,21 +29,103 @@ most notably <https://pagead2.googlesyndication.com>.
 
 Available options:
 
--   `heralds: number | (() => number)`
-    Heralds and Patreon-submitted grandma names are obtained by querying
-    <https://orteil.dashnet.org/patreon/grab.php>. Cookie Connoisseur intercepts this query;
-    `options.heralds` is the number used in the response.
-    Defaults to 42.
+-   `querySteamPlayers: number | CCQSteam`
+    Number of players currently playing Cookie Clicker on Steam.
+    Defaults to 1729.
 
--   `grandmaNames: string[] (() => string[])`
+    During initialization,
+    Cookie Clicker queries <https://orteil.dashnet.org/data/cookieclickersteam.json>
+    to update the number of players.
+    This `json` file has the format `{steamPlayers: number, lastUpdated: number}`,
+    which is exported as the type `CCQSteam`.
+    Note that `lastUpdated` is a Unix timestamp (number of seconds since January 1st, 1970),
+    rather than the number of milliseconds since January 1st, 1970
+    (which is the date timestamp format outputted by `Date.now()` and used througouht Cookie Clicker).
+    It is unused in the game.
+    If `querySteamPlayers` is a number,
+    `lastUpdated` is set to `Math.floor(mockedDate/1000)`
+    (or `Math.floor(Date.now()/1000)` if date mocking is disabled).
+
+-   `queryGrandmaNames: string[] | (() => string[])`
     list of names that some grandmas get if "Custom grandmas" is "ON".
-    Names must not contain the pipe `|` character.
     Defaults to `["Custom grandma names", "See cookie-clicker-page.ts for details"]`.
 
--   `updatesResponse: string | (() => string)`
-    Every 30 minutes Cookie Clicker checks for updates;
-    this is the string fed to Game.CheckUpdatesResponse.
-    The default value is '2.029|new stock market minigame!'.
+    Cookie Clicker obtains this list during initialization
+    by querying <https://orteil.dashnet.org/data/grandmas.json>.
+
+-   `queryInfo: CCQInfo | (() => CCQInfo)`
+    "Generic" additional info,
+    obtained during initialization
+    by querying <https://orteil.dashnet.org/data/cookieclickerinfo.json>.
+
+    It is an object with the following three members (all of them optional):
+
+    -   `versions?: Array<{off?: number, text: string, v: string | number, style?: string, url: string}>`
+        Populates the drop-down menu
+        that shows up when hovering the "Other versions" link in the top right corner of the screen.
+
+        `text` is the button text, and `url` is the link.
+        If `url` contains the string `'$DIR'`, it is replaced with `window.location.origin`.
+
+        If `v` is the string `LIVE`, `BETA`, or `CLASSIC`,
+        _and_ the language is set to something other than English,
+        then `text` is replaced with `Live`, `Beta`, or `Classic`, respectively.
+        This member has no use otherwise.
+
+        `style` is additional CSS styling for the button.
+
+        If `off` is defined, that entry is skipped.
+
+    -   `links: Array<{off?: number, text: string, tooltip: string, style?: string, class?: string, url?: string, remove?: string}>`
+        List of links appended to the top bar,
+        to the right of the heralds.
+
+        `text` is interpreted as HTML and appended to the top bar.
+        If `url` exists,
+        `text` is wrapped in a `<a>` element.
+        If `url` contains the string `'$DIR'`, it is replaced with `window.location.origin`.
+
+        If `tooltip` exists, it is interpreted as HTML and shown when hovering over that link.
+
+        `style` is additional CSS styling for the `<div>` element.
+
+        The `<div>` element always has the CSS class `topLink`, and additionally all classes listed in the member `class`.
+
+        `remove` is a list of element IDs separated by spaces (e.g. `"id1 id2+"`).
+        Each element (obtained via `document.getElementById`) is simply removed from the DOM.
+        If the ID ends in '+',
+        the parent element is removed instead.
+
+        If `off` is defined, that entry is skipped.
+
+    -   `extraCss?: Array<string>`
+        Additional CSS for the page.
+        The game simply adds a new CSS `<style>` tag to the page whose content is `extraCss.join('\n')`.
+
+    The default value is exported as the constant `defaultCCQInfo`,
+    and corresponds to the query response at the time of writing (2026-03-14).
+
+-   `queryVersion: CCQVersion | (() => CCQVersion)`
+    Cookie Clicker periodically queries <https://orteil.dashnet.org/data/version.json>
+    to check whether a new version is available.
+    The default value is
+    ```json
+    {
+        "Cookie Clicker": {
+            "v": 2.052,
+            "updateNotes": "new building!"
+        },
+        "Cookie Clicker beta": {
+            "v": 2.052,
+            "updateNotes": "new building!"
+        },
+    }
+    ```
+
+    Cookie Clicker checks for a new version once every 30 minutes.
+    If you provide a function (instead of a static value),
+    that function will be called whenever the check is performed,
+    so you may use that to dynamically change this option.
 
 -   `cookieConsent: boolean`
     Unless set to 'false',
@@ -122,11 +204,3 @@ Available options:
     [the later routes take precedence](https://github.com/microsoft/playwright/issues/7394),
     so you may override any route established by Cookie Connoisseur
     by just registering a new route.
-
-The first three options
-(`heralds`, `grandmaNames` and `updatesResponse`)
-are updated by the game every 60 minutes,
-querying an appropriate page.
-If you provide a function for these options,
-the function will be called every time it is needed,
-so you can use that to change those options dynamically.

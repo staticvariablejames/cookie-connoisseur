@@ -6,15 +6,74 @@ import { BrowserUtilitiesOptions, initBrowserUtilities, CookieClickerLanguage } 
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
 import { CCSave, CCBuildingsData } from './ccsave';
 
+// Cookie Clicker Query for https://orteil.dashnet.org/data/cookieclickersteam.json
+export type CCQSteam = {
+    steamPlayers: number;
+    lastUpdated: number;
+};
+
+// Cookie Clicker Query for https://orteil.dashnet.org/data/grandmas.json
+export type CCQGrandmaNames = string[];
+
+export const defaultCCQGrandmaNames: CCQGrandmaNames = [
+    "Custom grandma names",
+    "See cookie-clicker-page.ts for details"
+];
+
+// Cookie Clicker Query for https://orteil.dashnet.org/data/cookieclickerinfo.json
+export type CCQInfo = {
+    versions?: Array<{off?: number, text: string, v: string | number, style?: string, url: string}>;
+    links?: Array<{off?: number, text: string, tooltip?: string, style?: string, class?: string, url?: string, remove?: string}>;
+    extraCss?: Array<string>;
+};
+
+export const defaultCCQInfo: CCQInfo = {
+    // This is the query response at the time of writing this (2026-03-14)
+	"versions": [
+		{"text":"Latest","v":"LIVE","url":"$DIR/cookieclicker"},
+		{"text":"Try the beta!","v":"BETA","url":"$DIR/cookieclicker/beta"},
+		{"text":"v.2.052 <small>(2023)</small>","v":2.052,"url":"$DIR/cookieclicker/v2052"},
+		{"text":"v.1.0466 <small>(2014)</small>","v":1.0466,"url":"$DIR/cookieclicker/v10466"},
+		{"text":"Classic <small>(2013)</small>","v":"CLASSIC","url":"$DIR/experiments/cookie"}
+	],
+	"links": [
+		{"text":"<img src=\"img/topbarSteam.png\" style=\"margin-left:0px;\"> Steam","tooltip":"Play Cookie Clicker on Steam!<br>Featuring music by C418.","style":"padding-left:26px;","class":"promoLink","url":"https://store.steampowered.com/app/1454400/Cookie_Clicker/","remove":"topbarSteamCC+"},
+		{"text":"<img src=\"img/topbarMobile.png\" style=\"margin-left:2px;\"> Android","tooltip":"Play Cookie Clicker on your phone!","style":"padding-left:20px;","class":"promoLink","url":"https://play.google.com/store/apps/details?id=org.dashnet.cookieclicker","remove":"topbarMobileCC+"},
+		{"off":1,"text":"<img src=\"img/topbarXbox.png\" style=\"margin-left:0px;\"><img src=\"img/topbarPS.png\" style=\"margin-left:22px;\"><img src=\"img/topbarSwitch.png\" style=\"margin-left:44px;\"><span class=\"hideCompressed\" style=\"padding-left:8px;\">Consoles</span>","tooltip":"Play Cookie Clicker on Xbox, PlayStation and Nintendo Switch!","style":"padding-left:60px;","class":"promoLink","url":"https://cookieclicker.com/"},
+		{"text":"Consoles","tooltip":"Play Cookie Clicker on Xbox, PlayStation and Nintendo Switch!","class":"promoLink","url":"https://cookieclicker.com/"},
+		{"text":"<img src=\"img/fangamerClickerPic.png\" style=\"margin-left:2px;margin-top:2px;\"> Cookie Clicker clicker<div style=\"position:absolute;right:8px;bottom:3px;font-size:10px;\">by Fangamer</div>","style":"padding-left:40px;","tooltip":"Clicky merch by Fangamer!<br>There's shirts too!","class":"promoLink","url":"https://fanga.me/r/cookie-clicker-collection"}
+	],
+	"extraCss": ["#topBar .promoLink a{color:#06c;}"],
+};
+
+// Cookie Clicker Query for https://orteil.dashnet.org/data/version.json
+export type CCQVersion = {
+	"Cookie Clicker": {"v": number, "updateNotes": string };
+	"Cookie Clicker beta": {"v": number, "updateNotes": string };
+};
+
+export const defaultCCQVersion = {
+    // This is the query response at the time of writing this (2026-03-14)
+    "Cookie Clicker": {
+        "v": 2.052,
+        "updateNotes": "new building!"
+    },
+    "Cookie Clicker beta": {
+        "v": 2.052,
+        "updateNotes": "new building!"
+    },
+};
+
 /* These options are documented in `doc/openCookieClickerPage.md`.
  *
  * For convenience,
  * functions in this file pass around the entire `options` object to each other.
  */
 export type CCPageOptions = {
-    heralds?: number | (() => number),
-    grandmaNames?: string[] | (() => string[]),
-    updatesResponse?: string | (() => string),
+    querySteamPlayers?: number | CCQSteam,
+    queryGrandmaNames?: CCQGrandmaNames,
+    queryInfo?: CCQInfo,
+    queryVersion?: CCQVersion | (() => CCQVersion), // Queried once every half-hour
     cookieConsent?: boolean,
     saveGame?: string | object,
     mockedDate?: number | null,
@@ -23,46 +82,54 @@ export type CCPageOptions = {
     routingFallback?: (route: Route) => Promise<void>,
 };
 
-/* The first three options may be requested multiple times,
- * and their values can change each time.
- * Therefore they may be functions.
- *
- * The following utility functions return the value of the option,
- * regardless of the type,
+/* The following utility functions return the value of the option,
  * or their default value if they don't exist.
+ *
+ * The only exception is getQueryVersion;
+ * if options.queryVersion is a function,
+ * it is called instead.
  *
  * For uniformity, there are helper functions for all options.
  */
-function getHeralds(options: CCPageOptions) {
-    if(typeof options.heralds == 'number') {
-        return options.heralds;
-    } else if (typeof options.heralds == 'function') {
-        return options.heralds();
+function getQuerySteamPlayers(options: CCPageOptions): CCQSteam {
+    // The default value depends on options.mockedDate, so assembling it is a bit convoluted
+    let returnValue: CCQSteam | number;
+    if(options.querySteamPlayers !== undefined) {
+        returnValue = options.querySteamPlayers;
     } else {
-        return 42;
+        returnValue = 1729;
+    }
+
+    if(typeof returnValue == 'number') {
+        return {steamPlayers: returnValue, lastUpdated: getMockedDate(options) ?? Date.now()};
+    } else {
+        return returnValue;
     }
 }
 
-function getGrandmaNames(options: CCPageOptions) {
-    if(Array.isArray(options.grandmaNames)) {
-        return options.grandmaNames;
-    } else if (typeof options.grandmaNames == 'function') {
-        return options.grandmaNames();
-    } else {
-        return [
-            "Custom grandma names",
-            "See cookie-clicker-page.ts for details"
-        ];
+function getQueryGrandmaNames(options: CCPageOptions): CCQGrandmaNames {
+    if(Array.isArray(options.queryGrandmaNames)) {
+        return options.queryGrandmaNames;
+    } else  {
+        return defaultCCQGrandmaNames;
     }
 }
 
-function getUpdatesResponse(options: CCPageOptions) {
-    if(typeof options.updatesResponse == 'string') {
-        return options.updatesResponse;
-    } else if (typeof options.updatesResponse == 'function') {
-        return options.updatesResponse();
+function getQueryInfo(options: CCPageOptions): CCQInfo {
+    if (typeof options.queryInfo == 'object') {
+        return options.queryInfo;
     } else {
-        return '2.048|new building and a whole lot of other things!';
+        return defaultCCQInfo;
+    }
+}
+
+function getQueryVersion(options: CCPageOptions): CCQVersion {
+    if(typeof options.queryVersion == 'function') {
+        return options.queryVersion();
+    } else if (typeof options.queryVersion == 'object') {
+        return options.queryVersion;
+    } else {
+        return defaultCCQVersion;
     }
 }
 
@@ -124,20 +191,34 @@ function getRoutingFallback(options: CCPageOptions): (route: Route) => Promise<v
 }
 
 /* Helper function.
- * If the route queries for https://orteil.dashnet.org/patreon/grab.php,
- * this function fulfills the request with the format that the game expects
- * to configure the number of heralds and Patreon grandma names,
- * and returns true.
+ * If the route queries one of the following four URLs:
+ *  - https://orteil.dashnet.org/data/cookieclickersteam.json
+ *  - https://orteil.dashnet.org/data/grandmas.json
+ *  - https://orteil.dashnet.org/data/cookieclickerinfo.json
+ *  - https://orteil.dashnet.org/data/version.json
+ * it fulfills the request with the format with the game expects and returns true.
  * It returns false otherwise.
  */
-async function handlePatreonGrabs(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
-    if(!route.request().url().includes('https://orteil.dashnet.org/patreon/grab.php'))
+async function handleJSONRequest(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
+    let url = route.request().url();
+    let response: string;
+    /* The queries all have the argument '?nocache=n' appended,
+     * where nnnnnn is always `Math.floor(Date.now()/1000/60/30)`
+     * (i.e. number of half-hours since epoch).
+     * This argument has no effect in the game's code and I could not observe an effect in the query,
+     * so we silently ignore it.
+     */
+    if(url.startsWith('https://orteil.dashnet.org/data/cookieclickersteam.json')) {
+        response = JSON.stringify(getQuerySteamPlayers(options));
+    } else if(url.startsWith('https://orteil.dashnet.org/data/grandmas.json')) {
+        response = JSON.stringify(getQueryGrandmaNames(options));
+    } else if(url.startsWith('https://orteil.dashnet.org/data/cookieclickerinfo.json')) {
+        response = JSON.stringify(getQueryInfo(options));
+    } else if(url.startsWith('https://orteil.dashnet.org/data/version.json')) {
+        response = JSON.stringify(getQueryVersion(options));
+    } else {
         return false;
-
-    let response = JSON.stringify({
-        herald: getHeralds(options),
-        grandma: getGrandmaNames(options).join('|'),
-    });
+    }
 
     await route.fulfill({
         status: 200,
@@ -145,30 +226,9 @@ async function handlePatreonGrabs(route: Route, options: CCPageOptions, config: 
         body: response,
     }).catch(reason => {
         if(config.verbose >= 1)
-            console.log(`Couldn't deliver Herald count and Grandma names: ${reason}`);
+            console.log(`Couldn't deliver JSON request for ${url}: ${reason}`);
     });
 
-    return true;
-}
-
-/* Helper function.
- * If the route queries for https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate,
- * this function fulfills the request with options.updatesResponse and returns true.
- * It returns false otherwise.
- */
-async function handleUpdatesQuery(route: Route, options: CCPageOptions, config: CookieConnoisseurConfig) {
-    let url = route.request().url();
-    if(!url.includes('https://orteil.dashnet.org/cookieclicker/server.php?q=checkupdate'))
-        return false;
-
-    await route.fulfill({
-        status: 200,
-        contentType: 'text/html',
-        body: getUpdatesResponse(options),
-    }).catch(reason => {
-        if(config.verbose >= 1)
-            console.log(`Couldn't deliver answer to updates query: ${reason}`);
-    });
     return true;
 }
 
@@ -397,9 +457,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
         if(config.verbose >= 2) {
             console.log(`Requesting ${route.request().url()}`);
         }
-        if(await handlePatreonGrabs(route, options, config))
-            return;
-        if(await handleUpdatesQuery(route, options, config))
+        if(await handleJSONRequest(route, options, config))
             return;
         if(await handleCacheFile(route, config))
             return;
