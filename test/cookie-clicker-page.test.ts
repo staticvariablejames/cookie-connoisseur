@@ -198,3 +198,10 @@ test.describe('Language selection', () => {
         expect(lang).toEqual('PL');
     });
 });
+
+test('Ads are blocked', async ({ browser }) => {
+    let page = await openCookieClickerPage(browser);
+    await page.waitForLoadState('networkidle'); // TODO: wait for img/bgBlue.jpg to load instead
+    let shopHandle = await page.locator('id=sectionRight');
+    expect(await shopHandle.screenshot()).toMatchSnapshot('rightSectionWithoutAds.png');
+});

@@ -353,6 +353,15 @@ async function handleForbiddenURLs(route: Route) {
     return true;
 }
 
+/* Hides the two "sponsored links" blocks that show up above and below the shop.
+ */
+async function hideSponsoredLinks(page: Page) {
+    await page.evaluate(() => {
+        document.getElementById('support')!.style.display = 'none';
+        document.getElementById('smallSupport')!.style.display = 'none';
+    });
+}
+
 /* Creates a new page using the given browser or browserContext,
  * and navigates to https://orteil.dashnet.org/cookieclicker/index.html.
  * See `doc/openCookieClickerPage.md` for a complete documentation of the arguments.
@@ -421,5 +430,8 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
             }
         }
     }
+
+    await hideSponsoredLinks(page);
+
     return page;
 }
