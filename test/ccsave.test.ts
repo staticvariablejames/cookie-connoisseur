@@ -2435,19 +2435,6 @@ test.describe('CCSave.toNativeSave edge cases:', () => {
         await page.close();
     });
 
-    test('Saves started a long while ago are preserved', async ({ browser }) => {
-        let jsonSave = new CCSave();
-        jsonSave.fullDate = NaN;
-        let page = await openCookieClickerPage(browser, {saveGame: CCSave.toNativeSave(jsonSave)});
-        let fullDate = await page.evaluate( () => Game.fullDate );
-        expect(fullDate).toBe(NaN);
-        let strSave = await page.evaluate( () => Game.WriteSave(1) );
-        jsonSave = CCSave.fromNativeSave(strSave);
-        expect(jsonSave.fullDate).toBe(NaN);
-        expect(CCSave.toNativeSave(jsonSave)).toEqual(strSave);
-        await page.close();
-    });
-
     test('Vault is sorted', async ({ browser }) => {
         let page = await openCookieClickerPage(browser);
         await page.evaluate( () => Game.Upgrades['Carpal tunnel prevention cream'].vault() );

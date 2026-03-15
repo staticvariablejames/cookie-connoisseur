@@ -1807,6 +1807,9 @@ export const UpgradesById = [
     "Springerles",
     "Undecillion fingers",
     "Omniplast mouse",
+
+    // Introduced in 2.058
+    "Wrinkler ambergris",
 ];
 
 export const UpgradesByName = invertMap(UpgradesById);
@@ -1832,6 +1835,7 @@ export function upgradeListToNativeSave(
     else if(version <= 2.045) numberOfUpgrades = 819;
     else if(version <= 2.048) numberOfUpgrades = 819; // No new upgrades between 2.045 and 2.048
     else if(version <= 2.052) numberOfUpgrades = 875;
+    else if(version <= 2.058) numberOfUpgrades = 876;
     else numberOfUpgrades = UpgradesById.length; // fallback
 
     return upgrades.slice(0, 2*numberOfUpgrades).join('');
@@ -2984,7 +2988,7 @@ export class CCModSaveData {
 }
 
 export class CCSave {
-    static maxVersion = 2.052;
+    static maxVersion = 2.058;
     static minVersion = 2.022; // Versions earlier than this may not be properly parseable
 
     // Attribute names have the same name in game
