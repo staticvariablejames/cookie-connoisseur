@@ -32,12 +32,9 @@
  * so simply updating a save file from 2.031 to 2.04 introduces several bytes,
  * changing the text representation of the save.
  *
- * Note that onError and subobjectName are mandatory parameters;
- * this helps make the code corret,
- * as there's no chance of accidentally forgetting to pass e.g. `onError` down
- * and have it be the default, throwing error handler.
- * Since CCSave.fromObject is the only one meant to be used outside Cookie Connoisseur,
- * it is the only one that provides a cleaner interface.
+ * Note that onError and subobjectName are mandatory parameters,
+ * with exception of in CCSave.fromObject,
+ * which is meant to be used outside of Cookie Connoisseur whence has a cleaner interface.
  */
 
 import { invertMap, ErrorHandler, throwOnError, pseudoObjectAssign } from './util';

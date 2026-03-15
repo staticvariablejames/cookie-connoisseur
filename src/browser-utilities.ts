@@ -30,7 +30,7 @@ export type CookieClickerLanguage =
     'RU' |
     'SV' |
     'ZH-CN';
-
+// This list also shows up in `doc/openCookieClickerPage.md`.
 
 export type BrowserUtilitiesOptions = {
     mockedDate: number | null;

@@ -137,7 +137,7 @@ Available options:
     If it is a string, the value is stored as-is into `window.localStorage`
     prior to loading the game.
     If it is an object, it is first converted to a string using
-    [`CCSave.fromObject` and `CCSave.toNativeSave`](doc/CCSave.md#API).
+    [`CCSave.fromObject` and `CCSave.toNativeSave`](CCSave.md#API).
     Defaults to empty.
 
 -   `mockedDate: number | null`
@@ -166,8 +166,8 @@ Available options:
     Defaults to `'EN'`.
 
     The value of this option must be one of the available languages
-    (`'CS'`, `'DE'`, `'EN'`, `'ES'`, `'FR'`, `'IT'`, `'JA'`, `'KO'`,
-    `'NL'`, `'PL'`, `'PT-BR'`, `'RU'`, `'ZH-CN'`),
+    (`'CS'`, `'DA'`, `'DE'`, `'EN'`, `'ES'`, `'FR'`, `'IT'`, `'JA'`, `'KO'`,
+    `'NL'`, `'NO'`, `'PL'`, `'PT-BR'`, `'RU'`, `'SV'`, `'ZH-CN'`),
     or `null`.
 
     If explicitly set to `null`,
