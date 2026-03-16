@@ -13,6 +13,10 @@ const helpString =
     "Downloads a local copy of Cookie Clicker.\n" +
     "Options:\n" +
     "   --help      Show this help\n" +
+    "   --only-builtin, --builtin-only\n" +
+    "               Download only the built-in URLs\n" +
+    "   --only-custom, --custom-only\n" +
+    "               Download only the custom URLs (defined in cookie-connoisseur.config.json)\n" +
     "   --skip-good-sha1sum\n" +
     "               Do not redownload files whose sha1sum match the expected sha1sum\n" +
     "   --skip-missing-sha1sum\n" +
@@ -29,6 +33,8 @@ class FetchOptions {
     skipGoodSha1sum: boolean = false;
     skipMissingSha1sum: boolean = false;
     skipDisabledSha1sum: boolean = false;
+    downloadBuiltinFiles: boolean = true;
+    downloadCustomFiles: boolean = true;
 };
 
 /* Parses the command line, returning a FetchOptions.
@@ -42,6 +48,16 @@ function parseCommandLineArgs(args: string[]) {
             case '--help':
                 console.log(helpString);
                 return null;
+                break;
+            case '--only-builtin':
+            case '--builtin-only':
+                options.downloadBuiltinFiles = true;
+                options.downloadCustomFiles = false;
+                break;
+            case '--only-custom':
+            case '--custom-only':
+                options.downloadBuiltinFiles = false;
+                options.downloadCustomFiles = true;
                 break;
             case '--skip-existing':
                 options.skipGoodSha1sum = true;
@@ -155,7 +171,13 @@ export function fetchFiles(args: string[]) {
 
     setTimeout(async () => {
         let config = await parseConfigFile();
-        let urls = {...builtinURLs, ...config.customURLs};
+        let urls: URLDirectory = {};
+        if(options!.downloadBuiltinFiles) {
+            urls = {...builtinURLs, ...urls};
+        }
+        if(options!.downloadCustomFiles) {
+            urls = {...config.customURLs, ...urls};
+        }
         await downloadFiles(urls, options!, config);
     });
 }
