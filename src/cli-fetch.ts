@@ -1,23 +1,34 @@
 /* This file contains the implementation of the 'cookie-connoisseur fetch' subcommand.
  */
-import { access as fsAccess } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { localPathOfURL, makeDownloadingListener } from './local-cc-instance';
 import { firefox } from 'playwright';
 import { URLDirectory } from './url-list';
 import { liveURLs as builtinURLs } from './url-list-live';
 import { CookieConnoisseurConfig, parseConfigFile } from './parse-config';
+import { sha1sumFromBuffer } from './util';
 
 const helpString =
     "usage: npx cookie-connoisseur fetch [options]\n" +
     "Downloads a local copy of Cookie Clicker.\n" +
     "Options:\n" +
     "   --help      Show this help\n" +
+    "   --skip-good-sha1sum\n" +
+    "               Do not redownload files whose sha1sum match the expected sha1sum\n" +
+    "   --skip-missing-sha1sum\n" +
+    "               Do not redownload files without an expected sha1sum\n" +
+    "   --skip-disabled-sha1sum\n" +
+    "               Do not redownload files whose expected sha1sum was set to null\n" +
+    "               (i.e. files whose sha1sum checking was explicitly disabled)\n" +
     "   --skip-existing\n" +
-    "               Do not redownload files that already exist inside .cookie-cliker.\n" +
+    "               Do not redownload files that already exist inside .cookie-cliker\n" +
+    "               Equivalent to --skip-good-sha1sum --skip-missing-sha1sum --skip-disabled-sha1sum\n" +
     "";
 
 class FetchOptions {
-    skipExisting: boolean = false;
+    skipGoodSha1sum: boolean = false;
+    skipMissingSha1sum: boolean = false;
+    skipDisabledSha1sum: boolean = false;
 };
 
 /* Parses the command line, returning a FetchOptions.
@@ -33,7 +44,18 @@ function parseCommandLineArgs(args: string[]) {
                 return null;
                 break;
             case '--skip-existing':
-                options.skipExisting = true;
+                options.skipGoodSha1sum = true;
+                options.skipMissingSha1sum = true;
+                options.skipDisabledSha1sum = true;
+                break;
+            case '--skip-good-sha1sum':
+                options.skipGoodSha1sum = true;
+                break;
+            case '--skip-missing-sha1sum':
+                options.skipMissingSha1sum = true;
+                break;
+            case '--skip-disabled-sha1sum':
+                options.skipMissingSha1sum = true;
                 break;
             default:
                 console.error(helpString);
@@ -46,12 +68,15 @@ function parseCommandLineArgs(args: string[]) {
     return options;
 }
 
-async function fileExists(path: string) {
+/* Returns the sha1sum from the given file,
+ * or null if the file cannot be accessed.
+ */
+export async function sha1sumFromFile(path: string) {
     try {
-        await fsAccess(path);
-        return true;
-    } catch {
-        return false;
+        let file = await readFile(path);
+        return sha1sumFromBuffer(file);
+    } catch (e) {
+        return null;
     }
 }
 
@@ -71,10 +96,24 @@ async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: 
             continue;
         }
 
-        if(options.skipExisting) {
-            if(await fileExists(localPathOfURL(url))) {
-                if(config.verbose >= 1) {
-                    console.log(`Skipping ${url}`);
+        let actualSha1sum = await sha1sumFromFile(localPathOfURL(url));
+        let expectedSha1sum = urls[url].sha1sum;
+        if(actualSha1sum != null) { // File exists
+            if(options.skipGoodSha1sum && actualSha1sum == expectedSha1sum) {
+                if(config.verbose >= 2) {
+                    console.log(`Skipping ${url} because its sha1sum ${actualSha1sum} matches expected`);
+                }
+                continue;
+            }
+            if(options.skipMissingSha1sum && expectedSha1sum === undefined) {
+                if(config.verbose >= 2) {
+                    console.log(`Skipping ${url} because the file exists and its expected sha1sum is missing`);
+                }
+                continue;
+            }
+            if(options.skipDisabledSha1sum && expectedSha1sum === null) {
+                if(config.verbose >= 2) {
+                    console.log(`Skipping ${url} because the file exists and sha1sum checking was disabled for it`);
                 }
                 continue;
             }
