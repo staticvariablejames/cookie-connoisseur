@@ -182,11 +182,16 @@ function getLanguage(options: CCPageOptions): CookieClickerLanguage | null {
     }
 }
 
-function getRoutingFallback(options: CCPageOptions): (route: Route) => Promise<void> {
+function getRoutingFallback(options: CCPageOptions, config: CookieConnoisseurConfig): (route: Route) => Promise<void> {
     if(typeof options.routingFallback == 'function') {
         return options.routingFallback;
     } else {
-        return route => route.continue();
+        return (route: Route) => {
+            if(config.verbose >= 1) {
+                console.log(`No route configured for ${route.request().url()}, using the Internet...`);
+            }
+            return route.continue();
+        };
     }
 }
 
@@ -469,7 +474,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
             return;
         if(await handleForbiddenURLs(route))
             return;
-        await getRoutingFallback(options)(route);
+        await getRoutingFallback(options, config)(route);
     });
 
     await page.goto(entryURL);

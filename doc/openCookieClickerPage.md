@@ -178,11 +178,11 @@ Available options:
 
 -   `routingFallback?: (route: Route) => Promise<void>`
     Fallback for handling routes which are not accounted for by Cookie Connoisseur.
-    Defaults to `route => route.continue();`,
+    Defaults to essentially `route => route.continue();`,
     which simply forwards the route to the Internet.
 
     Cookie Connoisseur will intercept several requests,
-    like using a file downloaded by `npx cookie-connoisseur fetch`
+    for example by using a file downloaded by `npx cookie-connoisseur fetch`
     instead of letting the browser get it from the Internet.
     However,
     if Cookie Connoisseur does not know how to handle some request
@@ -191,13 +191,15 @@ Available options:
     it will call this function instead.
 
     For example,
-    for logging purposes,
-    `npx cookie-connoisseur launch` uses the following function:
-
-        routingFallback: route => {
-            console.log(`Internet request fallback for ${route.request().url()}`);
-            return route.continue();
-        },
+    the actual default value for `routingFallback` is
+    ```typescript
+    (route: Route) => {
+        if(config.verbose >= 1) {
+            console.log(`No route configured for ${route.request().url()}, using the Internet...`);
+        }
+        return route.continue();
+    }
+    ```
 
     Routing is done via [page.route](https://playwright.dev/docs/api/class-page#page-route).
     If you register conflicting routes,
