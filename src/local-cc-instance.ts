@@ -79,12 +79,8 @@ export function makeDownloadingListener(url: string, options: DownloadingListene
     }
 
     url = normalizeURL(url);
-
-    if(options.verbose >= 2) {
-        console.log(`Preparing to download ${url}`);
-    }
-
     let path = options.prefix + '/' + localPathOfURL(url);
+
     let handler = async (response: Response) => {
         if(response.ok() && normalizeURL(response.url()) == url) { // Success
             let responseBody;

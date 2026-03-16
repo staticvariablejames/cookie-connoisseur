@@ -89,12 +89,9 @@ async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: 
                     console.log(`Skipping ${url}`);
                 }
                 continue;
-            } else {
-                if(config.verbose >= 1) {
-                    console.log(`Downloading ${url}...`);
-                }
             }
         }
+        console.log(`Downloading ${url}...`);
 
         // Step 1: register the downloader
         let outerCallback = () => {};
