@@ -49,8 +49,6 @@ export function normalizeURL(url: string) {
  * and remove itself from the page listener list.
  *
  * Options:
- *  - prefix: where the '.cookie-connoisseur' directory is located.
- *      Defaults to './'.
  *  - sha1sum: the checksum that this file will be compared against.
  *      Set to `null` to disable checking.
  *  - verbose: verbosity level.
@@ -61,16 +59,12 @@ export function normalizeURL(url: string) {
  *      Defaults to async () => {}.
  */
 type DownloadingListenerOptions = {
-    prefix?: string,
     sha1sum?: string | null,
     verbose?: number,
     callback?: () => Promise<void>,
 };
 
 export function makeDownloadingListener(url: string, options: DownloadingListenerOptions = {}) {
-    if(options.prefix === undefined) {
-        options.prefix = './';
-    }
     if(options.callback === undefined) {
         options.callback = async () => {};
     }
@@ -79,7 +73,7 @@ export function makeDownloadingListener(url: string, options: DownloadingListene
     }
 
     url = normalizeURL(url);
-    let path = options.prefix + '/' + localPathOfURL(url);
+    let path = localPathOfURL(url);
 
     let handler = async (response: Response) => {
         if(response.ok() && normalizeURL(response.url()) == url) { // Success

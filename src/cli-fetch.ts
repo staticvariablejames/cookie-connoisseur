@@ -12,15 +12,11 @@ const helpString =
     "Downloads a local copy of Cookie Clicker.\n" +
     "Options:\n" +
     "   --help      Show this help\n" +
-    "   --save-prefix <path>\n" +
-    "               Creates the .cookie-connoisseur directory under the given path\n"
-    "               Default: './'\n" +
     "   --skip-existing\n" +
     "               Do not redownload files that already exist inside .cookie-cliker.\n" +
     "";
 
 class FetchOptions {
-    dir: string = './';
     skipExisting: boolean = false;
 };
 
@@ -35,14 +31,6 @@ function parseCommandLineArgs(args: string[]) {
             case '--help':
                 console.log(helpString);
                 return null;
-                break;
-            case '--save-prefix':
-                if(args[1] === undefined) {
-                    console.error(helpString);
-                    process.exit(1);
-                }
-                options.dir = args[1];
-                args.shift();
                 break;
             case '--skip-existing':
                 options.skipExisting = true;
@@ -97,7 +85,6 @@ async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: 
         let outerCallback = () => {};
         await page.on('response',
             makeDownloadingListener(url, {
-                prefix: options!.dir,
                 verbose: config.verbose,
                 sha1sum: urls[url].sha1sum,
                 callback: async () => {outerCallback();},
