@@ -140,7 +140,7 @@ async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: 
         let outerCallback = () => {};
         await page.on('response',
             makeDownloadingListener(url, {
-                verbose: config.verbose,
+                verbose: config.verbose? Math.max(config.verbose, 2) : 0, // More verbosity, as this is a command-line utility
                 sha1sum: urls[url].sha1sum,
                 callback: async () => {outerCallback();},
             })
