@@ -5,7 +5,6 @@ declare global {
     export const CConnoisseur: {
         mockedDate: number | null,
         clearNewsTickerText: () => void,
-        setSliderValue: (e: Element, value: number) => number,
         gainLumps: (lumpsToGain: number) => void,
         warpTimeToFrame: (frame: number) => void,
         ascend: () => void,

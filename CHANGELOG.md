@@ -13,6 +13,15 @@
     unless explicitly requested in `cookie-connoisseur.config.json`.
 - Fixed: Cookie Connoisseur now also handles resources requested from <cdn.orteil.org>
     as if they were from its corresponding <orteil.dashnet.org> URL.
+- **Removed**: function `CConnoisseur.setSliderValue(e, value)`.
+    [Some time between 2020 and 2025](https://github.com/microsoft/playwright/issues/4231#issuecomment-2614120154),
+    Playwright's `locator.fill` started working properly with sliders,
+    so you can just use that instead.
+
+    For example, if the slider was created with `Game.WriteSlider('mySlider', ...)`
+    then running `await page.locator('#mySlider').fill('15');`
+    will change its value to 15
+    (all sliders from `Game.WriteSlider` range from 0 to 100).
 - **Removed**: `--checksum` option for `npx cookie-connoisseur fetch`;
     use `npx cookie-connoisseur checksum` instead.
 

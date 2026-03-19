@@ -41,26 +41,6 @@ only in the browser environment.
     since the news ticker is random,
     clearing the news ticker before taking a snapshot prevents it from becoming flaky.
 
--   `setSliderValue: (e: Element, value: number) => number`
-    Changes the given HTML element to the given value,
-    dispatches the appropriate events,
-    and simply returns the value.
-
-    Currently,
-    [Playwright cannot change range inputs](https://github.com/microsoft/playwright/issues/4231#issuecomment-716049872),
-    like changing the volume slider;
-    this function mitigates this issue.
-
-    This function can be used with
-    [`page.$eval`](https://playwright.dev/docs/api/class-page#page-eval-on-selector);
-    for example,
-    ```typescript
-    await page.$eval('text=Volume50% >> input', e => CConnoisseur.setSliderValue(e, 15));
-    ```
-    sets the volume slider to 15%.
-    (The `text=Volume50%` is a trick to get Playwright to pick the entire `div`
-    containing the slider, rather than just the `Volume` label.)
-
 -   `gainLumps: (lumpsToGain: number) => void`
     Awards the given number of lumps.
 

@@ -81,15 +81,6 @@ test('News ticker gets cleared', async ({ browser }) => {
     await page.close();
 });
 
-test('Range inputs get slided', async ({ browser }) => {
-    let page = await openCookieClickerPage(browser);
-    await page.click('text=Options');
-    // TODO: find more resilient way of referring to the volume slider
-    await page.$eval('text=Volume75% >> input', e => CConnoisseur.setSliderValue(e, 15));
-    expect(await page.evaluate(() => Game.volume)).toEqual(15);
-    await page.close();
-});
-
 test.describe('Lumps are gained', () => {
     test('in an empty save', async ({ browser }) => {
         let page = await openCookieClickerPage(browser);

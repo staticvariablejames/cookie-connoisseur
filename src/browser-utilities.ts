@@ -79,17 +79,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         Game.tickerBelowL.innerHTML = '';
     }
 
-    let setSliderValue = (e: Element, value: number) => {
-        // From https://github.com/microsoft/playwright/issues/4231#issuecomment-716049872
-        if(!(e instanceof HTMLInputElement)) {
-            throw new Error(`Element is not an HTMLInputElement`);
-        }
-        e.value = String(value);
-        e.dispatchEvent(new Event('input'));
-        e.dispatchEvent(new Event('change'));
-        return value;
-    }
-
     let gainLumps = (lumpsToGain: number) => {
         if(Game.cookiesEarned+Game.cookiesReset < 1000000000) {
             Game.Earn(1e9 - Game.cookiesEarned - Game.cookiesReset);
@@ -216,7 +205,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     window.CConnoisseur = {
         mockedDate,
         clearNewsTickerText,
-        setSliderValue,
         gainLumps,
         warpTimeToFrame,
         ascend,
