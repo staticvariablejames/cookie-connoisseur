@@ -35,14 +35,14 @@ Installation
 currently, Cookie Connoisseur only works properly with Playwright 1.57.**
 
     npm install --save-dev cookie-connoisseur
-    npx cookie-connoisseur fetch
+    npx cookie-connoisseur install
 
 This istalls the library,
 the `cookie-connoisseur` binary,
 and downloads a copy of <https://orteil.dashnet.org/cookieclicker>.
 (The files will be stored to `.cookie-connoisseur`.)
 
-If you forget to run `npx cookie-connoisseur fetch`,
+If you forget to run `npx cookie-connoisseur install`,
 the copy of Cookie Clicker will be downloaded during testing,
 which might cause timing errors in your tests.
 
@@ -112,10 +112,17 @@ in the [test directory of Choose Your Own Lump](
 ).
 
 
-Executables
-===========
+Command Line Interface
+======================
 
-Cookie Connoiseur has a command-line interface with a few commands.
+Cookie Connoiseur has a command-line interface with a few subcommands.
+Some subcommands have further options;
+execute `npx cookie-connoisseur <subcommand> --help` for a list.
+
+    npx cookie-connoisseur install
+
+This is an alias for `npx cookie-connoisseur fetch --skip-good-sha1sum`,
+and exists mainly for analogy with `npx playwright install`.
 
     npx cookie-connoisseur checksum
 

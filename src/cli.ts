@@ -15,6 +15,7 @@ let helpString =
     "   checksum - Verifies the files of the local copy of Cookie Clicker\n" +
     "   fetch - Downloads a local copy of Cookie Clicker\n" +
     "           and of the files specified in cookie-connoisseur.config.json\n" +
+    "   install - alias of 'fetch --skip-good-sha1sum'\n" +
     "   launch - Launches a Cookie Clicker instance\n" +
     "   native-to-json - Parses stdin, which must be a save file\n" +
     "           in Cookie Clicker's native save format, to a JSON format\n" +
@@ -69,6 +70,9 @@ function writeNativeSaveFormat(args: string[]) {
 switch(args[0]) {
     case 'fetch':
         fetchFiles(args.splice(1));
+        break;
+    case 'install': // Quick implementation of an alias
+        fetchFiles(['--skip-good-sha1sum'].concat(args.splice(1)));
         break;
     case 'checksum':
         checksumFiles(args.splice(1));

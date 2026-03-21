@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Added: `routingFallback` option for `openCookieClickerPage`.
+- Added: subcommand `npx cookie-connoisseur install`,
+    which is simply an alias for `npx cookie-connoisseur fetch --skip-good-sha1sum`.
 - Added: subcommand `npx cookie-connoisseur checksum`,
     which does the old`--checksum` option for `npx cookie-connoisseur fetch`.
 - Added: option `--update-database` for `npx cookie-connoisseur checksum`,
