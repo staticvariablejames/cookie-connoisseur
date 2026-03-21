@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- **Breaking change**: Cookie Connoisseur now downloads and uses the game files
+    from the **live** version 2.058.
+- **Known issue**: Cookie Connoisseur 0.4.0 only works with Playwright 1.57.0.
 
 - Added: `routingFallback` option for `openCookieClickerPage`.
 - Added: subcommand `npx cookie-connoisseur install`,
@@ -10,6 +13,10 @@
 - Added: option `--update-database` for `npx cookie-connoisseur checksum`,
     which updates `sha1sum`s
     in files like `src/url-list-live.ts` and `cookie-connoisseur.config.json`.
+- Added: options `--skip-good-sha1sum`, `--skip-missing-sha1sum`, `--skip-disabled-sha1sum`,
+    `--only-builtin`, `--only-custom`
+    for `npx cookie-connoisseur fetch`.
+- Added: options `--browser`, `--ccsave`, `--mock-date` for `npx cookie-connoisseur launch`.
 - **Breaking change**:
     Cookie Connoisseur no longer automatically downloads a copy of Cookie Clicker on installation.
     You need to manually run `npx cookie-connoisseur fetch` instead.
@@ -29,6 +36,8 @@
     (all sliders from `Game.WriteSlider` range from 0 to 100).
 - **Removed**: `--checksum` option for `npx cookie-connoisseur fetch`;
     use `npx cookie-connoisseur checksum` instead.
+- **Removed**: option `.prefix` for `makeDownloadingListener`
+    and option `--save-prefix` for `npx cookie-connoisseur fetch`.
 
 ## 0.3.1 - 2022-07-23
 - **Breaking change**: Cookie Connoisseur now downloads and uses the game files
