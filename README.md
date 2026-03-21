@@ -133,8 +133,7 @@ It also downloads the custom URLs listed in the [configuration file](#configurat
 see below for details.
 
 Strictly speaking it is not necessary to run this command manually,
-as it is run on `npx install`,
-and `openCookieClickerPage` downloads any missing files on-the-fly.
+as `openCookieClickerPage` downloads any missing files on-the-fly.
 However this means that the very first test to be run after changing the configuration file
 will need extra time to download the missing files,
 so it is useful to run it manually in this case

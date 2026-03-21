@@ -8,6 +8,9 @@
 - Added: option `--update-database` for `npx cookie-connoisseur checksum`,
     which updates `sha1sum`s
     in files like `src/url-list-live.ts` and `cookie-connoisseur.config.json`.
+- **Breaking change**:
+    Cookie Connoisseur no longer automatically downloads a copy of Cookie Clicker on installation.
+    You need to manually run `npx cookie-connoisseur fetch` instead.
 - Changed: Console logging was tweaked;
     it should be less spammy now,
     unless explicitly requested in `cookie-connoisseur.config.json`.
