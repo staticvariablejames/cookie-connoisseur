@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 0.4.0 - 2026-03-21
 - **Breaking change**: Cookie Connoisseur now downloads and uses the game files
     from the **live** version 2.058.
 - **Known issue**: Cookie Connoisseur 0.4.0 only works with Playwright 1.57.0.
