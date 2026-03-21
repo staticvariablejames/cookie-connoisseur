@@ -136,26 +136,39 @@ async function downloadFiles(urls: URLDirectory, options: FetchOptions, config: 
         }
         console.log(`Downloading ${url}...`);
 
-        // Step 1: register the downloader
-        let outerCallback = () => {};
+        // Step 1: create a waiter, to be awaken once the download is finished
+        let downloadWaiterCallback = () => {};
+        let downloadWaiter = new Promise<void>(resolve => {
+            downloadWaiterCallback = resolve;
+        });
+
+        // Step 2: register the downloader
         await page.on('response',
             makeDownloadingListener(url, {
                 verbose: config.verbose? Math.max(config.verbose, 2) : 0, // More verbosity, as this is a command-line utility
                 sha1sum: urls[url].sha1sum,
-                callback: async () => {outerCallback();},
+                callback: async () => {downloadWaiterCallback();},
             })
         );
 
-        // Step 2: create promise that resolves when the download is done
-        let downloadWaiter = new Promise<void>(resolve => {
-            outerCallback = resolve;
-        });
-
         // Step 3: navigate to the page and wait
-        await Promise.all([
-            page.goto(url),
-            downloadWaiter,
-        ]);
+        try {
+            await page.goto(url);
+        } catch (e) {
+            if(e instanceof Error && e.message.includes('Download is starting')) {
+                /* Some pages are served as a download
+                 * (e.g. <https://orteil.dashnet.org/cf-fonts/s/merriweather/5.0.11/latin/900/normal.woff2>).
+                 * I don't know why Playwright throws an error in this case,
+                 * but the handler from `makeDownloadingListener` succeeds just fine.
+                 *
+                 * So we do nothing,
+                 * and rethrow the error if it is something different.
+                 */
+            } else {
+                throw e;
+            }
+        }
+        await downloadWaiter;
     }
 
     await page.close();
