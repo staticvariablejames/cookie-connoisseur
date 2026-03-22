@@ -3,10 +3,9 @@ import { CCSave } from './ccsave';
 process.stdin.setEncoding('utf8');
 
 const goodsSet = new Set([
-    'CRL', 'CHC', 'BTR', 'SUG',
-    'NUT', 'SLT', 'VNL', 'EGG',
-    'CNM', 'CRM', 'JAM', 'WCH',
-    'HNY', 'CKI', 'RCP', 'SBD',
+    'CRL', 'CHC', 'BTR', 'SUG', 'NUT', 'SLT',
+    'VNL', 'EGG', 'CNM', 'CRM', 'JAM', 'WCH',
+    'HNY', 'CKI', 'RCP', 'SBD', 'PBL', 'YOU',
 ]);
 
 /* "Pretty-prints" the save to a string.
