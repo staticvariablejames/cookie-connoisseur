@@ -150,7 +150,7 @@ For the most part,
 they follow the names of the corresponding variables in the `Game` namespace.
 
 The types do not necessarily match the in-game types.
-Most proeminently:
+Most prominently:
 -   Cookie Clicker frequently uses 0 and 1 for boolean attributes.
     `CCSave` attributes are actually `boolean`.
 
@@ -221,7 +221,7 @@ Modded data is stored in the `modSaveData` attribute.
 This field is essentially a `Record<string, string | object>`.
 In-game, all mod data must be a string,
 but since storing a `JSON.stringify`ed object is common practice,
-the `modSaveData` attribute also accepts objects (like the output of `JSON.stringify`).
+the `modSaveData` attribute also accepts objects (like the output of `JSON.parse`).
 
 
 Mod Data
@@ -321,6 +321,11 @@ behave idiosyncratically.
     `CCSave.fullDate` may also be `NaN`.
     Since `JSON.stringify` outputs `NaN` as `null`,
     `CCSave.fromObject` interprets `null` as `NaN` for `fullDate`.
+
+Niceties
+--------
+
+Small helpful things that `CCSave.fromObject` does.
 
 -   Buildings have a `.highest` attribute that's always higher than `.amount` in-game.
     If `.highest` is not present, `CCSave.fromObject` sets it to `.amount`.

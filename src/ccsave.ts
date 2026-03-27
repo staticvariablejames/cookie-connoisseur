@@ -870,7 +870,7 @@ export class CCBuildingsData { // Aggregates all buildings
                 `${subobjectName}["${buildingName}"]`
             );
 
-            if(!('highest' in sourceBuilding)) {
+            if(!('highest' in sourceBuilding)) { // Nicety (see CCSave.md)
                 targetBuilding.highest = targetBuilding.amount;
             }
 
