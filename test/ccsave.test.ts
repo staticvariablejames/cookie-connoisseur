@@ -2536,6 +2536,24 @@ test.describe('CCSave.fromObject', () => {
         });
     });
 
+    test.describe('handles .cookiesEarned', () => {
+        test('copying from .cookies if absent', () => {
+            let manualSave = new CCSave();
+            manualSave.cookies = 1e12;
+            manualSave.cookiesEarned = 1e12;
+            let jsonSave = CCSave.fromObject({cookies: 1e12});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('not overriding if present', () => {
+            let manualSave = new CCSave();
+            manualSave.cookies = 1e12;
+            manualSave.cookiesEarned = 1e9; // Triggers "Cheated cookies taste awful" if loaded
+            let jsonSave = CCSave.fromObject({cookies: 1e12, cookiesEarned: 1e9});
+            expect(jsonSave).toEqual(manualSave);
+        });
+    });
+
     test.describe('handles .permanentUpgrades', () => {
         test('with correct inputs', () => {
             let manualSave = new CCSave();

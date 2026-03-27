@@ -333,3 +333,9 @@ Small helpful things that `CCSave.fromObject` does.
     don't work properly if `.highest = 0`,
     so this allows us to explicitly set `.amount` only,
     without worrying about `.highest`.
+
+-   If `.cookiesEarned` is not defined, it is set to the same value as `.cookies`.
+    Having `.cookies` larger than `.cookiesEarned` is one way of getting the achievement
+    "Cheated cookies taste awful",
+    and several things unlock based on `.cookiesEarned`,
+    like sugar lumps and the "Bake cookies in one ascension" achievements.

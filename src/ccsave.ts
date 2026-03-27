@@ -3309,6 +3309,10 @@ export class CCSave {
 
         pseudoObjectAssign(save, _obj, onError);
 
+        if(!('cookiesEarned' in _obj)) { // Nicety (see CCSave.md)
+            save.cookiesEarned = save.cookies;
+        }
+
         if('YouCustomizer' in _obj) {
             save.YouCustomizer = YouCustomizerGenes.fromObject(_obj.YouCustomizer, onError, '.YouCustomizer');
         }
