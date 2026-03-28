@@ -2554,6 +2554,24 @@ test.describe('CCSave.fromObject', () => {
         });
     });
 
+    test.describe('handles .lumpsTotal', () => {
+        test('copying from .lumps if absent', () => {
+            let manualSave = new CCSave();
+            manualSave.lumps = 15;
+            manualSave.lumpsTotal = 15;
+            let jsonSave = CCSave.fromObject({lumps: 15});
+            expect(jsonSave).toEqual(manualSave);
+        });
+
+        test('not overriding if present', () => {
+            let manualSave = new CCSave();
+            manualSave.lumps = 15;
+            manualSave.lumpsTotal = 12; // Should not be possible, but we test anyway
+            let jsonSave = CCSave.fromObject({lumps: 15, lumpsTotal: 12});
+            expect(jsonSave).toEqual(manualSave);
+        });
+    });
+
     test.describe('handles .permanentUpgrades', () => {
         test('with correct inputs', () => {
             let manualSave = new CCSave();

@@ -3313,6 +3313,10 @@ export class CCSave {
             save.cookiesEarned = save.cookies;
         }
 
+        if(!('lumpsTotal' in _obj)) { // Nicety (see CCSave.md)
+            save.lumpsTotal = save.lumps;
+        }
+
         if('YouCustomizer' in _obj) {
             save.YouCustomizer = YouCustomizerGenes.fromObject(_obj.YouCustomizer, onError, '.YouCustomizer');
         }

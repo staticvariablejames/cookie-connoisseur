@@ -339,3 +339,5 @@ Small helpful things that `CCSave.fromObject` does.
     "Cheated cookies taste awful",
     and several things unlock based on `.cookiesEarned`,
     like sugar lumps and the "Bake cookies in one ascension" achievements.
+
+-   If `.lumpsTotal` is not defined, it is set to the same value as `.lumps`.
