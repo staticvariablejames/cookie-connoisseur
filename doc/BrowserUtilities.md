@@ -18,22 +18,26 @@ only in the browser environment.
 `CConnoisseur` attributes:
 
 -   `mockedDate: number | null`
-    The Cookie Connoisseur implementation of a `Date.now()` mock.
-    There are several game mechanics that rely on `Date.now()` advancing normally,
-    so it is not viable to simply set `Date.now() = () => 1.6e12`.
-    The compromise is setting a base starting date
-    and let `Date.now()` increment normally beyond that.
-    `CConnoisseur.mockedDate` is precisely this base starting date.
-    The default value is 1.6e12, which corresponds to 2020-09-13 12:26:40 UTC.
 
-    This value can be changed via `page.evaluate`;
+    The value set as `mockedDate` when [opening a Cookie Clicker page](openCookieClickerPage.md).
+    If date mocking was disabled,
+    this value is set to null.
+
+    If non-null,
+    this value can be changed via `page.evaluate`;
     for example,
-    ```typescript
-    await page.evaluate( () => { window.CConnoisseur.mockedDate = 1.7e12 } );
+    ```javascript
+    await page.evaluate( () => { window.CConnoisseur.mockedDate += 3600*1000 } );
     ```
     is equivalent to advancing the system clock by one hour.
 
-    Explicitly setting this option to `null` disables date mocking and prevents overwriting `Date.now()`.
+    Note that changing this attribute from null to non-null will _not_ enable date mocking,
+    and likewise changing the attribute from non-null to null will _not_ disable date mocking.
+
+-   `realDate: typeof Date`
+    The global object `window.Date`,
+    before being overwritten for date mocking.
+    (`CConnoisseur.realDate` will store `window.Date` even if date mocking is disabled.)
 
 -   `clearNewsTickerText: () => void`
     This function simply modifies the DOM to make the news ticker text empty.

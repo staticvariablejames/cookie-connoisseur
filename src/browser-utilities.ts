@@ -46,32 +46,56 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         window.localStorage.setItem('CookieClickerLang', options.language);
     }
 
+    let realDate: typeof Date = Date;
     let mockedDate = options.mockedDate; // assigned to window.CConnoisseur.mockedDate at the end of this function
     if(mockedDate != null) {
-        let currentDate = Date.now();
-        let realDate = Date;
 
-        let newDate = Object.assign(
-            function(this: Date, ...args : any[]) {
-                if(args.length == 0) {
-                    if(this) {
-                        return new realDate(newDate.now());
-                    }
-                    else
-                        return (new realDate(newDate.now())).toString();
-                } else {
-                    // @ts-ignore
-                    return new realDate(...args);
-                }
-            },
+        function mockedDateConstructor(): string;
+        function mockedDateConstructor(this: Date): Date;
+        function mockedDateConstructor(this: Date, value: string | number | Date): Date;
+        function mockedDateConstructor(this: Date, year: number, month: number, day?: number, hour?: number, minute?: number, second?: number, ms?: number): Date;
+        function mockedDateConstructor(this: Date, yearOrValue?: string | number | Date, month?: number, day?: number, hour?: number, minute?: number, second?: number, ms?: number): Date | string {
+            if(!new.target) { // mockedDateConstructor was called _without_ new
+                // We will override the global Date object so this does what we want
+                return new realDate(Date.now()).toString();
+            } else if (yearOrValue === undefined) {
+                return new realDate(Date.now());
+            } else if(typeof yearOrValue != 'number') {
+                return new realDate(yearOrValue!);
+            } else if(month === undefined) {
+                // Cannot explicitly pass 'undefined' as argument to realDate, so we check everything
+                return new realDate(yearOrValue);
+            } else if(day === undefined) {
+                return new realDate(yearOrValue, month);
+            } else if(hour === undefined) {
+                return new realDate(yearOrValue, month, day);
+            } else if(minute === undefined) {
+                return new realDate(yearOrValue, month, day, hour);
+            } else if(second === undefined) {
+                return new realDate(yearOrValue, month, day, hour, minute);
+            } else if(ms === undefined) {
+                return new realDate(yearOrValue, month, day, hour, minute, second);
+            } else {
+                return new realDate(yearOrValue, month, day, hour, minute, second, ms);
+            }
+        }
+
+        let currentDate = Date.now();
+        Date = Object.assign(
+            /* I could not figure out how to convince the TypeScript compiler
+             * that mockedDateConstructor indeed implements { new(): Date }.
+             * So we do a little bit of coercing.
+             * (In my defense, the Playwright devs also shut the compiler up
+             * in 'packages/injected/src/clock.ts',
+             * on their own implementation of date mocking (<https://playwright.dev/docs/clock>).)
+             */
+            mockedDateConstructor as typeof mockedDateConstructor & { new(): Date },
             {
                 now: () => realDate.now() - currentDate + window.CConnoisseur.mockedDate!,
                 parse: realDate.parse,
                 UTC: realDate.UTC,
             }
         );
-        // @ts-ignore (I couldn't figure out how to convince Typescript that this works)
-        Date = newDate;
     }
 
     let clearNewsTickerText = () => {
@@ -204,6 +228,7 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
 
     window.CConnoisseur = {
         mockedDate,
+        realDate,
         clearNewsTickerText,
         gainLumps,
         warpTimeToFrame,

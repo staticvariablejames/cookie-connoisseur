@@ -141,8 +141,20 @@ Available options:
     Defaults to empty.
 
 -   `mockedDate: number | null`
-    Initial value of CConnoisseur.mockedDate; see [here](./BrowserUtilities.md) for details.
+    Initial value of `Date.now()`.
     Defaults to 1.6e12.
+
+    There are several points in Cookie Clicker's code that rely on `Date.now()` advancing normally,
+    so it is not viable to simply set `Date.now() = () => 1.6e12`.
+    Cookie Connoisseur overwrites the global `Date` object with an implementation
+    that fundamentally just subtracts `Date.now()` with an appropriate value
+    to make it seem that the date has shifted to `mockedDate`.
+    The default value is 1.6e12, which corresponds to 2020-09-13 12:26:40 UTC.
+
+    Explicitly setting `mockedDate` to null disables date mocking
+    and prevents the global `Date` from being overwritten.
+
+    This value is stored as `CConoisseur.mockedDate`, see [here](./BrowserUtilities.md) for details.
 
 -   `waitForMinigames: boolean`
     Whether to wait or not to wait for minigames to load before returning the page.
