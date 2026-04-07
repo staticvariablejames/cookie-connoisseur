@@ -45,18 +45,6 @@ only in the browser environment.
     since the news ticker is random,
     clearing the news ticker before taking a snapshot prevents it from becoming flaky.
 
--   `gainLumps: (lumpsToGain: number) => void`
-    Awards the given number of lumps.
-
-    In Cookie Clicker,
-    sugar lumps can only be gained (and used)
-    if the player has more than a billion cookies baked all time.
-    If the player has less than this,
-    this function first `Game.Earn`s the minimum amount needed before calling `Game.gainLumps`,
-    so that all lump-related abilities
-    (like leveling up buildings)
-    can be used right after `CConnoisseur.gainLumps`.
-
 -   `warpTimeToFrame: (frame: number) => void`
     Sets the variable `Game.T` to `frame`,
     advances `Game.mockedDate` by the corresponding amount,

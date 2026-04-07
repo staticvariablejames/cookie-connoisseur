@@ -81,65 +81,6 @@ test('News ticker gets cleared', async ({ browser }) => {
     await page.close();
 });
 
-test.describe('Lumps are gained', () => {
-    test('in an empty save', async ({ browser }) => {
-        let page = await openCookieClickerPage(browser);
-        await page.evaluate(() => CConnoisseur.gainLumps(1));
-        expect(await page.evaluate(() => Game.lumps)).toEqual(1);
-        expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e9);
-        expect(await page.evaluate(() => Game.canLumps())).toBe(true);
-        await page.close();
-    });
-
-    test('if I have some cookies', async ({ browser }) => {
-        let page = await openCookieClickerPage(browser, {saveGame: {
-            cookiesEarned: 1e8,
-        }});
-        await page.evaluate(() => CConnoisseur.gainLumps(2));
-        expect(await page.evaluate(() => Game.lumps)).toEqual(2);
-        expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e9);
-        await page.close();
-    });
-
-    test('if I have plenty of cookies', async ({ browser }) => {
-        let page = await openCookieClickerPage(browser, {saveGame: {
-            cookiesEarned: 1e10,
-        }});
-        await page.evaluate(() => CConnoisseur.gainLumps(4));
-        expect(await page.evaluate(() => Game.lumps)).toEqual(4);
-        expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e10);
-        await page.close();
-    });
-
-    test('if I already have lumps', async ({ browser }) => {
-        let page = await openCookieClickerPage(browser, {saveGame: {
-            cookiesEarned: 1e10,
-            lumps: 5,
-            lumpsTotal: 6,
-        }});
-        await page.evaluate(() => CConnoisseur.gainLumps(10));
-        expect(await page.evaluate(() => Game.lumps)).toEqual(15);
-        expect(await page.evaluate(() => Game.lumpsTotal)).toEqual(16);
-        expect(await page.evaluate(() => Game.cookiesEarned)).toEqual(1e10);
-        await page.close();
-    });
-
-    test('and immediately allow leveling buildings up', async ({ browser }) => {
-        let page = await openCookieClickerPage(browser, {saveGame: {
-            buildings: {
-                'Cursor': {
-                    amount: 1,
-                },
-            },
-        }});
-
-        await page.evaluate(() => {CConnoisseur.gainLumps(1); Game.Objects['Cursor'].levelUp();});
-        expect(await page.evaluate(() => Game.Objects['Cursor'].level)).toEqual(1);
-
-        await page.close();
-    });
-});
-
 test.describe('Time can be warped', () => {
     test('by advancing both Game.T and Date.now', async ({ browser }) => {
         let page = await openCookieClickerPage(browser);

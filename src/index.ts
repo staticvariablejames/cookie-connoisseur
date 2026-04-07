@@ -6,7 +6,6 @@ declare global {
         mockedDate: number | null,
         realDate: typeof Date,
         clearNewsTickerText: () => void,
-        gainLumps: (lumpsToGain: number) => void,
         warpTimeToFrame: (frame: number) => void,
         ascend: () => void,
         reincarnate: () => void,

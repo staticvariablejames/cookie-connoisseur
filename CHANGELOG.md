@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Fixed: Pretty-printer of `npx cookie-connoisseur native-to-json`
+    now properly handles stocks from the last two buildings.
+- **Removed**: function `CConnoisseur.gainLumps`.
+    Instead,
+    either use the attribute `CCPageOptions.saveGame.lumps`,
+    or run `Game.Earn(1e9)` to unlock lumps and then `Game.gainLumps` to gain them.
+
 ## 0.4.0 - 2026-03-21
 - **Breaking change**: Cookie Connoisseur now downloads and uses the game files
     from the **live** version 2.058.

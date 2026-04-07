@@ -103,13 +103,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         Game.tickerBelowL.innerHTML = '';
     }
 
-    let gainLumps = (lumpsToGain: number) => {
-        if(Game.cookiesEarned+Game.cookiesReset < 1000000000) {
-            Game.Earn(1e9 - Game.cookiesEarned - Game.cookiesReset);
-        }
-        Game.gainLumps(lumpsToGain);
-    }
-
     let warpTimeToFrame = (frame: number) => {
         if(CConnoisseur.mockedDate == null) {
             throw 'CConnoisseur.warpTimeToFrame: cannot warp because date mocking is disabled';
@@ -230,7 +223,6 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         mockedDate,
         realDate,
         clearNewsTickerText,
-        gainLumps,
         warpTimeToFrame,
         ascend,
         reincarnate,
