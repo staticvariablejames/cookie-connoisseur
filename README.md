@@ -8,8 +8,8 @@ Cookie Connoisseur
 
 Cookie Connoisseur is a Node.js library to automate the testing of Cookie Clicker mods.
 
-Upon installation,
-Cookie Connoisseur downloads a local copy of <https://orteil.dashnet.org/cookieclicker/>.
+The command `npx cookie-connoisseur install`
+downloads a local copy of <https://orteil.dashnet.org/cookieclicker/>.
 Then,
 the function [`openCookieClickerPage`](#api)
 constructs a [Playwright Page](https://playwright.dev/docs/api/class-page)
