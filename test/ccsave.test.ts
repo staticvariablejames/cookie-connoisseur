@@ -1634,7 +1634,7 @@ const saveAsString2_04 = // 2.04 save game
    'MCwyNTAsMTIuNiwxMjt8TUVUQToqY29vbGVyIHNhbXBsZSBtb2QsKmxhbmcgc2FtcGxlIG1vZCwq'+
    'c2FtcGxlIG1vZDs%3D%21END%21';
 
-const saveAsObject2_04 = {
+const saveAsObject2_04: CCSave = {
     version: 2.04,
     startDate: 1630868834330,
     fullDate: 1630537720837,
@@ -2384,7 +2384,7 @@ const saveAsObject2_04 = {
     modSaveData: {
         META: "*cooler sample mod,*lang sample mod,*sample mod"
     },
-} as CCSave;
+};
 
 test('The save game is properly parsed', async() => {
     expect(CCSave.fromNativeSave(saveAsString2_031)).toEqual(saveAsObject2_031);
@@ -3035,12 +3035,21 @@ test.describe('CCSave.fromObject', () => {
     });
 
     test.describe('handles .achievements', () => {
-        test('with correct inputs', () => {
+        test('when given an array', () => {
             let manualSave = new CCSave();
             manualSave.achievements[0] = 'Wake and bake';
             manualSave.achievements[1] = 'Gaseous assets';
             let jsonSave = CCSave.fromObject({achievements: [0, 'Gaseous assets']});
             expect(jsonSave).toEqual(manualSave);
+        });
+
+        test("when given the string 'all'", async ({browser}) => {
+            let page = await openCookieClickerPage(browser);
+            await page.evaluate(() => Game.RuinTheFun());
+            let browserSave = CCSave.fromNativeSave(await page.evaluate(() => Game.WriteSave(1)));
+            let constructedSave = CCSave.fromObject({achievements: 'all'});
+            expect(constructedSave.achievements).toEqual(browserSave.achievements);
+            await page.close();
         });
 
         test('sorting the achievements if necessary', () => {
@@ -3053,8 +3062,8 @@ test.describe('CCSave.fromObject', () => {
 
         test('throwing readable error messages', () => {
             expect(() => {
-                CCSave.fromObject({achievements: 'all of them'});
-            }).toThrow('source.achievements is not an array');
+                CCSave.fromObject({achievements: 'some of them'});
+            }).toThrow("source.achievements is neither an array nor the string 'all'");
             expect(() => {
                 CCSave.fromObject({achievements: ['invalid achievement']});
             }).toThrow('source.achievements[0] is not an achievement');

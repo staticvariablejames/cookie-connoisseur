@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added: In `CCSave.fromObject`,
+    the `.achievements` attribute may be just the string `'all'`.
 - Fixed: Pretty-printer of `npx cookie-connoisseur native-to-json`
     now properly handles stocks from the last two buildings.
 - **Removed**: function `CConnoisseur.gainLumps`.

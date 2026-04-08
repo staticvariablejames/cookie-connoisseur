@@ -3433,10 +3433,18 @@ export class CCSave {
         }
 
         if('achievements' in _obj) {
-            // TODO: maybe eliminate duplicates?
-            if(!Array.isArray(_obj.achievements)) {
-                onError(`source.achievements is not an array`);
+            if(_obj.achievements === 'all') { // Nicety (see CCSave.md)
+                save.achievements = AchievementsById.filter(achievementName => {
+                    // Remove the beta dungeon minigame achievements
+                    return achievementName != "Getting even with the oven" &&
+                        achievementName != "Now this is pod-smashing" &&
+                        achievementName != "Chirped out" &&
+                        achievementName != "Follow the white rabbit";
+                });
+            } else if(!Array.isArray(_obj.achievements)) {
+                onError(`source.achievements is neither an array nor the string 'all'`);
             } else {
+                // TODO: maybe eliminate duplicates?
                 for(let i = 0; i < _obj.achievements.length; i++) {
                     if(typeof _obj.achievements[i] == 'string') {
                         let achievement: string = _obj.achievements[i];

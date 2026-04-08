@@ -341,3 +341,7 @@ Small helpful things that `CCSave.fromObject` does.
     like sugar lumps and the "Bake cookies in one ascension" achievements.
 
 -   If `.lumpsTotal` is not defined, it is set to the same value as `.lumps`.
+
+-   The `.achievements` attribute may be just the string `'all'` instead of a list of achievements.
+    This gives all achievements _except_ the dungeon achievements
+    (i.e. everything that'd be granted by `Game.RuinTheFun()`).
