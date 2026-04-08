@@ -156,6 +156,16 @@ Available options:
 
     This value is stored as `CConoisseur.mockedDate`, see [here](./BrowserUtilities.md) for details.
 
+-   `forceDiscrepancy: number | null`
+    Forces the [Lump Timestamp Computation Discrepancy](./discrepancy.md) bug to happen,
+    with the given discrepancy.
+    Set to `null` to disable this feature.
+    Defaults to `null`.
+
+    Only available if `mockedDate` is not null,
+    and if the save file has all achievements and does not own Century egg.
+    (The last two interfere in the timings, so Cookie Connoisseur simply disallows them.)
+
 -   `waitForMinigames: boolean`
     Whether to wait or not to wait for minigames to load before returning the page.
     Defaults to true.

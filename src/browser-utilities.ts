@@ -34,6 +34,7 @@ export type CookieClickerLanguage =
 
 export type BrowserUtilitiesOptions = {
     mockedDate: number | null;
+    forceDiscrepancy: number | null;
     language: CookieClickerLanguage | null;
     saveGame: string;
 }
@@ -46,10 +47,10 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         window.localStorage.setItem('CookieClickerLang', options.language);
     }
 
+    let realInitialTimestamp = Date.now();
     let realDate: typeof Date = Date;
     let mockedDate = options.mockedDate; // assigned to window.CConnoisseur.mockedDate at the end of this function
     if(mockedDate != null) {
-
         function mockedDateConstructor(): string;
         function mockedDateConstructor(this: Date): Date;
         function mockedDateConstructor(this: Date, value: string | number | Date): Date;
@@ -80,7 +81,29 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
             }
         }
 
-        let currentDate = Date.now();
+        let numberOfCalls = 0;
+        let poisonedTimestamp = 0;
+        function mockedDateNow() {
+            numberOfCalls++;
+            let mockedNow = realDate.now() - realInitialTimestamp + window.CConnoisseur.mockedDate!;
+            if(options.forceDiscrepancy == null) {
+                return mockedNow;
+            }
+
+            // Need to force the discrepancy
+            if(numberOfCalls <= 16) {
+                return mockedNow;
+            } else if(numberOfCalls == 17) { // Call from the poisoned age calculation
+                poisonedTimestamp = mockedNow;
+                return mockedNow;
+            } else if(numberOfCalls <= 22) {
+                return poisonedTimestamp + options.forceDiscrepancy;
+            } else {
+                // Ensure Date.now() is still monotonic
+                return Math.max(mockedNow, poisonedTimestamp + options.forceDiscrepancy);
+            }
+        }
+
         Date = Object.assign(
             /* I could not figure out how to convince the TypeScript compiler
              * that mockedDateConstructor indeed implements { new(): Date }.
@@ -91,7 +114,7 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
              */
             mockedDateConstructor as typeof mockedDateConstructor & { new(): Date },
             {
-                now: () => realDate.now() - currentDate + window.CConnoisseur.mockedDate!,
+                now: mockedDateNow,
                 parse: realDate.parse,
                 UTC: realDate.UTC,
             }

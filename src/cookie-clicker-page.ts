@@ -4,7 +4,7 @@ import { liveURLs as builtinURLs, liveEntryURL as entryURL } from './url-list-li
 import { isForbiddenURL, localPathOfURL, normalizeURL, makeDownloadingListener } from './local-cc-instance';
 import { BrowserUtilitiesOptions, initBrowserUtilities, CookieClickerLanguage } from './browser-utilities';
 import { parseConfigFile, CookieConnoisseurConfig } from './parse-config';
-import { CCSave, CCBuildingsData } from './ccsave';
+import { CCSave, CCBuildingsData, AchievementsById } from './ccsave';
 
 // Cookie Clicker Query for https://orteil.dashnet.org/data/cookieclickersteam.json
 export type CCQSteam = {
@@ -77,13 +77,14 @@ export type CCPageOptions = {
     cookieConsent?: boolean,
     saveGame?: string | object,
     mockedDate?: number | null,
+    forceDiscrepancy?: number | null,
     waitForMinigames?: boolean,
     language?: CookieClickerLanguage | null,
     routingFallback?: (route: Route) => Promise<void>,
 };
 
 /* The following utility functions return the value of the option,
- * or their default value if they don't exist.
+ * or their default value if it does not exist.
  *
  * The only exception is getQueryVersion;
  * if options.queryVersion is a function,
@@ -160,6 +161,35 @@ function getMockedDate(options: CCPageOptions) {
     } else {
         return 1.6e12; // 2020-09-13 12:26:40 UTC
     }
+}
+
+function getForceDiscrepancy(options: CCPageOptions) {
+    if(typeof options.forceDiscrepancy != 'number') {
+        return null;
+    }
+
+    // Need to force the discrepancy. Some sanity checks:
+    if(getMockedDate(options) == null) {
+        throw new Error('.mockedDate must not be null to use .forceDiscrepancy');
+    }
+    if(options.saveGame == undefined) {
+        throw new Error('.forceDiscrepancy is only allowed when specifying .saveGame');
+    }
+    let saveGame = typeof options.saveGame == 'string' ?
+        CCSave.fromNativeSave(options.saveGame) :
+        CCSave.fromObject(options.saveGame);
+    if(saveGame.lumpsTotal == -1) {
+        throw new Error('.forceDiscrepancy needs lumps to be unlocked (.lumpsTotal != -1)');
+    }
+    if(saveGame.achievements.length < AchievementsById.length - 4) {
+        // The -4 is to account for the beta dungeon achievements
+        throw new Error('.forceDiscrepancy requires the .saveGame to have all achievements');
+    }
+    if(saveGame.ownedUpgrades.includes('Century egg')) {
+        throw new Error('.forceDiscrepancy requires the .saveGame to not own Century egg');
+    }
+
+    return options.forceDiscrepancy;
 }
 
 function getWaitForMinigames(options: CCPageOptions) {
@@ -453,6 +483,7 @@ export async function setupCookieClickerPage(page: Page, options: CCPageOptions 
 
     let utilOptions: BrowserUtilitiesOptions = {
         mockedDate: getMockedDate(options),
+        forceDiscrepancy: getForceDiscrepancy(options),
         saveGame: getSaveGame(options),
         language: getLanguage(options),
     };

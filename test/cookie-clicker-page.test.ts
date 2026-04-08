@@ -1,6 +1,7 @@
 /* Basic test for openCookieClickerPage.
  *
  * The "saveGame" option is tested in `cookie-clicker-page-savegame.test.ts`.
+ * The "forceDiscrepancy" option is tested in `discrepancy.test.ts`.
  */
 import { test, expect } from '@playwright/test';
 
