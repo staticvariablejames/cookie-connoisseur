@@ -269,7 +269,7 @@ in the following order:
 - 1 time in `Game.Init()` to compute the local variable `years`,
   which is then used to calculate the power of the Birthday cookie upgrade.
 
-**Inside `Game.LoadSave` before `Game.loadLumps`**
+**Inside `Game.LoadSave` but before `Game.loadLumps`**
 the game calls `Date.now()` a few more times:
 
 - One time per tiered building achievement awarded.
@@ -344,23 +344,91 @@ the game still triggers `Date.now()` up to three more times:
 - Notifying the player that the save has loaded.
 These have no effect on the discrepancy bug.
 
+Forcing the discrepancy when loading from a save file
+-----------------------------------------------------
+
+"Loading from a save file" means running `Game.LoadSave(save)` after the game has loaded.
+In this case,
+if the given save file would not earn any achievements upon load,
+and also does not own Century egg,
+then we know there are exactly three `Date.now()` calls before reaching the first poisoned line,
+then the `Date.now()` call from the poisoned line,
+then between two and four calls between the poisoned lines,
+and finally the `Date.now()` call from the second poisoned line.
+
+Cookie Connoisseur's solution is to simply count the number of calls to `Date.now()`
+and return appropriately rigged timestamps.
+The function `setupDiscrepancy` is meant to be called like this:
+```javascript
+    await page.evaluate(save => {
+        CConnoisseur.setupDiscrepancy(3);
+        Game.LoadSave(save); // The discrepancy should be exactly 3
+    }, save);
+```
+When running the first line,
+Cookie Connoisseur stores the current value of `Date.now()`;
+call this `baseTimestamp`.
+In the next four calls to `Date.now()`
+Cookie Connoisseur simply returns `baseTimestamp`.
+(This is exactly enough for the first poisoned line to use the value `baseTimestamp`.)
+Then,
+for the next five calls,
+Cookie Connoisseur returns `baseTimestamp + 3`.
+This ensures that,
+regardless of the type and how many lumps were autoharvested,
+the second poisoned line uses the value `baseTimestamp + 3`.
+As analyzed above,
+this forces the discrepancy to be exactly 3.
+
+Predictably-spaced calls to `Date.now()`
+----------------------------------------
+
+```typescrypt
+    CConnoisseur.forceDateNowSpacing: (delays: number[]) => number
+```
+
+This is a more general time manipulation function.
+When this function is called, the current value of `Date.now()`
+is stored as the base timestamp,
+and the subsequent calls to `Date.now()` returns that timestamp plus the nth number in `nthDelay`.
+
+`CConnoisseur.setupDiscrepancy` actually just calls `CConnoisseur.forceDateNowSpacing`
+with an appropriate array.
+The main motivation for also exposing `forceDateNowSpacing`
+is that mods may want to try to patch the discrepancy themselves,
+so by running code like
+```javascript
+    await page.evaluate(save => {
+        MyMod.patchDiscrepancyBug();
+        CConnoisseur.forceDateNowSpacing([0, 0, 1, 5, 233]);
+        Game.LoadSave(save);
+    }, save);
+```
+we are effectively testing whether the implementation's patch worked,
+without having to assume that the "poisoned lines" from vanilla Cookie Clicker are the same.
+
+This function does one more thing:
+it ensures that `Date.now()` keeps behaving monotonically after we "run out" of delays.
+More specifically,
+the function stores in  `highestForcedSpacingTimestamp`
+the value of `baseTimestamp + delays[delays.length-1]`.
+After we run out of delays,
+`Date.now()` returns its "normal" value,
+unless it would be smaller than `highestForcedSpacingTimestamp`,
+in which case it returns that instead.
+
 Forcing the discrepancy when loading from localStorage
 ------------------------------------------------------
 
-From the list above,
-the number of calls to `Date.now()` is variable,
-but we can make it consistent if we demand the save file to have all achievements,
-and to not own Century egg.
+"Loading from localStorage" means the save game loading performed by the game during initialization,
+when the save used in `Game.LoadSave(save)` comes from `window.localStorage`.
+In this case the instruction to force discrepancy comes directly from `openCookieClickerPage`,
+in the `CCPageOptions.forceDiscrepancy` attribute.
 
-In this case,
-there are exactly 16 calls to `Date.now()` before the first poisoned line,
-so we record the timestamp during the 17th call.
-There are between 2 and 4 calls to `Date.now()` strictly between the two poisoned lines,
-so for the next 5 calls to `Date.now()`
-we simply return the recorded timestamp plus `forceDiscrepancy`.
-
-And starting from call 23,
-we return the "normal" value of `Date.now()`,
-unless this number would be smaller than the recorded timestamp plus `forceDiscrepancy`,
-in which case we return the latter;
-this ensures that `Date.now()` remains monotonic.
+This happens before the game has finished loading,
+so we cannot execute commands in the page beforehand.
+However Cookie Connoisseur's `Date.now()` mocking
+gets installed in the page even before the game starts loading.
+We know that the game calls `Date.now()` 13 times before calling `Game.LoadSave`,
+so again we simply count invocations,
+and in the 13th invocation of `Date.now()` we call `setupDiscrepancy` ourselves.
