@@ -1,7 +1,8 @@
 Lump Timestamp Computation Discrepancy
 ======================================
 
-This is a technical document analyzing the code surrounding the discrepancy bug.
+This is a technical document analyzing the code surrounding the discrepancy bug,
+and how Cookie Connoisseur forces it to happen.
 
 Summary
 -------
@@ -209,3 +210,157 @@ will make the player miss out on the chosen lump
 
 Note that **the discrepancy bug has no visible effect for players who are not savescumming**,
 as the other seeds for `Game.computeLumpType()` would not be visible in this case.
+
+
+Forcing the Discrepancy
+=======================
+
+In order to force the discrepancy to be the value `forceDiscrepancy`,
+the value returned by `Date.now()` in the second poisoned line
+must be exactly `forceDiscrepancy` milliseconds more
+than the value returned by `Date.now()` in the first poisoned line.
+
+Cookie Connoisseur already overwrites `Date.now()` in order to implement date mocking,
+and this overwrite happens even before Cookie Clicker is loaded.
+We thus modify our reimplementation of `Date.now()` to also force the discrepancy.
+
+We essentially have to detect when that line is being executed.
+[`Function.prototype.caller` is deprecated](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/caller)
+and [`Error.prototype.stack` is not standardized](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack),
+so we resort to simply counting how many times `Date.now()` has been invoked
+and trigger the code to force discrepancy at the right moment.
+
+Calls to `Date.now()` when loading from localStorage
+----------------------------------------------------
+
+**Before running `Game.LoadSave()`**,
+Cookie Clicker calls `Date.now()` or `new Date()` 13 times
+in the following order:
+
+- 1 time before the `Game.Launch()` function,
+    to initialize the global `Timer.t`.
+
+- 2 times in the beginning of `Game.Launch()`, to calculate `Game.baseSeason`.
+  - These two are actually calls to `new Date()`,
+    but Cookie Connoiseur's `Date` override simply calls `Date.now()` in this case.
+
+- 6 times in `Game.Init()`,
+  to populate `Game.lastActivity`, `Game.time`, `Game.lumpT`,
+  `Game.startDate`, `Game.fullDate`, `Game.lastDate`,
+  - `Game.lumpT` is indeed initialized here, but this initialization is completely inert.
+    If the player has a save file, it will be overwritten during load.
+    If the player does not have a save file,
+    then `Game.lumpsTotal` will be `-1`,
+    so `Game.doLumps()` will overwrite `Game.lumpT` with `Date.now()` again.
+    Whence this value never has any visible effect in the game.
+
+- 3 times in `Game.Init()` when calling `getJson`.
+  The first time queries `'cookieclickerinfo.json'`,
+  the second time is inside `Game.UpdateHeralds()` querying `'cookieclickersteam.json'`,
+  and the third is inside `Game.FetchGrandmanames()` querying `grandmas.json`.
+  - The function `getJson(url, callback, error)` will ping the given URL,
+    and calls `callback` once it gets the result back.
+    It appends the URL with `'nocache='+Math.floor(Date.now()/1000/60/30)` before issuing the request,
+    which is where the `Date.now()` call comes from.
+  - All these queries are intercepted by Cookie Connoisseur
+    (see <./openCookieClickerPage.md>),
+    but JavaScript is single-threaded so the response can never trigger more `Date.now()` calls.
+
+- 1 time in `Game.Init()` to compute the local variable `years`,
+  which is then used to calculate the power of the Birthday cookie upgrade.
+
+**Inside `Game.LoadSave` before `Game.loadLumps`**
+the game calls `Date.now()` a few more times:
+
+- One time per tiered building achievement awarded.
+  - Awarding an achievement via `Game.Win` triggers a notification via `Game.Notify`,
+    which creates a note whose creation date is populated with a single `Date.now()` call.
+  - On load, the game awards tiered building achievements
+    (awarded for reaching thresholds of amount of each building owned).
+    Each achievement won triggers one call to `Game.Notify`.
+  - Typically these achievements should only be awarded on `Game.LoadSave`
+    if the player has updated their game,
+    or from manufactured saves (like the ones produced by Cookie Connoisseur).
+
+- 1 time to calculate `framesElapsed`,
+  used to update `Game.pledgeT`, `Game.seasonT`, and `Game.researchT`.
+
+- How many times are needed inside `Game.loadModData()`.
+  - But never on loading from localStorage,
+    which happens before `Game.LoadMod` has had the chance to run.
+
+- One time per raw-cookies-per-second achievement awarded
+  (inside `Game.CalculateGains()`).
+
+- 1 time inside `Game.CalculateGains()`,
+  to compute the effect of Century egg
+  (if the player owns this upgrade).
+
+- 1 time to populate the local variable `timeOffline`,
+  to compute offline idling.
+
+Without achievements or Century egg,
+this is fixed at 2 `Date.now()` calls.
+
+At this point,
+the game calls `Game.loadLumps(timeOffline)`,
+but the argument is ignored inside the function.
+**Inside `Game.loadLumps`**,
+the sequence of calls is as follows.
+
+- 1 time for the first assignment outlined above.
+
+- 1 time for computing the variable `age`. This is the "poisoned age calculation" outlined above.
+  With no achievements or Century egg,
+  this is the 17th call.
+
+- 1 time inside `Game.harvestLumps` for the second assignment outlined above.
+
+- If the autoharvested lump was a golden one,
+  1 time inside `Game.harvestLumps` to notify the player about the sugar blessing.
+
+- If the autoharvested lump was a caramelized one,
+  1 time inside `Game.harvestLumps` to notify the player about sugar lumps cooldowns being cleared.
+
+- Once per lump-related achievement (lump amount and lump types).
+
+- 1 time inside `Game.harvestLumps` for the third assignment outlined above.
+
+- Once per lump-related achievement (only lump amounts this time).
+
+- 1 time inside `Game.loadLumps` to notify the number of lumps harvested.
+
+- 1 time for the "poisoned assignment" outlined above.
+  Without achievements, Century egg, or special lumps, and only one lump harvested,
+  this is the 20th call;
+  if the autoharvested lump was either golden or caramelized,
+  and more than one lump was harvested,
+  this is the 22nd call.
+
+**After `Game.loadLumps`** returns,
+the game still triggers `Date.now()` up to three more times:
+- Winning the "All the stars in heaven" achievement, if applicable;
+- Announcing the current season, if applicable;
+- Notifying the player that the save has loaded.
+These have no effect on the discrepancy bug.
+
+Forcing the discrepancy when loading from localStorage
+------------------------------------------------------
+
+From the list above,
+the number of calls to `Date.now()` is variable,
+but we can make it consistent if we demand the save file to have all achievements,
+and to not own Century egg.
+
+In this case,
+there are exactly 16 calls to `Date.now()` before the first poisoned line,
+so we record the timestamp during the 17th call.
+There are between 2 and 4 calls to `Date.now()` strictly between the two poisoned lines,
+so for the next 5 calls to `Date.now()`
+we simply return the recorded timestamp plus `forceDiscrepancy`.
+
+And starting from call 23,
+we return the "normal" value of `Date.now()`,
+unless this number would be smaller than the recorded timestamp plus `forceDiscrepancy`,
+in which case we return the latter;
+this ensures that `Date.now()` remains monotonic.
