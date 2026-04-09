@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added: `forceDiscrepancy` option for `openCookieClickerPage`.
+- Added: functions `CConnoisseur.setupDiscrepancy` and `CConnoisseur.forceDateNowSpacing`.
 - Added: In `CCSave.fromObject`,
     the `.achievements` attribute may be just the string `'all'`.
 - Fixed: Pretty-printer of `npx cookie-connoisseur native-to-json`

@@ -47,17 +47,36 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         window.localStorage.setItem('CookieClickerLang', options.language);
     }
 
+    let forceDateNowSpacing: (delays: number[]) => number =
+        () => {throw new Error('Date mocking must be enabled')};
+    let setupDiscrepancy: (discrepancy: number) => number =
+        () => {throw new Error('Date mocking must be enabled')};
+
     let realInitialTimestamp = Date.now();
     let realDate: typeof Date = Date;
     let mockedDate = options.mockedDate; // assigned to window.CConnoisseur.mockedDate at the end of this function
-    if(mockedDate != null) {
+    if(mockedDate != null) { // We need to install date mocking tools.
+        /* Internal utility function.
+         * Returns what the would the mocked value of Date.now() be,
+         * if we did not have to worry about forceDiscrepancy or forceDateNowSpacing.
+         */
+        function simpleMockedDateNow() {
+            return realDate.now() - realInitialTimestamp + window.CConnoisseur.mockedDate!;
+        }
+
         function mockedDateConstructor(): string;
         function mockedDateConstructor(this: Date): Date;
         function mockedDateConstructor(this: Date, value: string | number | Date): Date;
         function mockedDateConstructor(this: Date, year: number, month: number, day?: number, hour?: number, minute?: number, second?: number, ms?: number): Date;
         function mockedDateConstructor(this: Date, yearOrValue?: string | number | Date, month?: number, day?: number, hour?: number, minute?: number, second?: number, ms?: number): Date | string {
+            /* We will override the global Date object later,
+             * and with it the function Date.now(),
+             * so we may call Date.now() here to get the mocked timestamps.
+             *
+             * We explicitly do _not_ use simpleMockedDateNow
+             * to allow `Date()` and `new Date()` to also be affected by forceDiscrepancy.
+             */
             if(!new.target) { // mockedDateConstructor was called _without_ new
-                // We will override the global Date object so this does what we want
                 return new realDate(Date.now()).toString();
             } else if (yearOrValue === undefined) {
                 return new realDate(Date.now());
@@ -81,29 +100,74 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
             }
         }
 
-        let numberOfCalls = 0;
-        let poisonedTimestamp = 0;
-        function mockedDateNow() {
-            numberOfCalls++;
-            let mockedNow = realDate.now() - realInitialTimestamp + window.CConnoisseur.mockedDate!;
-            if(options.forceDiscrepancy == null) {
-                return mockedNow;
-            }
+        // Makeshift state machine for our Date.now() replacement
+        type DateNowMockingState = 'initializing' | 'forcingSpacing' | 'monotonicGuarantee';
+        let state: DateNowMockingState = 'initializing';
 
-            // Need to force the discrepancy
-            if(numberOfCalls <= 16) {
-                return mockedNow;
-            } else if(numberOfCalls == 17) { // Call from the poisoned age calculation
-                poisonedTimestamp = mockedNow;
-                return mockedNow;
-            } else if(numberOfCalls <= 22) {
-                return poisonedTimestamp + options.forceDiscrepancy;
-            } else {
-                // Ensure Date.now() is still monotonic
-                return Math.max(mockedNow, poisonedTimestamp + options.forceDiscrepancy);
+        let baseForcedSpacingTimestamp = 0;
+        let highestForcedSpacingTimestamp = 0;
+        let forcedSpacingDelays: number[] = [];
+
+        forceDateNowSpacing = (delays: number[]) => {
+            if(forcedSpacingDelays.length != 0)
+                throw new Error('Cannot force Date.now spacing twice at the same time');
+            baseForcedSpacingTimestamp = simpleMockedDateNow();
+            highestForcedSpacingTimestamp = baseForcedSpacingTimestamp + delays[delays.length-1];
+            forcedSpacingDelays = delays.slice(); // makes a copy
+            state = 'forcingSpacing';
+            return baseForcedSpacingTimestamp;
+        }
+
+        setupDiscrepancy = (discrepancy: number) => {
+            // We trust that player's save does not get achievements or has Century egg.
+            return forceDateNowSpacing([
+                0, 0,           // Before game.LoadLumps
+                0,              // First assignment (irrelevant)
+                0,              // First poisoned line
+                discrepancy,
+                discrepancy,
+                discrepancy,    // Earliest possible time we reach the second poisoned line
+                discrepancy,
+                discrepancy,    // Latest possible time we reach the second poisoned line
+            ]);
+        }
+
+        let numberOfCallsSinceInitialization = 0;
+        function mockedDateNow() { // We will replace Date.now with this function
+            numberOfCallsSinceInitialization++;
+            switch(state) {
+            case 'initializing':
+                if(numberOfCallsSinceInitialization == 13) {
+                    /* This is the last call to Date.now() before entering Game.loadSave.
+                     * If we need to forceDiscrepancy,
+                     * we can simply call setupDiscrepancy to change the state
+                     * and appropriately configure the next few Date.now() calls.
+                     *
+                     * We still need to return a timestamp for this invocation of Date.now(),
+                     * so we simply use the baseForcedSpacingTimestamp returned by setupDiscrepancy.
+                     */
+                    if(options.forceDiscrepancy != null) {
+                        return setupDiscrepancy(options.forceDiscrepancy);
+                    }
+                }
+                return simpleMockedDateNow();
+
+            case 'forcingSpacing':
+                if(forcedSpacingDelays.length == 0) {
+                    // Should never happen
+                    state = 'monotonicGuarantee';
+                    return Math.max(highestForcedSpacingTimestamp, simpleMockedDateNow());
+                }
+                let nextDelay = forcedSpacingDelays.shift();
+                if(forcedSpacingDelays.length == 0) state = 'monotonicGuarantee';
+                return baseForcedSpacingTimestamp + nextDelay!;
+
+            case 'monotonicGuarantee':
+                return Math.max(highestForcedSpacingTimestamp, simpleMockedDateNow());
             }
         }
 
+        // Overwrite the global Date object
         Date = Object.assign(
             /* I could not figure out how to convince the TypeScript compiler
              * that mockedDateConstructor indeed implements { new(): Date }.
@@ -245,6 +309,8 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
     window.CConnoisseur = {
         mockedDate,
         realDate,
+        forceDateNowSpacing,
+        setupDiscrepancy,
         clearNewsTickerText,
         warpTimeToFrame,
         ascend,

@@ -5,6 +5,8 @@ declare global {
     export const CConnoisseur: {
         mockedDate: number | null,
         realDate: typeof Date,
+        forceDateNowSpacing: (delays: number[]) => number,
+        setupDiscrepancy: (discrepancy: number) => number,
         clearNewsTickerText: () => void,
         warpTimeToFrame: (frame: number) => void,
         ascend: () => void,

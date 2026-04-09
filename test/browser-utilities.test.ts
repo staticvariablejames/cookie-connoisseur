@@ -1,4 +1,6 @@
 /* Basic test for the browser utilities installed by src/browser-utilities.
+ *
+ * Exception: the methods setupDiscrepancy and forceDateNowSpacing are tested in discrepancy.test.ts.
  */
 
 import { test, expect } from '@playwright/test';

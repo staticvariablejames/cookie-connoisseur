@@ -39,6 +39,38 @@ only in the browser environment.
     before being overwritten for date mocking.
     (`CConnoisseur.realDate` will store `window.Date` even if date mocking is disabled.)
 
+-   `forceDateNowSpacing: (delays: number[]) => number`
+    Consistently delays the next `nthDelay.length` calls to `Date.now()`.
+
+    More specifically, when this function is called, the current value of `Date.now()`
+    is stored as the base timestamp,
+    and the subsequent calls to `Date.now()` returns that timestamp plus the nth number in `nthDelay`.
+    When the array runs out,
+    `Date.now()` resumes behaving normally,
+    with a monotonicity guarantee
+    (if it would return a timestamp earlier than the last forced timestamp,
+    it returns the last forced timestamp instead).
+
+    The return value is the base timestamp.
+
+    Date mocking must be enabled.
+
+-   `setupDiscrepancy: (discrepancy: number) => number`
+    Calls `forceDateNowSpacing` with an appropriate array so that
+    calling `Game.LoadSave` immediately afterwards [triggers the discrepancy bug](./discrepancy.md)
+    with the given discrepancy.
+
+    You must call `Game.LoadSave` immediately afterwards,
+    otherwise the normal game loop will consume the forced values of `Date.now()`.
+
+    The return value is the current value of `Date.now()`.
+
+    The save file loaded afterwards must _not_ earn any achievements upon load,
+    nor own Century egg,
+    as these consume `Date.now()` calls.
+
+    Date mocking must be enabled.
+
 -   `clearNewsTickerText: () => void`
     This function simply modifies the DOM to make the news ticker text empty.
     This is mostly useful for [snapshot testing](https://playwright.dev/docs/test-snapshots);
