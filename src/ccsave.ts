@@ -2340,6 +2340,8 @@ export const AchievementsById = [
     "Curly braces",
     "Seven horseshoes",
     "Olden days",
+
+    // Introduced in 2.031
     "The devil's workshop",
     "In the green",
     "Mountain out of a molehill, but like in a good way",
@@ -2510,12 +2512,15 @@ export function achievementListToNativeSave(achievementList: string[], version: 
     }
 
     let numberOfAchievements: number;
-    if     (version <= 2.043) numberOfAchievements = 538;
+    if     (version <= 2.029) numberOfAchievements = 493;
+    else if(version <= 2.031) numberOfAchievements = 538;
+    else if(version <= 2.043) numberOfAchievements = 538; // None added between 2.031 and 2.043
     else if(version <= 2.044) numberOfAchievements = 581;
     else if(version <= 2.045) numberOfAchievements = 584;
     else if(version <= 2.046) numberOfAchievements = 589;
     else if(version <= 2.048) numberOfAchievements = 589; // None added between 2.047 and 2.048
     else if(version <= 2.052) numberOfAchievements = 643;
+    // TODO: check whether floating-point innaccuracies affect the comparisons above
     else numberOfAchievements = AchievementsById.length;
 
     return achievements.slice(0, numberOfAchievements).join('');
@@ -2896,7 +2901,7 @@ export function parseBuffFromObject(obj: unknown, onError: ErrorHandler, subobje
  * the values of modSaveData are always strings.
  * However, a common pattern is for the string to be the output of JSON.stringify.
  * Therefore, if the given string is JSON.parse-able,
- * this is the value it will be written here.
+ * this is the value that will be stored here.
  */
 export class CCModSaveData {
     [modName: string] : string | object;
