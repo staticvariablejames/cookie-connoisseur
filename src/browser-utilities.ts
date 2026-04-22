@@ -119,8 +119,8 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
         }
 
         setupDiscrepancy = (discrepancy: number) => {
-            // We trust that player's save does not get achievements or has Century egg.
-            return forceDateNowSpacing([
+            // We trust that player's save does not get achievements nor has Century egg.
+            let delays = [
                 0, 0,           // Before game.LoadLumps
                 0,              // First assignment (irrelevant)
                 0,              // First poisoned line
@@ -129,7 +129,18 @@ export function initBrowserUtilities(options: BrowserUtilitiesOptions) {
                 discrepancy,    // Earliest possible time we reach the second poisoned line
                 discrepancy,
                 discrepancy,    // Latest possible time we reach the second poisoned line
-            ]);
+            ];
+            // @ts-ignore TODO @types/cookieclicker is missing Minigame.reset
+            if(Game?.Objects['Farm']?.minigame?.reset) {
+                // Garden's reset function calls Date.now() three times
+                delays.unshift(0, 0, 0);
+            }
+            // @ts-ignore
+            if(Game?.Objects['Temple']?.minigame?.reset) {
+                // Garden's reset function calls Date.now() once
+                delays.unshift(0);
+            }
+            return forceDateNowSpacing(delays);
         }
 
         let numberOfCallsSinceInitialization = 0;

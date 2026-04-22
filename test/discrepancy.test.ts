@@ -35,6 +35,52 @@ test.describe('CConnoisseur.forceDateNowSpacing works', () => {
 });
 
 test.describe('Discrepancy can be forced', () => {
+    let buildingsWithMinigames = [
+        {
+            minigameDescription: 'without minigames',
+            buildings: {},
+        },
+        {
+            minigameDescription: 'with the garden minigame',
+            buildings: {
+                'Farm': {
+                    amount: 1,
+                    level: 1,
+                },
+            },
+        },
+        {
+            minigameDescription: 'with the pantheon minigame',
+            buildings: {
+                'Temple': {
+                    amount: 1,
+                    level: 1,
+                },
+            },
+        },
+        {
+            minigameDescription: 'with all minigames',
+            buildings: {
+                'Farm': {
+                    amount: 1,
+                    level: 1,
+                },
+                'Bank': {
+                    amount: 1,
+                    level: 1,
+                },
+                'Temple': {
+                    amount: 1,
+                    level: 1,
+                },
+                'Wizard tower': {
+                    amount: 1,
+                    level: 1,
+                },
+            },
+        },
+    ];
+
     for(let discrepancy of [0, 1, 3, 617])
     for(let lumpCurrentType of ['normal', 'golden', 'meaty', 'caramelized'])
     for(let hasDragonsCurve of [false, true])
@@ -49,7 +95,6 @@ test.describe('Discrepancy can be forced', () => {
         let curveFactor = 1 + 0.05 * Number(hasDragonsCurve);
         let overripeAge = 23 * 3600*1000/curveFactor + 3600*1000;
         let expectedLumpT = 1.6e12 + overripeAge * offlineDays + discrepancy;
-
 
         let paramsDescription = '(' +
             'target discrepancy: ' + discrepancy + ', ' +
@@ -69,17 +114,24 @@ test.describe('Discrepancy can be forced', () => {
             await page.close();
         });
 
-        test('via CConnoisseur.setupDiscrepancy ' + paramsDescription, async ({browser}) => {
-            let page = await openCookieClickerPage(browser, {
-                mockedDate: 1.6e12 + 86400*1000 * offlineDays + 1,
+        for(let {minigameDescription, buildings} of buildingsWithMinigames) {
+            let description = 'via CConnoisseur.setupDiscrepancy, ' +
+                minigameDescription + ' ' + paramsDescription;
+            test(description, async ({browser}) => {
+                let page = await openCookieClickerPage(browser, {
+                    mockedDate: 1.6e12 + 86400*1000 * offlineDays + 1,
+                    saveGame: {
+                        buildings,
+                    },
+                });
+                await page.evaluate(({saveGame, discrepancy}) => {
+                    CConnoisseur.setupDiscrepancy(discrepancy);
+                    Game.LoadSave(saveGame);
+                }, {saveGame, discrepancy});
+                let actualLumpT = await page.evaluate(() => Game.lumpT);
+                expect(actualLumpT).toEqual(expectedLumpT);
+                await page.close();
             });
-            await page.evaluate(({saveGame, discrepancy}) => {
-                CConnoisseur.setupDiscrepancy(discrepancy);
-                Game.LoadSave(saveGame);
-            }, {saveGame, discrepancy});
-            let actualLumpT = await page.evaluate(() => Game.lumpT);
-            expect(actualLumpT).toEqual(expectedLumpT);
-            await page.close();
-        });
+        }
     }
 });

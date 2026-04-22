@@ -205,7 +205,7 @@ On the other hand,
 if the theoretical new value of `Game.lumpT`
 is calculated by [a lump planner](https://github.com/staticvariablejames/ChooseYourOwnLump),
 having a discrepancy value different from the discrepancy used in calculation
-will make the player miss out on the chosen lump
+will make the player miss out on the predicted lump
 (as lump types computed with different discrepancy values are essentially random).
 
 Note that **the discrepancy bug has no visible effect for players who are not savescumming**,
@@ -272,15 +272,31 @@ in the following order:
 **Inside `Game.LoadSave` but before `Game.loadLumps`**
 the game calls `Date.now()` a few more times:
 
+- If `Game.Objects['Farm'].minigame` is loaded,
+  then `Game.Objects['Farm'].minigame.reset(true)` is executed,
+  which calls `Date.now()` three times.
+  - As [mentioned above](#the-pantheon-does-not-load-in-time),
+    minigames are never loaded on loading from localStorage,
+    so this may only happen when loading from a file.
+
+- If `Game.Objects['Temple'].minigame` is loaded,
+  then `Game.Objects['Temple'].minigame.reset(true)` is executed,
+  which calls `Date.now()` once.
+  - Again, this may only happen when loading from a file.
+
 - One time per tiered building achievement awarded.
   - Awarding an achievement via `Game.Win` triggers a notification via `Game.Notify`,
     which creates a note whose creation date is populated with a single `Date.now()` call.
-  - On load, the game awards tiered building achievements
-    (awarded for reaching thresholds of amount of each building owned).
+  - On load, the game calls the method `buyFunction` for all buildings.
+    This method in turn calls `Game.UnlockTiered`,
+    which (among other things) award the tiered achievements
+    for reaching thresholds of aumount of each building owned.
+    (Exception: `Game.Objects.Cursors.buyFunction`
+    awards the achievements directly, without using `Game.UnlockTiered`.)
     Each achievement won triggers one call to `Game.Notify`.
   - Typically these achievements should only be awarded on `Game.LoadSave`
     if the player has updated their game,
-    or from manufactured saves (like the ones produced by Cookie Connoisseur).
+    or from edited/manufactured saves (like the ones produced by Cookie Connoisseur).
 
 - 1 time to calculate `framesElapsed`,
   used to update `Game.pledgeT`, `Game.seasonT`, and `Game.researchT`.
@@ -350,11 +366,13 @@ Forcing the discrepancy when loading from a save file
 "Loading from a save file" means running `Game.LoadSave(save)` after the game has loaded.
 In this case,
 if the given save file would not earn any achievements upon load,
-and also does not own Century egg,
-then we know there are exactly three `Date.now()` calls before reaching the first poisoned line,
-then the `Date.now()` call from the poisoned line,
-then between two and four calls between the poisoned lines,
-and finally the `Date.now()` call from the second poisoned line.
+does not own Century egg,
+and also the _previous_ save files did not have any minigames loaded,
+then we know the sequence of calls:
+1. Exactly three `Date.now()` calls before reaching the first poisoned line.
+2. The `Date.now()` call from the poisoned line.
+3. Between two and four calls between the poisoned lines.
+4. Finally, the `Date.now()` call from the second poisoned line.
 
 Cookie Connoisseur's solution is to simply count the number of calls to `Date.now()`
 and return appropriately rigged timestamps.
@@ -379,6 +397,23 @@ regardless of the type and how many lumps were autoharvested,
 the second poisoned line uses the value `baseTimestamp + 3`.
 As analyzed above,
 this forces the discrepancy to be exactly 3.
+
+Handling minigames
+------------------
+
+In theory the interface to `CConnoisseur.setupDiscrepancy`
+could also include parameters to inform Cookie Connoisseur how many achievements
+would be unlocked upon loading the save,
+and whether the player owns Century egg,
+but I thought it is simpler to just demand that no achievements be earned
+and that Century egg is not owned.
+
+But whether minigames are loaded or not
+_can_ be decided when `CConnoisseur.setupDiscrepancy` is called.
+So, if `Game.Objects['Farm'].minigame.reset` is defined,
+Cookie Connoisseur simply adds 3 to the number of expected calls to `Date.now()`,
+and similar if `Game.Objects['Temple'].minigame.reset` is defined.
+This means that `CConnoisseur.setupDiscrepancy` also works if minigames are loaded.
 
 Predictably-spaced calls to `Date.now()`
 ----------------------------------------
