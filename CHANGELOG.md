@@ -6,12 +6,17 @@
 - Added: functions `CConnoisseur.setupDiscrepancy` and `CConnoisseur.forceDateNowSpacing`.
 - Added: In `CCSave.fromObject`,
     the `.achievements` attribute may be just the string `'all'`.
-- Fixed: Pretty-printer of `npx cookie-connoisseur native-to-json`
+- Added: The function `CCSave.fromObject` now sets `.cookiesEarned` to `.cookies`
+    if the former is not present,
+    and simisarly for `.lumpsTotal` and `.lumps`.
+- Fixed: The pretty-printer of `npx cookie-connoisseur native-to-json`
     now properly handles stocks from the last two buildings.
 - **Removed**: function `CConnoisseur.gainLumps`.
     Instead,
     either use the attribute `CCPageOptions.saveGame.lumps`,
     or run `Game.Earn(1e9)` to unlock lumps and then `Game.gainLumps` to gain them.
+- (internal) Added: file `doc/discrepancy.md`,
+    which extensively documents the discrepancy bug and how Cookie Connoisseur forces it.
 
 ## 0.4.0 - 2026-03-21
 - **Breaking change**: Cookie Connoisseur now downloads and uses the game files
