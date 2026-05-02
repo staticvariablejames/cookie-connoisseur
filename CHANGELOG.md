@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## 0.4.1 - 2026-05-01
 - Added: `forceDiscrepancy` option for `openCookieClickerPage`.
 - Added: functions `CConnoisseur.setupDiscrepancy` and `CConnoisseur.forceDateNowSpacing`.
 - Added: In `CCSave.fromObject`,
