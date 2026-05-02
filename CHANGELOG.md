@@ -9,7 +9,7 @@
     the `.achievements` attribute may be just the string `'all'`.
 - Added: The function `CCSave.fromObject` now sets `.cookiesEarned` to `.cookies`
     if the former is not present,
-    and simisarly for `.lumpsTotal` and `.lumps`.
+    and similarly for `.lumpsTotal` and `.lumps`.
 - Fixed: The pretty-printer of `npx cookie-connoisseur native-to-json`
     now properly handles stocks from the last two buildings.
 - **Removed**: function `CConnoisseur.gainLumps`.
